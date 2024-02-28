@@ -1,0 +1,2 @@
+(()=>{"use strict";if(sessionStorage.getItem("register-attempt")){const r='<input type="hidden" name="return_to" value="/account">';(e=".shopify-challenge__container form",(t||document).querySelector(e)).insertAdjacentHTML("afterbegin",r),sessionStorage.removeItem("register-attempt")}var e,t})();
+//# sourceMappingURL=challenge.js.map

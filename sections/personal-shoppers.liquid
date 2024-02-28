@@ -1,0 +1,58 @@
+<div>
+  {% if section.settings.image != blank %}
+    <div class="text-image__image">
+      {% render "render-image"
+        title: section.settings.image.alt,
+        img: section.settings.image,
+        size: "300 400 500 600 700 800 900 1000",
+        alt: section.settings.image.alt
+      %}
+    </div>
+  {% endif %}
+</div>
+
+<div class="wrapper-m">
+  {% if section.settings.subtitle != blank %}
+    <h2 class="h4 text-image__subtitle">
+      {{ section.settings.subtitle }}
+    </h2>
+  {% endif %}
+
+  {% if section.settings.description != blank %}
+    <div class="text-image__description">
+      {{ section.settings.description }}
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Personal shoppers",
+  "class": "text-image",
+  "tag": "section",
+  "templates": [
+    "customers/account"
+  ],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "It is the main section image"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "info": "It is the section subtitle"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "info": "It is the section description",
+      "default": "<p>Nous sommes à votre disposition pour offrir à vos articles une seconde vie à la hauteur de vos attentes. Pour cela, nous avons établi les 5 conseils et astuces pour assurer une vente rapide et efficace de vos articles.</p>"
+    }
+  ]
+}
+{% endschema %}

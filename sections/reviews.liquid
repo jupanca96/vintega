@@ -1,0 +1,172 @@
+{%- assign number_review_show = 16 -%}
+
+{% if section.settings.icon %}
+  {%- assign slider_class = 'reviews__slider' -%}
+{% else %}
+  {%- assign slider_class = 'reviews__slider reviews__slider--no-icon' -%}
+{% endif %}
+
+{% if section.blocks.size <= 1 %}
+  {%- assign slider_class = slider_class | append: ' unique-slide' -%}
+{% endif %}
+
+<div class="reviews__header">
+  {% if section.settings.title %}
+    <span class="reviews__title h2 headings-home wrapper-s">
+      {{ section.settings.title }}
+    </span>
+  {% endif %}
+</div>
+
+{% capture review %}
+  {% for block in section.blocks limit: number_review_show %}
+    {% if
+      block.settings.description != blank and block.settings.author != blank
+    %}
+      <div
+        class="swiper-slide"
+        data-swiper-autoplay="{{ section.settings.slider_delay }}"
+      >
+        <div class="reviews__single">
+          <!-- eslint-disable-next-line @html-eslint/require-closing-tags -->
+          <p
+            class="reviews__single-description"
+          >
+            {{ block.settings.description
+              | remove: '<p>'
+              | remove: '</p>'
+            }}
+          </p>
+
+          <p class="reviews__single-author">
+            {{ block.settings.author }}
+          </p>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+
+{% render 'slider',
+  wrapper: slider_class
+  content: review,
+  pagination: true,
+  autoplay: section.settings.slider_autoplay
+%}
+
+<div
+  class="trustpilot-widget"
+  data-locale="fr-FR"
+  data-template-id="5419b637fa0340045cd0c936"
+  data-businessunit-id="64807e2d02bb3df0a63d9661"
+  data-style-height="20px"
+  data-style-width="100%"
+  data-theme="light">
+  <a
+    href="https://fr.trustpilot.com/review/vintega.com"
+    target="_blank"
+    rel="noopener">Trustpilot</a>
+</div>
+
+{% if section.settings.icon_letter != blank %}
+  {% assign image = section.settings.icon_letter | append: '.svg' | file_url %}
+
+  {% render "letter-icon"
+    image: image,
+    position: 'top-left',
+    width: "200",
+    height: "271"
+  %}
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Reviews section",
+    "class": "reviews wrapper section-space",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "LEURS AVIS"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon",
+        "label": "Main Review Icon",
+        "info": "Size: 107x50px"
+      },
+      {
+        "type": "url",
+        "id": "trustlink",
+        "label": "Link of trustpilot",
+        "default": "/"
+      },
+      {
+        "type": "text",
+        "id": "icon_letter",
+        "label": "Letter Icon stamp",
+        "info": "Only SVG format",
+        "default": "letter-stamp-rose"
+      },
+      {
+        "type": "header",
+        "content": "Slider settings"
+      },
+      {
+        "type": "number",
+        "id": "slider_delay",
+        "label": "Slider delay",
+        "default": 3000,
+        "info": "Format to seconds: 1000 is a one second, 500 half second."
+      },
+      {
+        "type": "checkbox",
+        "id": "slider_autoplay",
+        "label": "Slider autoplay",
+        "default": false,
+        "info": "This setting work for two slides or more slides"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "review",
+        "name": "Review Block",
+        "settings": [
+          {
+            "type": "text",
+            "id": "author",
+            "label": "Author",
+            "default": "Anonymous"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description",
+            "default": "<p>Pellentesque tellus ante, posuere sed diam vel, mattis cursus diam.</p>"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Reviews section",
+        "blocks": [
+          {
+            "type": "review"
+          },
+          {
+            "type": "review"
+          },
+          {
+            "type": "review"
+          },
+          {
+            "type": "review"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

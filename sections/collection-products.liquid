@@ -1,0 +1,153 @@
+{% if collection.products_count > 0 %}
+  <div class="collection">
+    {% render 'filters-component'
+      type: 'collection'
+      section: section
+    %}
+
+    <div class="collection__products-grid">
+      <div id="js-filter-rendering">
+
+        <div class="collection__products-count-wrapper">
+          <button
+            type="button"
+            class="btn-2"
+            id="filter-open"
+          >
+            {% render 'icon-filter' %}
+            {{ 'products.facets.filter_and_sort' | t }}
+          </button>
+
+          {% render 'filters-applied' %}
+
+          {% render 'sorting' type: 'collection' %}
+
+        </div>
+
+        {% paginate collection.products by section.settings.pagination %}
+          {% liquid
+            assign filter_value_url_join = ''
+            assign sort_by = collection.sort_by | default: collection.default_sort_by
+
+            for filter in collection.filters
+              for filter_value in filter.values
+                if filter_value.active == true
+                  assign filter_value_url_join = filter_value.url_to_add | append: '&'
+                endif
+              endfor
+            endfor
+
+            assign filter_value_url_join = filter_value_url_join | split: collection.url
+            assign filter_value_url_join = filter_value_url_join | last
+
+            if filter_value_url_join == blank or filter_value_url_join == '[]'
+              assign filter_value_url_join = '?sort_by=' | append: sort_by
+            else
+              assign filter_value_url_join = filter_value_url_join | append: '&sort_by=' | append: sort_by
+            endif
+          %}
+
+            <div id="list-products">
+              <div class="item-list">
+                {% for product in collection.products %}
+                  {% render 'banner-collection-promo'
+                    forloop: forloop
+                    collection: collection
+                  %}
+
+                  {% render 'product-card'
+                    product: product,
+                    is_simple: true
+                  %}
+                {% endfor %}
+              </div>
+
+
+              {% render 'infinity-scroll'
+                container: ".item-list",
+                item: ".product-card",
+                page_current: paginate.current_page,
+                section_render: "collection-products",
+                current_url: collection.url,
+                current_url_filters: filter_value_url_join
+              %}
+            </div>
+
+        {% endpaginate %}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="search__empty">
+    <h2 class="search__empty-title">
+      {{ 'templates.search.empty_state' | t }}
+    </h2>
+
+    <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" class="btn-2 collection-filters__remove js-remove-filter">
+      {{ 'products.facets.clear_all' | t }}
+    </a>
+  </div>
+{% endif %}
+
+<script>
+  const collections = {{ collection.products | json }}
+</script>
+
+{% schema %}
+{
+  "name": "Products in collection",
+  "tag": "section",
+  "class": "js-empty-state collection__container wrapper-without-limit",
+  "settings": [
+    {
+      "type": "range",
+      "id": "pagination",
+      "label": "Products by page",
+      "unit": "Pr",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "default": 48
+    },
+    {
+      "type": "text",
+      "id": "custom_acc_title",
+      "label": "Title of custom filters",
+      "default": "Collection du moment"
+    },
+    {
+      "type": "checkbox",
+      "id": "accordion_open",
+      "label": "Accordion manage toggle",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "all_closed",
+      "label": "Every accordion opened",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "accordion_open_position",
+      "label": "Open accordion by position",
+      "default": "1,4,5",
+      "info": "Put positions accordions that you want to keep open and separte with: ','. ex: 1,4,5"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "custom-filters",
+      "name": "Custom filter",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Add collection"
+        }
+
+      ]
+    }
+  ]
+}
+{% endschema %}

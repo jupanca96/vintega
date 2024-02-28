@@ -1,0 +1,68 @@
+{% comment %}
+  Renders slide component
+
+  Accepts:
+  - content: {Html} Internal sliders **init with for (iteration)
+
+  NOTE: In <content> use className "swiper-slide" in the first item
+
+  Usage:
+  {% render 'slider-upsell',
+    content: snippet_content,
+  %}
+{% endcomment %}
+
+<div class="cart-upsell-container wrapper__slider">
+  <!-- Slider main container -->
+  <div
+    id="slider_{{ section.id }}"
+    class="swiper {{ class }} slider_upsell"
+  >
+    <!-- Additional required wrapper -->
+    <div class="swiper-wrapper">
+      <!-- Slides from props snippet -->
+      {{ content }}
+    </div>
+
+    {% if pagination %}
+      <div
+        data-id="slider_{{ id | default: section.id }}"
+        class="swiper-pagination"
+      >
+      </div>
+    {% endif %}
+  </div>
+
+  {% if type == "vertical" %}
+    <button
+      type="button"
+      data-slider="upsell"
+      class="swiper-button swiper-vertical-button-prev"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+    <button
+      type="button"
+      data-slider="upsell"
+      class="swiper-button  swiper-vertical-button-next"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+  {% elsif type == "horizontal" %}
+    <button
+      type="button"
+      data-slider="upsell"
+      class="swiper-button  swiper-button-prev"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+    <button
+      type="button"
+      data-slider="upsell"
+      class="swiper-button  swiper-button-next"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+  {% endif %}
+
+</div>

@@ -1,0 +1,189 @@
+{%- comment -%}
+This snippet structures the micro-data using JSON-LD specification. Please note that for Product especially,
+the schema often changes. We try to output as much info as possible, but Google may add new requirements over time,
+or change the format of some info
+{%- endcomment -%}
+
+{%- if request.page_type == 'product' -%}
+  {%- assign days_product_price_valid_until = 10 | times: 86400 -%}
+
+  {%- assign gtin_option = 'gtin' -%}
+  {%- if product.selected_or_first_available_variant.barcode != blank -%}
+    {%- assign is_barcode_available = true -%}
+    {%- assign gtin_string_length = product.selected_or_first_available_variant.barcode | size -%}
+
+    {%- if gtin_string_length == 8 or gtin_string_length == 12 or gtin_string_length == 13 or gtin_string_length == 14 -%}
+      {%- assign is_valid_gtin_length = true -%}
+      {%- assign gtin_option = gtin_option | append: gtin_string_length -%}
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- capture main_entity_microdata -%}
+    <ls-static-723380>"@type": "Product",
+    "offers": [</ls-static-723380>
+      {%- for variant in product.variants -%}
+        <ls-static-474372>{
+          "@type": "Offer",
+          "name":</ls-static-474372> {{ variant.title | json }}<ls-static-208743>,
+          "availability":</ls-static-208743> {%- if variant.available -%}<ls-static-713107>"https://schema.org/InStock"</ls-static-713107>{%- else -%}<ls-static-773351>"https://schema.org/OutOfStock"</ls-static-773351>{%- endif -%}<ls-static-81710>,
+          "price":</ls-static-81710> {{ variant.price | divided_by: 100.0 | json }}<ls-static-952021>,
+          "priceCurrency":</ls-static-952021> {{ shop.currency | json }}<ls-static-868487>,
+          "priceValidUntil": "</ls-static-868487>{{ 'now' | date: '%s' | plus: days_product_price_valid_until | date: '%Y-%m-%d'}}",
+          {%- if variant.sku != blank -%}
+            <ls-static-989641>"sku":</ls-static-989641> {{ variant.sku | json }},
+          {%- endif -%}
+          <ls-static-164924>"url": "</ls-static-164924>{{ request.path }}{{ variant.url }}"
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ],
+    {%- if is_barcode_available and is_valid_gtin_length %}
+      "{{gtin_option}}": {{ product.selected_or_first_available_variant.barcode | json }}<ls-static-12105>,
+      "productId":</ls-static-12105> {{ product.selected_or_first_available_variant.barcode | json }},
+    {%- elsif is_barcode_available %}
+      <ls-static-668534>"mpn":</ls-static-668534> {{ product.selected_or_first_available_variant.barcode | json }}<ls-static-614164>,
+      "productId":</ls-static-614164> {{ product.selected_or_first_available_variant.barcode | json }},
+    {%- endif %}
+    <ls-static-7650>"brand": {
+      "name":</ls-static-7650> {{ product.vendor | json }}
+    <ls-static-916020>},
+    "name":</ls-static-916020> {{ product.title | json }}<ls-static-335028>,
+    "description":</ls-static-335028> {{ product.description | strip_html | json }}<ls-static-966006>,
+    "category":</ls-static-966006> {{ product.type | json }}<ls-static-795037>,
+    "url": "</ls-static-795037>{{ request.path }}{{ product.url }}<ls-static-788829>",
+    "sku":</ls-static-788829> {{ product.selected_or_first_available_variant.sku | json }}<ls-static-43130>,
+    "image": {
+      "@type": "ImageObject",
+      "url": "https:</ls-static-43130>{% comment ls-rpl %}{{ product.featured_media | img_url: '1024x' }}{% endcomment %}{%- capture LS_IMG_URL -%}{%- render "ls-img-url", image: product.featured_media, img_url: '1024x' -%}{%- endcapture -%}{{ LS_IMG_URL }}{% comment /ls-rpl %}{% endcomment %}<ls-static-435188>",
+      "image": "https:</ls-static-435188>{% comment ls-rpl %}{{ product.featured_media | img_url: '1024x' }}{% endcomment %}{%- capture LS_IMG_URL -%}{%- render "ls-img-url", image: product.featured_media, img_url: '1024x' -%}{%- endcapture -%}{{ LS_IMG_URL }}{% comment /ls-rpl %}{% endcomment %}<ls-static-176733>",
+      "name":</ls-static-176733> {% comment ls-rpl %}{{ product.featured_media.alt | json }}{% endcomment %}{%- capture LS_ALT -%}{%- render "ls-alt", image: product.featured_media -%}{%- endcapture -%}{{ LS_ALT | json }}{% comment /ls-rpl %}{% endcomment %}<ls-static-190490>,
+      "width": "1024",
+      "height": "1024"
+    }</ls-static-190490>
+  {%- endcapture -%}
+{%- elsif request.page_type == 'article' -%}
+  {%- capture main_entity_microdata -%}
+    <ls-static-698849>"@type": "BlogPosting",
+    "mainEntityOfPage": "</ls-static-698849>{{ article.url }}<ls-static-130068>",
+    "articleSection":</ls-static-130068> {{ blog.title | json }}<ls-static-858228>,
+    "keywords": "</ls-static-858228>{% comment ls-rpl %}{{ article.tags | join: ', ' }}{% endcomment %}{%- capture LS_TAGS -%}{%- render "ls-tags", resource: article, tags: article.tags -%}{%- endcapture -%}{%- assign LS_TAGS = LS_TAGS | split: "," -%}{{ LS_TAGS | join: ', ' }}{% comment /ls-rpl %}{% endcomment %}<ls-static-415423>",
+    "headline":</ls-static-415423> {{ article.title | json }}<ls-static-913699>,
+    "description":</ls-static-913699> {{ article.excerpt_or_content | strip_html | truncatewords: 25 | json }}<ls-static-353662>,
+    "dateCreated": "</ls-static-353662>{{ article.created_at | date: '%Y-%m-%dT%T' }}<ls-static-552278>",
+    "datePublished": "</ls-static-552278>{{ article.published_at | date: '%Y-%m-%dT%T' }}<ls-static-884060>",
+    "dateModified": "</ls-static-884060>{{ article.published_at | date: '%Y-%m-%dT%T' }}<ls-static-288184>",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https:</ls-static-288184>{% comment ls-rpl %}{{ article.image | img_url: '1024x' }}{% endcomment %}{%- capture LS_IMG_URL -%}{%- render "ls-img-url", image: article.image, img_url: '1024x' -%}{%- endcapture -%}{{ LS_IMG_URL }}{% comment /ls-rpl %}{% endcomment %}<ls-static-325643>",
+      "image": "https:</ls-static-325643>{% comment ls-rpl %}{{ article.image | img_url: '1024x' }}{% endcomment %}{%- capture LS_IMG_URL -%}{%- render "ls-img-url", image: article.image, img_url: '1024x' -%}{%- endcapture -%}{{ LS_IMG_URL }}{% comment /ls-rpl %}{% endcomment %}<ls-static-799852>",
+      "name":</ls-static-799852> {% comment ls-rpl %}{{ article.image.alt | json }}{% endcomment %}{%- capture LS_ALT -%}{%- render "ls-alt", image: article.image -%}{%- endcapture -%}{{ LS_ALT | json }}{% comment /ls-rpl %}{% endcomment %}<ls-static-74433>,
+      "width": "1024",
+      "height": "1024"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "</ls-static-74433>{{ article.user.first_name | escape }} {{ article.user.last_name | escape }}<ls-static-306895>",
+      "givenName":</ls-static-306895> {{ article.user.first_name | json }}<ls-static-541653>,
+      "familyName":</ls-static-541653> {{ article.user.last_name | json }}
+    <ls-static-736256>},
+    "publisher": {
+      "@type": "Organization",
+      "name":</ls-static-736256> {{ shop.name | json }}
+    <ls-static-570639>},
+    "commentCount":</ls-static-570639> {{ article.comments_count }}<ls-static-305224>,
+    "comment": [</ls-static-305224>
+      {%- for comment in article.comments limit: 5 -%}
+        <ls-static-934569>{
+          "@type": "Comment",
+          "author":</ls-static-934569> {{ comment.author | json }}<ls-static-25706>,
+          "datePublished": "</ls-static-25706>{{ comment.created_at | date: '%Y-%m-%dT%T' }}<ls-static-38588>",
+          "text":</ls-static-38588> {{ comment.content | json }}
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- capture breadcrumb_entity_microdata -%}
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": {{ 'general.breadcrumb.home' | t | json }},
+      "item": "{{ shop.url }}"
+    }
+
+    {%- if request.page_type == 'product' -%}
+      {%- if collection -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ collection.title | json }},
+          "item": "{{ shop.url }}{{ collection.url }}"
+        }, {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url | within: collection }}"
+        }
+      {%- else -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- endif -%}
+    {%- elsif request.page_type == 'collection' -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ collection.title | json }},
+          "item": "{{ shop.url }}{{ collection.url }}"
+        }
+    {%- elsif request.page_type == 'blog' -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ blog.title | json }},
+          "item": "{{ shop.url }}{{ blog.url }}"
+        }
+    {%- elsif request.page_type == 'article' -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ blog.title | json }},
+          "item": "{{ shop.url }}{{ blog.url }}"
+        }, {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ blog.title | json }},
+          "item": "{{ shop.url }}{{ article.url }}"
+        }
+    {%- elsif request.page_type == 'page' -%}
+       ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ page.title | json }},
+          "item": "{{ shop.url }}{{ page.url }}"
+        }
+    {%- endif -%}
+  ]
+{%- endcapture -%}
+
+{% if main_entity_microdata != blank %}
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    {{ main_entity_microdata }}
+  }
+  </script>
+{% endif %}
+
+{% if breadcrumb_entity_microdata != blank %}
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    {{ breadcrumb_entity_microdata }}
+  }
+  </script>
+{% endif %}

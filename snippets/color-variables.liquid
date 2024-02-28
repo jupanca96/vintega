@@ -1,0 +1,34 @@
+<!-- eslint-disable max-len -->
+{% style %}
+  :root {
+    --color-base-principal: rgba({{ settings.colors_brand.red }}, {{ settings.colors_brand.green }}, {{ settings.colors_brand.blue }});
+    --color-base-secondary: rgba({{ settings.colors_secondary.red }}, {{ settings.colors_secondary.green }}, {{ settings.colors_secondary.blue }});
+    --color-base-accent-1: {{ settings.colors_accent_1 }};
+    --color-base-accent-2: {{ settings.colors_accent_2 }};
+    --color-base-accent-3: {{ settings.colors_accent_3 }};
+
+    --color-base-text: {{ settings.colors_txt }};
+    --color-base-title: {{ settings.colors_title }};
+    --color-base-bg: {{ settings.colors_bg_1 }};
+    --color-base-bg-2: {{ settings.colors_bg_2 }};
+    --color-base-link: {{ settings.colors_link }};
+
+    --color-btn-color-1: {{ settings.colors_btn_color_1 }};
+    --color-btn-bg-1: {{ settings.colors_btn_bg_1 }};
+    --color-btn-border-1: {{ settings.colors_btn_border_1 }};
+
+    --color-active: {{ settings.color_active }};
+
+    --color-btn-color-2: {{ settings.colors_btn_color_2 }};
+    --color-btn-bg-2: {{ settings.colors_btn_bg_2 }};
+    --color-btn-border-2: {{ settings.colors_btn_border_2 }};
+
+    --color-btn-color-hover: {{ settings.colors_btn_color_hover }};
+    --color-btn-bg-hover: {{ settings.colors_btn_bg_hover }};
+    --color-btn-border-hover: {{ settings.colors_btn_border_hover }};
+
+    --icon-caret: url('{{ 'icon-caret-dark.svg' | asset_url }}');
+    --icon-caret-blue: url('{{ 'icon-caret-blue.svg' | asset_url }}');
+    --icon-check: url('{{ 'icon-check.svg' | asset_url }}');
+  }
+{% endstyle %}

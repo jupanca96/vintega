@@ -1,0 +1,145 @@
+{% liquid
+  assign link_text = section.settings.empty_btn_text
+  assign link_url = section.settings.empty_btn_url
+  assign empty_complement = section.settings.empty_complement
+  assign title = 'sections.cart.title' | t
+  assign cart_remove = 'sections.cart.delete' | t
+  assign shipping_info = 'sections.cart.taxes_and_shipping_at_checkout' | t
+  assign empty_msg = 'sections.cart.empty' | t
+
+  assign vertical_upsell = false
+  assign all_collection =  section.settings.upsell_collection
+
+  if section.settings.upsell_collection == blank
+    assign all_collection = collections['all']
+  endif
+%}
+
+<span
+  class="cart__max-quantity"
+  data-active="false"
+>
+  {{ 'sections.cart.cart_quantity_error_html' | t: quantity: 1 }}
+</span>
+
+<div
+  id="side-cart"
+  data-upsell-direction="{{ vertical_upsell }}"
+  class="cart"
+  data-template="{{ template }}"
+>
+  <div class="cart-wrapper">
+    {% render 'cart-header'
+      cart: cart,
+      title: title,
+      limit_price: section.settings.limit_price,
+      progressbar_title: section.settings.progressbar_title,
+      text_free_shipping: section.settings.free_shipping
+    %}
+
+    {% render 'cart-items'
+      cart: cart,
+      cart_empty_message: empty_msg,
+      empty_complement: empty_complement,
+      empty_btn_text: link_text,
+      empty_btn_url: link_url,
+      cart_remove: cart_remove
+    %}
+
+    {% render 'cart-upsell'
+      cart: cart,
+      default_collection: all_collection
+      title: section.settings.upsell_title,
+      class_slider: 'slider_upsell',
+      limit: section.settings.upsell_limit
+    %}
+
+    {% render 'cart-discount' cart: cart %}
+
+    {% render 'cart-footer'
+      cart: cart,
+      shipping_info: shipping_info
+    %}
+  </div>
+</div>
+
+
+{%- comment -%}
+
+  IF YOU NEED PROGRESS BAR SCHEMA
+
+  {
+    "type": "header",
+    "content": "Progress bar configuration"
+  },
+  {
+    "type": "text",
+    "id": "progressbar_title",
+    "label": "Progress bar title",
+    "default": "Plus que [value] pour avoir la réduction de 10%"
+  },
+  {
+    "type": "text",
+    "id": "free_shipping",
+    "label": "Text free shipping",
+    "default": "sa livraison gratuite"
+  },
+  {
+    "type": "number",
+    "id": "limit_price",
+    "label": "Limit price €",
+    "default": 100
+  }
+
+{%- endcomment -%}
+
+{% schema %}
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Upsell configuration"
+      },
+      {
+        "type": "text",
+        "id": "upsell_title",
+        "label": "Upsell title",
+        "default": "CELA POURRAIT VOUS INTÉRESSER..."
+      },
+      {
+        "type": "collection",
+        "id": "upsell_collection",
+        "label": "Products upsell"
+      },
+      {
+        "type": "number",
+        "id": "upsell_limit",
+        "label": "Products limit in upsell",
+        "default": 16
+      },
+      {
+        "type": "header",
+        "content": "General configuration"
+      },
+      {
+        "type": "richtext",
+        "id": "empty_complement",
+        "label": "Empty complement text",
+        "default": "<p>Trouvez dès maintenant votre nouvel article préféré parmi une large gamme  de vêtements de créateurs exclusifs.</p>"
+      },
+      {
+        "type": "text",
+        "id": "empty_btn_text",
+        "label": "Empty button text",
+        "default": "VOIR TOUTE LA BOUTIQUE"
+      },
+      {
+        "type": "url",
+        "id": "empty_btn_url",
+        "label": "Empty button url",
+        "default": "/"
+      }
+    ]
+  }
+{% endschema %}

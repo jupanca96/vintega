@@ -1,0 +1,308 @@
+{% comment %}
+  Renders menu mobil
+  Accepts:
+  - linklistsAll: Array menu current
+
+  Usage:
+  {% render 'site-nav-mobil'
+    linklistsAll: linklists[linklist]
+    open_first_element: open_first_element
+  %}
+{% endcomment %}
+
+<ul
+  id="nav-list-movil-js"
+  data-event="mouseenter"
+  class="menu-mobil"
+  data-toggle="true"
+  data-active="false"
+>
+  <button
+    type="button"
+    class="burger-nav burger-nav-js"
+    aria-label="menu"
+  >
+    {% render 'icon-close' %}
+  </button>
+
+  {%- assign items_dropdown_count = 1 -%}
+
+  {% for link in linklistsAll.links %}
+
+    {%- assign split_title = link.title | split: '[' -%}
+    {%- assign title = split_title | first -%}
+    {%- assign data_type = split_title
+      | last
+      | split: ']'
+      | first
+    -%}
+
+    {%- assign type = data_type | split: ':' | first -%}
+
+    {%- assign title = link.title -%}
+
+    {% if link.links != blank %}
+
+      {% liquid
+        assign split_title = link.title | split: '['
+        assign title = split_title | first
+
+        if items_dropdown_count == 1 and open_first_element
+          assign first_element = true
+        else
+          assign first_element = false
+        endif
+      %}
+
+      <li
+        class="nav-item nav-item-js
+        {% if title contains 'blue' %} nav-item--blue {% endif %}"
+      >
+        <button
+          type="button"
+          class="button-dropdown-js"
+          data-active="{{ first_element }}"
+        >
+          <span>{{ title | replace: '|blue', '' }}</span>
+          {% render 'icon-caret' %}
+        </button>
+
+        <div class="dropdown">
+          <div>
+            <ul>
+              {% for childlink in link.links %}
+                {% if childlink.links != blank %}
+                  {% assign title_child_one = childlink.title
+                    | remove: ']'
+                    | split: '['
+                    | first
+                  %}
+
+                    <ul class="child-list-mobil">
+                        <div class="child-title">{{ title_child_one }}</div>
+                      {% for grandchildlink in childlink.links %}
+
+                        {%- assign title_alternate = grandchildlink.title
+                          | split: '['
+                          | first
+                        -%}
+
+                        <li class="item-child">
+                          <a
+                            href="{{ grandchildlink.url }}"
+                          >
+                            {{ title_alternate }}
+                          </a>
+                        </li>
+                      {% endfor %}
+
+                    </ul>
+                  {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      {%- assign items_dropdown_count = items_dropdown_count | plus: 1 -%}
+    {%- else -%}
+      {% if link.link != blank %}
+
+        {% liquid
+          assign split_title = link.title | split: '['
+          assign title = split_title | first
+
+          if items_dropdown_count == 1 and open_first_element
+            assign first_element = true
+          else
+            assign first_element = false
+          endif
+        %}
+
+        <li
+          class="nav-item-child  nav-item-js
+          {% if title contains 'blue' %} nav-item--blue {% endif %}"
+        >
+          <a href="{{ link.link }}">
+            <button
+              type="button"
+              data-active="{{ first_element }}"
+            >
+              <span>{{ title | replace: '|blue', '' }}</span>
+            </button>
+          </a>
+        </li>
+
+        {%- assign items_dropdown_count = items_dropdown_count | plus: 1 -%}
+      {% else %}
+        {%- assign limit = split_title | last | split: ':' | last -%}
+        {%- assign data_collection = data_type | split: ':' -%}
+        {%- assign data_arr = data_collection[1] | split: ']' | first -%}
+
+        {% if type == 'blog' %}
+          {% liquid
+            if items_dropdown_count == 1 and open_first_element
+              assign first_element = true
+            else
+              assign first_element = false
+            endif
+          %}
+
+          <li
+            class="nav-item nav-item-js
+            nav-item--type-blog
+            {% if title contains 'blue' %} nav-item--blue {% endif %}"
+
+          >
+            <a href="{{ blogs[data_arr].url }}">
+              {{ blogs[data_arr].title }}
+            </a>
+
+            <button
+              type="button"
+              class="button-dropdown-js"
+              data-active="{{ first_element }}"
+            >
+              <span>{{ title | replace: '|blue', '' }}</span>
+              {% render 'icon-caret' %}
+            </button>
+            <div class="dropdown">
+              <div>
+                <ul>
+                  {% for article in blogs[data_arr].articles limit: limit %}
+                    <li>
+                      <a
+                        href="{{ article.url }}"
+                      >
+                        {{ article.title }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          {%- assign items_dropdown_count = items_dropdown_count | plus: 1 -%}
+        {% endif %}
+      {% endif %}
+
+      {% if link.title contains 'btn' %}
+        {%- assign title = link.title | split: '|' | first -%}
+
+        <li class="nav-item nav-item--btn">
+          {% render 'link'
+            type: 'btn'
+            class: "btn-1",
+            content: title,
+            url: link.url
+          %}
+        </li>
+        {% else %}
+          <li class="nav-item">
+            <a
+              href="{{ link.url }}"
+            >
+              {{ link.title }}
+            </a>
+
+            <div class="underline"></div>
+          </li>
+        {% endif %}
+
+    {%- endif -%}
+
+  {% endfor %}
+
+  <li class="nav-item">
+    <a href="{{ routes.account_url }}">
+      {{ 'customer.account.title' | t }}
+    </a>
+  </li>
+
+  <li class="nav-item nav-item--info">
+    {% if localization.available_languages.size > 1 %}
+      <div class="footer-linklist__languages">
+        <div
+          class="nav-item__lang-content"
+          id="js-localization-lang-form-header"
+        >
+          <button
+            type="button"
+            class="nav-item__lang-btn"
+            id="js-button-language"
+            aria-expanded="false"
+            aria-controls="CountryList"
+          >
+              {% assign icon_url =
+                localization.language.iso_code | append: '.svg' | file_url %}
+              {% render "render-image"
+              title: icon_alt,
+                img_src: icon_url,
+                size: "220 300 400 500",
+                alt: localization.language.endonym_name,
+                width: "100",
+                height: "100"
+              %}
+            {% comment %} Put custom {% endcomment %}
+              <span>
+                Retour au menu
+              </span>
+            {% render 'icon-caret' %}
+          </button>
+          {% form 'localization' %}
+            <ul
+              role="list"
+            >
+              {% for language in localization.available_languages %}
+                <li tabindex="-1">
+                  <a
+                    href="#"
+                    class="markets-js"
+                    {% if language.iso_code == localization.language.iso_code %}
+                      aria-current="true"
+                    {% endif %}
+                    hreflang="{{ language.iso_code }}"
+                    lang="{{ language.iso_code }}"
+                    data-value="{{ language.iso_code }}"
+                  >
+                    {% assign icon_url =
+                      language.iso_code | append: '.svg' | file_url %}
+                    {% render "render-image"
+                      title: icon_alt,
+                      img_src: icon_url,
+                      size: "220 300 400 500",
+                      alt: language.endonym_name,
+                      width: "100",
+                      height: "100"
+                    %}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+
+            <input
+              type="hidden"
+              name="language_code"
+              value="{{ localization.language.iso_code }}"
+            />
+          {% endform %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.message_url != blank
+    and section.settings.contact_text != blank %}
+      <a href="{{ section.settings.message_url }}">
+        {{ section.settings.contact_text }}
+      </a>
+    {% endif %}
+  </li>
+</ul>
+<button
+  type="button"
+  class="burger-nav burger-nav-js"
+  aria-label="menu"
+>
+  {% render 'icon-hamburger' %}
+</button>

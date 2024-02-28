@@ -1,0 +1,28 @@
+{% comment %}
+  Get searching_filter_management metaobject a validate:
+    name filter that is in metaobject is where it show input search
+
+  Use:
+    {% render 'render-filter-searching',
+      filter: filter.label.
+    %}
+
+{% endcomment %}
+
+{% liquid
+  for item in shop.metaobjects.searching_filter_management.values
+    assign metaobject_hide_input_search = item.item.value
+  endfor
+  assign metaobject_hide_input_search = metaobject_hide_input_search | downcase | strip
+  assign metaobject_hide_input_search_parse = metaobject_hide_input_search | split: '|' | uniq
+
+  assign filter_label_parse = filter.label | downcase | strip
+
+  for meta in metaobject_hide_input_search_parse
+    assign meta_parse = meta | strip | downcase
+
+    if meta_parse contains filter_label_parse
+      render 'filter-searching'
+    endif
+  endfor
+%}

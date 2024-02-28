@@ -1,0 +1,58 @@
+{% comment %}
+  Renders service snippet
+
+  Accepts:
+  - image: {Object} The image for the snippet,
+  - subtitle: {String} The subtitle for the snippet,
+  - description: {String} The description,
+  - btn_text: {String} The button text,
+  - btn_link: {String} The button url
+  - reassurence: {HTML}
+
+  Usage:
+  {% render 'service-snippet',
+    image: image,
+    subtitle: subtitle,
+    description: description,
+    btn_text: btn_text,
+    btn_link: btn_link,
+    reassurence
+  %}
+{% endcomment %}
+
+<article class="service__slide">
+    {% render "render-image"
+      class: "service__image",
+      title: "Image alt",
+      img: image,
+      size: "220 300 400 500 600 700 800 900",
+      alt: "Image alt"
+    %}
+
+  <div class="service__content">
+    {% if template.name contains 'product' %}
+      <span class="service__subtitle h3">
+        {{ subtitle }}
+      </span>
+    {% else %}
+      <h2 class="service__subtitle h3">
+        {{ subtitle }}
+      </h2>
+    {% endif %}
+
+    <div class="service__description">
+      {{ description }}
+    </div>
+
+    {% if reassurence != blank %}
+      {{ reassurence }}
+    {% endif %}
+
+    {% render 'link'
+      type: 'btn'
+      class: "btn-1 service__link",
+      content: btn_text,
+      url: btn_link
+    %}
+  </div>
+</article>

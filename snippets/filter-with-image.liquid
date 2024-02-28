@@ -1,0 +1,42 @@
+{% comment %}
+  Usage:
+    {% render 'filter-with-image',
+      setting_images: setting_images,
+      setting_image_default: setting_image_default,
+      image_alt: ''
+    %}
+{% endcomment %}
+
+{% assign files_array = setting_images | split: ';' %}
+{% assign url_file = blank %}
+{% for file_item in files_array %}
+
+  {% assign file_name_structure = file_item | split: ':' %}
+  {% assign prefix_file = file_name_structure | first | strip %}
+  {% assign prefix_file_array = prefix_file | split: '|' | uniq %}
+  {% assign image_file = file_name_structure | last | strip %}
+  {% assign filter_value_label_parse = filter_value_label | strip | downcase %}
+
+  {% for setting in prefix_file_array %}
+    {% assign meta_parse = setting | strip | downcase %}
+    {% if meta_parse == filter_value_label_parse %}
+      {% assign url_file = image_file %}
+    {% endif %}
+  {% endfor %}
+
+{% endfor %}
+
+{% if url_file != blank %}
+  {% assign url_file = url_file | file_url %}
+{% else %}
+  {% assign url_file = setting_image_default | file_url %}
+{% endif %}
+
+{% render 'render-image',
+  title: image_alt,
+  img_src: url_file,
+  size: "100",
+  alt: image_alt,
+  width: "40",
+  height: "40"
+%}

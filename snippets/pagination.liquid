@@ -1,0 +1,80 @@
+{% comment %}
+  Pagination
+
+  Accepts:
+  - paginate: {Object}
+  - anchor: {String} (optional) This can be added so that on page
+    reload it takes you to wherever you've placed your anchor tag.
+
+  Usage:
+    {% paginate results by 2 %}
+      {% render 'pagination'
+        paginate: paginate
+        anchor: '#yourID'
+      %}
+  {% endpaginate %}
+
+{% endcomment %}
+
+{%- if paginate.parts.size > 0 -%}
+  <div class="pagination">
+    <nav
+      class="pagination--nav"
+      role="navigation"
+      aria-label="{{ 'general.pagination.label' | t }}"
+    >
+      <ul role="list">
+      {%- if paginate.previous -%}
+        <li class="caret">
+          <a
+            class="caret--prev"
+            href="{{ paginate.previous.url }}{{ anchor }}"
+            aria-label="{{ 'general.pagination.previous' | t }}">
+            {% render 'icon-caret' %}
+          </a>
+        </li>
+      {%- endif -%}
+
+      {%- for part in paginate.parts -%}
+        <!-- eslint-disable max-len -->
+        <li>
+          {%- if part.is_link -%}
+            <a
+              href="{{ part.url }}{{ anchor }}"
+              aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+            >
+              {{ part.title }}
+            </a>
+          {%- else -%}
+            {%- if part.title == paginate.current_page -%}
+              <span
+                aria-current="page"
+                aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+              >
+                {{ part.title }}
+              </span>
+            {%- else -%}
+              <span>
+                {{ part.title }}
+              </span>
+            {%- endif -%}
+          {%- endif -%}
+        </li>
+        <!-- eslint-enable max-len -->
+      {%- endfor -%}
+
+      {%- if paginate.next -%}
+        <li class="caret">
+          <a
+            class="caret--next"
+            href="{{ paginate.next.url }}{{ anchor }}"
+            aria-label="{{ 'general.pagination.next' | t }}"
+          >
+            {%- render 'icon-caret' -%}
+          </a>
+        </li>
+      {%- endif -%}
+      </ul>
+    </nav>
+  </div>
+{%- endif -%}

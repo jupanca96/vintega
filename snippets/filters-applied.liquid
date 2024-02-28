@@ -1,0 +1,80 @@
+{% comment %}
+  Render filtering in collections
+
+  Usage:
+  {% render 'filtering-store' %}
+{% endcomment %}
+
+{% if type == 'search' %}
+  {% assign typePage = search %}
+{% else %}
+  {% assign typePage = collection %}
+{% endif %}
+
+{%- liquid
+  assign filter_length = 0
+  assign filter_availability = true
+
+  for filter in typePage.filters
+    for filter_value in filter.active_values
+      assign filter_length = filter_length | plus: 1
+    endfor
+
+    if filter.min_value.value != nil or filter.max_value.value != nil
+      assign filter_length = filter_length | plus: 1
+    endif
+
+    if filter.param_name == 'filter.v.availability' and filter_length == 1
+      assign filter_availability = false
+    endif
+  endfor
+-%}
+
+{%- if filter_length != 0 and filter_availability -%}
+  <div class="collection-filters__actives {% if css_class %} {{ css_class }}{% endif %}">
+
+    {%- for filter in typePage.filters -%}
+      {%- if filter.type == "price_range" -%}
+        {%- if filter.min_value.value != nil or
+          filter.max_value.value != nil
+        -%}
+          <div class="active-filters__tag">
+            {%- assign min_value = filter.min_value.value | default: 0 -%}
+            {%- assign max_value =
+              filter.max_value.value | default: filter.range_max
+            -%}
+            {{ min_value | money }} - {{ max_value | money }}
+
+            <a
+              href="{{ filter.url_to_remove }}"
+              class="active-filters__remove-filter js-remove-filter"
+              data-filter-name="{{  }}"
+            >
+              ✕
+            </a>
+          </div>
+        {%- endif -%}
+      {%- elsif filter.param_name != 'filter.v.availability' -%}
+        {%- for filter_value in filter.active_values -%}
+          <span
+            class="active-filters__tag"
+          >
+            {% if filter_value.label contains ':' %}
+              {{ filter_value.label | split: ':' | last }}
+            {% else %}
+              {{ filter_value.label }}
+            {% endif %}
+
+            <a
+              href="{{ filter_value.url_to_remove }}"
+              class="active-filters__remove-filter js-remove-filter"
+              data-filter-name="{{ filter_value.value }}"
+            >
+              ✕
+            </a>
+          </span>
+        {%- endfor -%}
+      {%- endif- %}
+    {%- endfor -%}
+  </div>
+{%- endif -%}

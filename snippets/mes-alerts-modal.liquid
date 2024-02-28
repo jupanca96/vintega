@@ -1,0 +1,59 @@
+{% comment %}
+
+  {% render 'mes-alerts-modal'
+    section: section,
+    add_btn: add_btn,
+    id: id
+  %}
+
+{% endcomment %}
+
+
+{% liquid
+  assign button_text = 'customer.login_page.sign_in' | t
+
+  if customer
+      assign title_modal = settings.modal_title_mes_alerts
+      assign description_modal = settings.modal_description_mes_alerts
+  else
+    assign title_modal = settings.modal_title_mes_alerts_notlogin
+    assign description_modal = settings.modal_description_mes_alerts_notlogin
+  endif
+%}
+
+{%- capture text_btn -%}data-text="{{ button_text }}"{%- endcapture -%}
+
+{% capture mes_alerts_form %}
+  {% if customer %}
+    {% render 'mes-alerts-form'
+      add_btn: add_btn,
+      id: id
+    %}
+  {% else %}
+    {% render 'link'
+      class: "btn-1 mes-alerts-modal__btn-login",
+      type: 'btn',
+      content: button_text,
+      url: routes.account_url,
+    %}
+
+    <div class="mes-alerts-modal__texts-login">
+      <span>
+        {{ 'customer.login_page.sign_in_suggestion' | t }}
+      </span>
+
+      <a href="{{ routes.account_register_url }}">
+        {{ 'customer.login_page.create_account' | t }}
+      </a>
+    </div>
+  {% endif %}
+{% endcapture %}
+
+{% render 'modal-description-product'
+  css_class: 'mes-alerts-modal',
+  modal_id: 'js-mes-alerts-modal',
+  modal_id_close: 'js-mes-alerts-modal-close',
+  moda_title: title_modal,
+  modal_description: description_modal,
+  grid: mes_alerts_form
+%}

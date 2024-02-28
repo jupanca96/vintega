@@ -1,0 +1,43 @@
+{% assign discountList = '' %}
+{% for tag in product.tags %}
+  {% if tag contains 'statustag' %}
+    {% assign status_tag = tag | split: '-' %}
+    {% assign status_tag = status_tag | last | split: '|' %}
+    {% assign status_tag_text = status_tag | first %}
+
+    {% if status_tag_text != blank %}
+      {% if discountList == "" %}
+        {% assign discountList = status_tag_text %}
+      {% else %}
+        {% assign discountList = discountList | append:"," | append: status_tag_text %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% unless quantity %}
+  {% assign quantity = 1 %}
+{% endunless %}
+
+<input
+  type="hidden"
+  class="meta-data"
+  data-item_id="{{ product.metafields.custom.reference }}"
+  data-item_serialcode="{{ product.metafields.custom.serial_code }}"
+  data-item_name="{{ product.title }}"
+  data-item_brand="{{ product.vendor }}"
+  data-item_category="{{ product.type }}"
+  data-item_exteriorcolor="{{ product.metafields.custom.extern_colors_filtres_.value | join: ', ' }}"
+  data-item_interiorcolor="{{ product.metafields.custom.inner_color }}"
+  data-item_exteriormaterial="{{ product.metafields.custom.extern_material.value | join: ', ' }}"
+  data-item_interiormaterial="{{ product.metafields.custom.interior_materials }}"
+  data-item_hardware="{{ item.metafields.custom.hardware }}"
+  data-item_year="{{ product.metafields.custom.year_of_production }}"
+  data-item_variant="{{ product.metafields.custom.product_condition }}"
+  data-depth="Depth: {{ product.metafields.custom.product_conditionproduct.metafields.custom.size_depth }}"
+  data-width="Width: {{ product.metafields.custom.size_width }}"
+  data-height="Height: {{ product.metafields.custom.size_height }}"
+  data-price="{{ product.price |  divided_by: 100.0 }}"
+  data-discount_type="{{ discountList }}"
+  data-quantity="{{ quantity }}">
+  

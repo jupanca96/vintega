@@ -1,0 +1,38 @@
+{% comment %}
+  {% render 'banner-collection-promo'
+    forloop: forloop
+    collection: collection
+  %}
+                desk     mobile
+    short_code: R or L|U or D|
+{% endcomment %}
+
+{% liquid
+  assign size_loop = collection.products.size
+%}
+
+{% if size_loop >= 15 %}
+  {% if forloop.index == 13 %}
+    {% if collection.metafields.custom.image_banner.value != blank
+    and collection.metafields.custom.text_and_config_banner.value != blank %}
+      {% render 'banner-collection'
+        type: 1,
+        image: collection.metafields.custom.image_banner.value,
+        text_config: collection.metafields.custom.text_and_config_banner.value
+      %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% if size_loop >= 27 %}
+  {% if forloop.index == 25 %}
+    {% if collection.metafields.custom.image_banner_2.value != blank
+      and collection.metafields.custom.text_and_config_banner_2.value != blank %}
+      {% render 'banner-collection'
+        type: 2,
+        image: collection.metafields.custom.image_banner_2.value,
+        text_config: collection.metafields.custom.text_and_config_banner_2.value
+      %}
+    {% endif %}
+  {% endif %}
+{% endif %}

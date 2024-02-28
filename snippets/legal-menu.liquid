@@ -1,0 +1,67 @@
+{%- comment -%}
+  Renders: Legal menu
+
+  Receives:
+  - blocks: {Array} It is the array of blocks for legal menu
+
+  Usage:
+  {% render 'legal-menu',
+    blocks: linklist[section.settings.menu].links
+  %}
+{%- endcomment -%}
+
+<aside class="faq-menu">
+  <nav>
+    <div
+      class="account-sidebar__mobile"
+    >
+      <select
+        name="account-select"
+        class="account-sidebar__select hidden"
+      >
+        {%- for option in blocks -%}
+          <option
+            value="{{ option.handle }}"
+            {% if option.current %}
+              selected="true"
+            {% endif %}
+          >
+            {{ option.title }}
+          </option>
+        {%- endfor -%}
+      </select>
+
+      <div
+        class="account-sidebar__options"
+        data-active="false"
+      >
+        {%- for option in blocks -%}
+          {% if option.current %}
+            {% assign current_handle = option.handle %}
+
+            <div
+              class="custom-select__selected"
+              data-id="{{ option.handle }}"
+            >
+              <span>{{ option.title }}</span>
+              {% render 'icon-caret' %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <ul
+          class="custom-select__items"
+          data-selected="{{ current_handle }}"
+        >
+          {%- for option in blocks -%}
+            {% unless option.current %}
+              <li data-id="{{ option.handle }}">
+                {{ option.title | link_to: option.url }}
+              </li>
+            {% endunless %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</aside>

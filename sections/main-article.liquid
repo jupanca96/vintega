@@ -1,0 +1,168 @@
+<div class="article">
+  <div class="article__hero">
+    <div class=" wrapper-s">
+      <div class="article__hero--image">
+        {% if article.image != null %}
+          {% assign image_url = article.image | img_url: "1440x" %}
+          {% assign image = article.image %}
+
+          {% render "render-image"
+            class: "image1",
+            img_src: image_url,
+            img: image,
+            size: "165 330 535 750 1000 1500 3000",
+            alt: image.alt
+          %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="article__hero--tags wrapper-m">
+      {% for tag in article.tags -%}
+        <div class="article__hero--tags-tag">
+          {{ tag }}
+        </div>
+      {%- endfor %}
+    </div>
+    <div class="article__hero--name wrapper-m">
+      <h1>{{ article.title }}</h1>
+    </div>
+    <div class="article__hero--date wrapper-m">
+      {{ article.published_at | date: '%d/%m/%Y' }}
+    </div>
+
+    {% if section.settings.icon_letter_right != blank %}
+      {% assign image = section.settings.icon_letter_right | append: '.svg' | file_url %}
+
+      {% render "letter-icon"
+        image: image,
+        position: 'top-left',
+        width: "200",
+        height: "271"
+      %}
+    {% endif %}
+  </div>
+
+  <div class="article__content wrapper-m section-space">
+    {% assign snippets = article.content | split: '[brl]' %}
+
+    {% for content in snippets %}
+      {% assign article_content = content %}
+
+      {% if article_content contains '[bnn]' %}
+        {% assign banner = article_content | split: '[bnn]' %}
+        {% assign banner = banner | last | split: '[/bnn]' %}
+        {% assign banner = banner | first %}
+
+        {% render 'article-banner'
+          short_code: banner,
+          stamp: section.settings.icon_letter
+        %}
+
+        {% assign article_content = article_content
+          | replace: banner, ''
+          | replace: '[bnn]', ''
+          | replace: '[/bnn]', ''
+        %}
+      {% endif %}
+
+
+      {% if article_content contains '[ups]' %}
+        {% assign upsell = article_content | split: '[ups]' %}
+        {% assign upsell = upsell | last | split: '[/ups]' %}
+        {% assign upsell = upsell | first %}
+
+        {% render 'article-carousel',
+          short_code: upsell
+        %}
+
+        {% assign article_content = article_content
+          | replace: upsell, ''
+          | replace: '[ups]', ''
+          | replace: '[/ups]', ''
+        %}
+      {% endif %}
+
+
+      {{ article_content }}
+    {% endfor %}
+  </div>
+</div>
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "articleBody": {{ article.content | strip_html | json }},
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": {{ request.origin | append: page.url | json }}
+    },
+    "headline": {{ article.title | json }},
+    {% if article.excerpt != blank %}
+      "description": {{ article.excerpt | strip_html | json }},
+    {% endif %}
+    {% if article.image %}
+      "image": [
+        {{ article
+          | image_url: width: article.image.width
+          | prepend: "https:"
+          | json
+        }}
+      ],
+    {% endif %}
+    "datePublished": {{ article.published_at
+      | date: '%Y-%m-%dT%H:%M:%SZ'
+      | json
+    }},
+    "dateCreated": {{ article.created_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+    "author": {
+      "@type": "Person",
+      "name": {{ article.author | json }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      {% if settings.share_image %}
+        "logo": {
+          "@type": "ImageObject",
+          "height": {{ settings.share_image.height | json }},
+          "url": {{ settings.share_image
+            | image_url: width: settings.share_image.width
+            | prepend: "https:"
+            | json
+          }},
+          "width": {{ settings.share_image.width | json }}
+        },
+      {% endif %}
+      "name": {{ shop.name | json }}
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Article",
+    "class": "article",
+    "tag": "section",
+    "settings": [
+    {
+      "type": "header",
+      "content": "Stamp settings"
+    },
+    {
+      "type": "text",
+      "id": "icon_letter",
+      "label": "Letter Icon stamp",
+      "info": "Only SVG format",
+      "default": "letter-stamp-rose-2"
+    },
+    {
+      "type": "text",
+      "id": "icon_letter_right",
+      "label": "Letter Icon stamp (right)",
+      "info": "Only SVG format",
+      "default": "letter-stamp"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,75 @@
+<!-- eslint-disable max-len -->
+{% comment %}
+  Share icons
+  Accepts:
+  - article: { objecto } article object for the URL
+  - social-networks { boolean } defines if the social share should be active
+
+  Usage:
+  {% render 'share-icons'
+     article: article,
+     facebook: section.settings.facebook,
+     twitter: section.settings.twitter,
+     pinterest: section.settings.pinterest,
+     linkedin: section.settings.linkedin
+  %}
+{% endcomment %}
+
+<div class="social-icons">
+  {% if share_mobile %}
+    <div class="social-icons__shared-mobil">
+      <svg width="21" height="23" viewBox="0 0 21 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.1273 16.1908C16.2939 16.1908 15.5406 16.517 14.9709 17.0417L7.14111 12.4563C7.20232 12.2058 7.23999 11.9458 7.23999 11.6811C7.23999 11.4164 7.20232 11.1564 7.14111 10.9105L14.8862 6.37248C15.4747 6.92555 16.261 7.26591 17.1273 7.26591C18.9447 7.26591 20.4231 5.78158 20.4231 3.9569C20.4231 2.13222 18.9447 0.647888 17.1273 0.647888C15.3099 0.647888 13.8315 2.13222 13.8315 3.9569C13.8315 4.22162 13.8692 4.48161 13.9304 4.72743L6.18534 9.2655C5.59681 8.71715 4.81053 8.37206 3.94421 8.37206C2.12683 8.37206 0.648438 9.85639 0.648438 11.6811C0.648438 13.5058 2.12683 14.9901 3.94421 14.9901C4.81053 14.9901 5.59681 14.6497 6.18534 14.0967L14.0152 18.682C13.9587 18.9136 13.9257 19.1547 13.9257 19.4053C13.9257 21.1827 15.357 22.6197 17.1273 22.6197C18.8976 22.6197 20.3289 21.1779 20.3289 19.4053C20.3289 17.6326 18.8976 16.1908 17.1273 16.1908Z" fill="black"/>
+        </svg>
+    </div>
+  {% endif %}
+  <div class="social-icons__title">
+    <label >{{ 'blogs.article.share' | t }}</label>
+  </div>
+  <ul class="social-icons__list">
+    {% if facebook %}
+      <li class="social-icons__list--icon">
+        <a
+          href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ article.url }}"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {% render 'icon-facebook' %}
+        </a>
+      </li>
+    {% endif %}
+    {% if twitter %}
+      <li class="social-icons__list--icon">
+        <a
+          href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ article.url }}"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {% render 'icon-twitter' %}
+        </a>
+      </li>
+    {% endif %}
+    {% if pinterest %}
+      <li class="social-icons__list--icon">
+        <a
+          href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ article.url }}"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {% render 'icon-pinterest' %}
+        </a>
+      </li>
+    {% endif %}
+    {% if linkedin %}
+    <li class="social-icons__list--icon">
+      <a
+        href="https://www.linkedin.com/shareArticle?mini=true&url={{ shop.url }}{{ article.url }}"
+        target="_blank"
+        rel="noreferrer"
+      >
+        {% render 'icon-linkedin' %}
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</div>

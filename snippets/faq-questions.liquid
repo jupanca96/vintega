@@ -1,0 +1,44 @@
+{%- comment -%}
+  Renders: Faq menu
+
+  Receives:
+
+  - questions: {String} It is the questions text from block
+  - toggle: {Boolean} It determines if accordion is toggle or not
+  - question_toggle: {Boolean} It determines if first question is open
+
+  Usage:
+
+  {% render 'faq-questions',
+    questions: block.settings.questions_content,
+    toggle: section.settings.toggle,
+    question_toggle: section.settings.question_toggle
+  %}
+{%- endcomment -%}
+
+{% assign questions = questions | split: '[brl]' %}
+
+{% capture accordions %}
+  {% for question in questions %}
+    {% assign question_title = question | split: '[brt]' | first | strip_html %}
+    {% assign question_response = question | split: '[brt]' | last | replace: '<br />', '' %}
+
+    {% if question_toggle and forloop.first %}
+      {% assign active = true %}
+    {% else %}
+      {% assign active = false %}
+    {% endif %}
+
+    {% render 'accordion-item',
+      title: question_title,
+      content: question_response,
+      active: active
+    %}
+  {% endfor %}
+{% endcapture %}
+
+{% render 'accordions',
+  accordions: accordions,
+  toggle: toggle,
+  class: 'wrapper'
+%}

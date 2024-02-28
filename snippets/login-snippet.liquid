@@ -1,0 +1,208 @@
+{% comment %}
+  Login: Move login form section to snippet for it
+  can in another section or snippet.
+  Also add two parameters for add a redirect feature
+
+  Accepts:
+  - redirect: {Boolean} To add a redirect diferent to /account(optional)
+  - redirect_url: {String} url or path (optional)
+
+  Usage:
+  {% render 'login-snippet'
+    redirect: true,
+    redirect_url: 'pages/contact'
+  %}
+{% endcomment %}
+
+<div class="wrapper customer auth auth__login">
+  <div
+    id="recover-container"
+    class="auth__recover"
+    data-active="false"
+  >
+    <span id="recover" class="title h2" tabindex="-1">
+      {{ 'customer.recover_password.title' | t }}
+    </span>
+
+    <div>
+      <p>
+        {{ 'customer.recover_password.subtext' | t }}
+      </p>
+
+      {%- form 'recover_customer_password' -%}
+        {% assign errors = form.errors %}
+        {% assign posted_successfully = form.posted_successfully? %}
+
+        <div class="form__textfield form__textfield--spaced">
+          <input type="email"
+            value=""
+            name="email"
+            id="RecoverEmail"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            required
+            title="{{ 'customer.recover_password.fill' | t }}"
+            {% if form.errors %}
+              aria-invalid="true"
+              aria-describedby="RecoverEmail-email-error"
+              autofocus
+            {% endif %}
+            placeholder="{{ 'customer.login_page.email' | t }}"
+          />
+          <label for="RecoverEmail">
+            {{ 'customer.login_page.email' | t }}
+          </label>
+        </div>
+
+        <div class="flex auth__buttons">
+          <div>
+            <button class="btn-1" type="submit">
+              {{ 'customer.recover_password.btn' | t }}
+            </button>
+          </div>
+
+          <div class="auth__buttons-wrapper">
+            {{ 'customer.reset_password.known' | t }}
+          </div>
+
+          <div>
+            <a id="recover-hidden" href="#login">
+              {{ 'customer.recover_password.return_login' | t }}
+            </a>
+          </div>
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+  <div
+    id="login-container"
+    data-active="true"
+  >
+    {% if page.handle contains 'vendre-sac-luxe-occasion' or page.handle contains 'sell-my-bag' %}
+      <span id="login" class="title h2 customer__title" tabindex="-1">
+        {{ 'customer.login_page.title' | t }}
+      </span>
+    {% else %}
+      <h1 id="login" class="title h2 customer__title" tabindex="-1">
+        {{ 'customer.login_page.title' | t }}
+      </h1>
+    {% endif %}
+    <div>
+      {% if errors %}
+      <small
+        id="RecoverEmail-email-error"
+        class="form__message form__message--error"
+      >
+        {% render 'icon-error' %}
+        {{ errors.messages['form'] }}
+      </small>
+      {% endif %}
+
+      {% if posted_successfully %}
+        <span
+          class="form__message form__message--success test"
+          tabindex="-1"
+          autofocus
+        >
+          {% render 'icon-check' %}
+          {{ 'customer.recover_password.success' | t }}
+        </span>
+      {% endif %}
+
+      {%- form 'customer_login' -%}
+        {%- if form.errors -%}
+          <span
+            class="form__message form__message--error"
+            tabindex="-1"
+            autofocus
+          >
+            {% render 'icon-error' %}
+            {{ 'templates.contact.form.error_heading' | t }}
+          </span>
+          {{ form.errors | default_errors }}
+        {%- endif -%}
+
+        {% if redirect %}
+          <input type="hidden" name="return_to" value="{{ redirect_url }}">
+        {% endif %}
+
+        <div class="form__textfield form__textfield--spaced">
+          <input
+            type="email"
+            name="customer[email]"
+            id="CustomerEmail"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            required
+            title="{{ 'customer.recover_password.fill' | t }}"
+            {% if form.errors contains 'form' %}
+              aria-invalid="true"
+            {% endif %}
+            placeholder="{{ 'customer.login_page.email' | t }}"
+          />
+          <label for="CustomerEmail">
+            {{ 'customer.login_page.email' | t }}
+          </label>
+        </div>
+
+        {%- if form.password_needed -%}
+          <div class="form__textfield form__textfield--spaced">
+            <input
+              type="password"
+              value=""
+              name="customer[password]"
+              id="CustomerPassword"
+              autocomplete="current-password"
+              required
+              title="{{ 'customer.recover_password.fill' | t }}"
+              {% if form.errors contains 'form' %}
+                aria-invalid="true"
+              {% endif %}
+              placeholder="{{ 'customer.login_page.password' | t }}"
+            />
+            <label for="CustomerPassword">
+              {{ 'customer.login_page.password' | t }}
+            </label>
+          </div>
+
+          <a id="display-recover" href="#shopify-section-header">
+            {{ 'customer.login_page.forgot_password' | t }}
+          </a>
+        {%- endif -%}
+          <div class="flex auth__buttons" id="login-buttons">
+            <div class="auth__buttons-wrapper">
+              <button class="btn-1" type="submit">
+                {{ 'customer.login_page.sign_in' | t }}
+              </button>
+            </div>
+            <div class="auth__buttons-wrapper">
+              {{ 'customer.login_page.sign_in_suggestion' | t }}
+            </div>
+            <div class="auth__buttons-wrapper">
+              <a href="{{ routes.account_register_url }}">
+                {{ 'customer.login_page.create_account' | t }}
+              </a>
+            </div>
+          </div>
+
+      {%- endform -%}
+    </div>
+
+    {%- if shop.checkout.guest_login -%}
+      <div>
+        </hr>
+        <h2>{{ 'customer.login_page.guest_title' | t }}</h2>
+
+        {%- form 'guest_login' -%}
+          <button class="btn-2" type="button">
+            {{ 'customer.login_page.guest_continue' | t }}
+          </button>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+
+    {% render "social-media-forms" %}
+  </div>
+</div>

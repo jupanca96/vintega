@@ -1,0 +1,62 @@
+{% liquid
+  assign section_text = section.settings.section_text
+  assign btn_text = section.settings.button_text
+  assign btn_link = section.settings.button_link
+%}
+
+<div class="wrapper-{% if template contains 'faq' %}m{% else %}s{% endif %}">
+  <div class="box-customize__container">
+    {% if section_text != blank %}
+      {{ section.settings.section_text
+        | replace: '<p>', '<p class="h4 box-customize__text">'
+      }}
+    {% endif %}
+
+    {% if btn_text != blank and btn_link != blank %}
+      {% render 'link'
+        type: 'btn'
+        class: "btn-1 box-customize__link",
+        content: btn_text,
+        url: btn_link,
+      %}
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Box customize",
+  "class": "box-customize section-space",
+  "templates": [
+    "page"
+  ],
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "section_text",
+      "label": "Section text",
+      "info": "It is the section text",
+      "default": "<p>(Re)pensez avec nous le luxe de demain, et choisissez votre prochain allié du quotidien.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "info": "It is the button text",
+      "default": "VOIR PLUS"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "It is the button url",
+      "default": "/"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Box customize"
+    }
+  ]
+}
+{% endschema %}

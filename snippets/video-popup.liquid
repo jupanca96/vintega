@@ -1,0 +1,38 @@
+<div 
+  class="instalation-video__overlay"
+>
+</div>
+
+<div 
+  class="instalation-video__popup"
+>
+  {% if video_src != blank %}
+  <div 
+    class="instalation-video__popup--container"
+  >
+    <div 
+      class="instalation-video__popup--close fade"
+    >
+      &#10006;
+    </div>
+    <video
+      id="my-video"
+      class="video-js"
+      preload="auto"
+      poster="{{ img_src }}"
+      {% if video_src contains 'youtube' %}  
+        data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "{{ video_src }}"}], "youtube": { "ytControls": 2 } }'
+      {% elsif video_src contains 'vimeo' %}
+        data-setup='{ "techOrder": ["vimeo"], "sources": [{ "type": "video/vimeo", "src": "{{ video_src }}"}], "vimeo": { "ytControls": 2 } }'
+      {% else %}
+        data-setup='{}'
+      {% endif %}
+    >
+        {% unless video_src contains 'youtube' or video_src contains 'vimeo' %}
+            <source src="{{ video_src }}" type="video/mp4">
+            <source src="{{ video_src }}" type="video/webm">
+        {% endunless %}
+    </video>
+  </div>
+  {% endif %}
+</div>

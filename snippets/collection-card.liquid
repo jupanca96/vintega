@@ -1,0 +1,50 @@
+{% comment %}
+  Collection card
+
+  Accepts:
+  - classname: {string} The classname for a tag
+  - title: {string} It is the title for the card
+  - image: {string} It is the image for the card
+  - link: {string} Text description
+  - enable_background: {Boolean} It enables a class for background
+  - enable_zoom: {Boolean} It enables a class for zoom
+
+  Usage:
+  {% render 'collection-card',
+    classname: 'collage-custom__image',
+    title: card_title,
+    image: card_img,
+    link: card_link,
+    enable_background: enable_background
+    enable_zoom: enable_zoom
+  %}
+{% endcomment %}
+
+{% liquid
+  if enable_background
+    assign title_background = 'collage-custom__subtitle--background'
+  endif
+
+  if enable_zoom
+    assign zoom_class = 'collage-custom__card--zoom'
+  endif
+
+  if image == blank
+    assign empty_background = classname | append: '--no-img'
+  endif
+%}
+
+<a href="{{ link }}" class="{{ classname }} {{ empty_background }} {{ zoom_class }}">
+  {% if image != blank %}
+    {% render 'render-image', class: 'collage-custom__image', img: image, alt: image.alt %}
+  {% endif %}
+
+  {% if title != blank %}
+    <span class="collage-custom__subtitle {{ title_background }} h3">
+      <span class="collage-custom__subtitle-content">
+        {{ title }}
+        <span class="overflow-hide"></span>
+      </span>
+    </span>
+  {% endif %}
+</a>

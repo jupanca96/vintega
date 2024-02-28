@@ -1,0 +1,39 @@
+{% comment %}
+  Infinitu scroll
+
+  Accepts:
+  - container: {Elemnt} - class or id element '.container'
+  - item: {Elemnt} - element card item render list '.item'
+  - page_current: {Number} - number current page
+  - section_render: {String} - name section rendering
+  - current_url: {Object} - url current page actualy
+
+  Usage:
+  {% render 'infinity-scroll'
+    container: ".item-list",
+    item: ".product-card",
+    page_current: paginate.current_page,
+    current_url_filters: '',
+    section_render: "collection-products",
+    current_url: collection.url,
+  %}
+{% endcomment %}
+
+<div id="init-infinityscroll-js" class="infinity__scroll">
+  <div
+    id="data-config"
+    data-container="{{ container }}"
+    data-current-page="{{ page_current }}"
+    data-current-url="{{ current_url }}"
+    data-current-url-filters="{{ current_url_filters }}"
+    data-current-url-search="{{ current_url_search }}"
+    data-section="{{ section_render }}"
+    data-item="{{ item }}"
+  ></div>
+  <div
+    id="loading-items"
+    class="infinity__scroll--loading-container hidden"
+  >
+    <div id="dots-loader"></div>
+  </div>
+</div>

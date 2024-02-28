@@ -1,0 +1,167 @@
+{%- form 'customer_login', id: 'customer--social', novalidate: 'novalidate' -%}
+
+  <div class="form__textfield form__textfield--spaced hidden">
+    <input
+      type="email"
+      name="customer[email]"
+      id="CustomerEmail--social"
+      autocomplete="email"
+      autocorrect="off"
+      autocapitalize="off"
+      {% if form.errors contains 'form' %}
+        aria-invalid="true"
+      {% endif %}
+      placeholder="{{ 'customer.login_page.email' | t }}"
+    />
+    <label for="CustomerEmail">
+      {{ 'customer.login_page.email' | t }}
+    </label>
+  </div>
+
+  {%- if form.password_needed -%}
+    <div class="form__textfield form__textfield--spaced hidden">
+      <input
+        type="password"
+        value=""
+        name="customer[password]"
+        id="CustomerPassword--social"
+        autocomplete="current-password"
+        {% if form.errors contains 'form' %}
+          aria-invalid="true"
+        {% endif %}
+        placeholder="{{ 'customer.login_page.password' | t }}"
+      />
+      <label for="CustomerPassword">
+        {{ 'customer.login_page.password' | t }}
+      </label>
+    </div>
+  {%- endif -%}
+    <div class="flex auth__buttons" id="login-buttons">
+      <div>
+        <button class="btn-2 hidden" type="submit">
+          {{ 'customer.login_page.sign_in' | t }}
+        </button>
+      </div>
+
+      {% comment %} {% render 'google-button' %} {% endcomment %}
+        <div class="buttons__social flex">
+
+          {% render 'button-social'
+            class: "button-login-fb"
+            type: "facebook"
+          %} 
+
+          {% render 'button-social'
+            class: "button-login-gg"
+            type: "google"
+          %}
+        </div>
+    </div>
+
+{%- endform -%}
+
+{%- form 'create_customer', id: 'create_customer--social', novalidate: 'novalidate' -%}
+
+  <div class="form__textfield form__textfield--spaced hidden">
+    <input
+      type="text"
+      name="customer[first_name]"
+      id="RegisterForm-FirstName"
+      {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+      autocomplete="given-name"
+      placeholder="{{ 'customer.register.first_name' | t }}"
+    />
+    <label for="RegisterForm-FirstName">
+      {{ 'customer.register.first_name' | t }}
+    </label>
+  </div>
+  <div class="form__textfield form__textfield--spaced hidden">
+    <input
+      type="text"
+      name="customer[last_name]"
+      id="RegisterForm-LastName"
+      {% if form.last_name %} value="{{ form.last_name }}"{% endif %}
+      autocomplete="family-name"
+      placeholder="{{ 'customer.register.last_name' | t }}"
+    />
+    <label for="RegisterForm-LastName">
+      {{ 'customer.register.last_name' | t }}
+    </label>
+  </div>
+  <div class="form__textfield form__textfield--spaced hidden">
+    <input
+      type="email"
+      name="customer[email]"
+      id="RegisterForm-email"
+      {% if form.email %} value="{{ form.email }}"{% endif %}
+      spellcheck="false"
+      autocapitalize="off"
+      autocomplete="email"
+      aria-required="true"
+      {% if form.errors contains 'email' %}
+        aria-invalid="true"
+        aria-describedby="RegisterForm-email-error"
+      {% endif %}
+      placeholder="{{ 'customer.register.email' | t }}"
+    />
+    <label for="RegisterForm-email">
+      {{ 'customer.register.email' | t }}
+    </label>
+  </div>
+
+  <div class="form__textfield form__textfield--spaced hidden">
+    <input
+      type="password"
+      name="customer[password]"
+      id="RegisterForm-password"
+      aria-required="true"
+      {% if form.errors contains 'password' %}
+        aria-invalid="true"
+        aria-describedby="RegisterForm-password-error"
+      {% endif %}
+      placeholder="{{ 'customer.register.password' | t }}"
+    />
+    <label for="RegisterForm-password">
+      {{ 'customer.register.password' | t }}
+    </label>
+  </div>
+  {%- if form.errors contains 'password' -%}
+    <span
+      id="RegisterForm-password-error"
+      class="form__message form__message--error"
+    >
+      {% render 'icon-error' %}
+      {{ form.errors.translated_fields['password'] | capitalize }} {{ form.errors.messages['password'] }}.
+    </span>
+  {%- endif -%}
+  <button class="btn-2 hidden" type="submit">
+    {{ 'customer.register.submit' | t }}
+  </button>
+{%- endform -%}
+
+<script
+  async
+  defer
+  crossorigin="anonymous"
+  src="https://connect.facebook.net/en_US/sdk.js"
+></script>
+
+<script
+  src="https://apis.google.com/js/api:client.js"
+  defer
+></script>
+
+<script
+  src="https://accounts.google.com/gsi/client"
+  defer
+></script>
+
+<script
+  src="https://apis.google.com/js/platform.js"
+  defer
+></script>
+
+<script
+  src="{{ 'login.js' | asset_url }}"
+  defer="defer"
+></script>

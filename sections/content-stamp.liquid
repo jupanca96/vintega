@@ -1,0 +1,60 @@
+{% if section.settings.heading != blank %}
+  <h2 class="content-stamp__title wrapper-xm">
+    {{ section.settings.heading }}
+  </h2>
+{% endif %}
+
+{% if section.settings.description != blank %}
+  <div class="content-stamp__description wrapper-xm">
+    {{ section.settings.description }}
+  </div>
+{% endif %}
+
+{% if section.settings.icon_letter != blank %}
+  {% assign image = section.settings.icon_letter | append: '.svg' | file_url %}
+  {% render "letter-icon"
+    image: image,
+    position: 'top-right',
+    width: "200",
+    height: "271"
+  %}
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Content with stamp",
+    "class": "content-stamp section-space",
+    "tag": "section",
+    "templates": [
+      "page"
+    ],
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Title",
+        "info": "It is the main section title",
+        "default": "Notre histoire"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description",
+        "info": "It is the section description",
+        "default": "<p>Nous sommes à votre disposition pour offrir à vos articles une seconde vie à la hauteur de vos attentes. Pour cela, nous avons établi les 5 conseils et astuces pour assurer une vente rapide et efficace de vos articles.</p>"
+      },
+      {
+        "type": "text",
+        "id": "icon_letter",
+        "label": "Letter Icon stamp",
+        "info": "Only SVG format",
+        "default": "letter-stamp-vert"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Content with stamp"
+      }
+    ]
+  }
+{% endschema %}

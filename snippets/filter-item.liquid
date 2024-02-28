@@ -1,0 +1,110 @@
+{%- comment -%}
+  Renders: Filter item
+
+  Receives:
+  - type: {string} define type of filter item. Ex subitem or item color
+
+  Next parameters receive filter object values.
+
+  - filter_param_name: {string} filter.param_name
+  - filter_value_value: {string} filter_value.value
+  - filter_value_count: {string} filter_value.count
+  - filter_value_active: {bool} filter_value.active
+  - filter_value_param_name: {string} filter_value.param_name
+  - filter_value_label: {string} filter_value.label
+  - forloop_index: {number} forloop.index
+
+  Usage:
+
+  {% render 'filter-item',
+    type: 'sub' || color-image || 'size-image'
+    filter_param_name: filter.param_name
+
+    filter_value_value: filter_value.value
+    filter_value_count: filter_value.count
+    filter_value_active: filter_value.active
+    filter_value_param_name: filter_value.param_name
+    filter_value_label: filter_value.label
+
+    forloop_index: forloop.index
+  %}
+{%- endcomment -%}
+
+<label
+  class="form__checkbox"
+  for="Filter-{{ filter_param_name }}-{{ forloop_index }}"
+  data-value="{{ filter_value_value }}"
+
+  {% if filter_value_count == 0 and filter_value_active == false -%}
+    disabled
+    data-disable="true"
+  {%- endif %}
+>
+  <!-- eslint-disable max-len -->
+  <!-- eslint-disable @html-eslint/no-extra-spacing-attrs -->
+  <input type="checkbox"
+    name="{{ filter_value_param_name }}"
+    value="{{ filter_value_value }}"
+    id="Filter-{{ filter_param_name }}-{{ forloop_index }}"
+    data-name="{{ label_filter }}"
+    class="input-check filter-input{% if filter_param_name != 'filter.v.option.color' %}
+      checkbox__input
+    {% endif %}"
+    {% if filter_value_active -%}
+      checked
+    {%- endif %}
+    {% if filter_value_count == 0 and filter_value_active == false -%}
+      disabled
+    {%- endif %}
+  />
+  <!-- eslint-enable max-len -->
+  <!-- eslint-enable @html-eslint/no-extra-spacing-attrs -->
+  {% if filter_param_name != 'filter.v.option.color'  %}
+    <span class="slider {% if type == 'color-image' %} color-image{% endif %}"></span>
+  {% endif %}
+
+    {% comment %}
+      Here start logic to render colors
+      To get info:
+      - Create a general setting "textarea" to set and get files color.
+      - Structure of files color: Color: file_name.png; Color2: file_name_2.jpg, etc
+
+      Logic
+      - Create a array splitting ';'
+      - Iterate to each one until match with filter label.
+      - Get image file and render.
+    {% endcomment %}
+    <!-- eslint-disable @html-eslint/no-inline-styles -->
+
+    {% if type == 'color-image' %}
+      {% if filter_param_name contains 'filter.p.m.custom.extern_colors_filtres_' %}
+        {% assign settings_colors = settings.colors_table_filters %}
+      {% elsif filter_param_name contains 'filter.p.m.custom.hardware' %}
+        {% assign settings_colors = settings.colors_table_filters_details %}
+      {% endif %}
+
+      {% render 'filter-with-image',
+        setting_images: settings_colors,
+        setting_image_default: settings.colors_table_filters_default,
+        filter_value_label: filter_value_label,
+        image_alt: 'Color image',
+        forloop_index: forloop_index
+      %}
+    {% endif %}
+
+    {% if type == 'size-image' %}
+      {% render 'filter-with-image',
+        setting_images: settings.sizes_table_filters,
+        setting_image_default: settings.sizes_table_filters_default,
+        filter_value_label: filter_value_label,
+        image_alt: 'Size image',
+        forloop_index: forloop_index
+      %}
+    {% endif %}
+
+    <span>
+      {{ filter_value_label }} <span>({{ filter_value_count }})</span>
+    </span>
+
+  <!-- eslint-enable @html-eslint/no-inline-styles -->
+</label>

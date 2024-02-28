@@ -1,0 +1,86 @@
+{% comment %}
+  type: search || collection
+  section: section
+{% endcomment %}
+
+
+{% if type == 'search' %}
+  {% assign typePage = search %}
+{% else %}
+  {% assign typePage = collection %}
+{% endif %}
+
+<div class="collection__filters-wrapper">
+  <div class="collection__filters">
+    <div class="collection-filters">
+      <div class="collection-filters__controls">
+        {% if settings.mes_alerts_enable %}
+          {% render 'mes-alerts'
+            is_simple: true,
+            available: true
+          %}
+        {% endif %}
+
+        {% if type == 'search' %}
+          {%- liquid
+            assign terms = typePage.terms | escape
+            assign search_url_remove = '?q=' | append: terms | append: '&options%5Bprefix%5D=last'
+          -%}
+
+          <a href="{{ routes.search_url | append : search_url_remove }}" class="btn-2 collection-filters__remove js-remove-filter">
+            {{ 'products.facets.clear_all' | t }}
+          </a>
+        {% else %}
+          <a href="{{ typePage.url }}?sort_by={{ typePage.sort_by }}" class="btn-2 collection-filters__remove js-remove-filter">
+            {{ 'products.facets.clear_all' | t }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% capture items_filter_custom %}
+      {% if section.blocks.size > 0 %}
+        <ul class="filter-group-display__list">
+          {% for block in section.blocks %}
+            <li class="filter-group-display__list-item">
+              <a
+                href="{{ block.settings.collection.url }}"
+              >
+                {{ block.settings.collection.title }}  ({{ block.settings.collection.all_products_count }})
+              </a>
+            </li>
+
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endcapture %}
+
+    {% if items_filter_custom != blank %}
+      {% capture custom_acc %}
+        {% render 'accordion-item',
+          title: section.settings.custom_acc_title,
+          content: items_filter_custom,
+          active: false,
+          css_class: 'custom-filters'
+        %}
+      {% endcapture %}
+    {% endif %}
+
+    {% if type == 'search' %}
+      {% render 'filtering-store'
+        is_search: true,
+        items_filter_custom: custom_acc,
+        toggle: section.settings.accordion_open,
+        all_closed: section.settings.all_closed
+      %}
+    {% else  %}
+      {% render 'filtering-store'
+        items_filter_custom: custom_acc,
+        toggle: section.settings.accordion_open,
+        all_closed: section.settings.all_closed,
+        accordion_open_position: section.settings.accordion_open_position
+      %}
+    {% endif %}
+
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<!-- eslint-disable @html-eslint/no-duplicate-id -->
+<!-- eslint-disable @html-eslint/no-extra-spacing-attrs -->
+{% comment %}
+  Input
+
+  Accepts:
+
+  - options: Options {HTML} wrap in capture variable
+  - class: {String} className in input (optional)
+  - name: {String} Name in input (Required)
+  - id: {String} Id in input (Requerid)
+  - label: {String} Input label
+
+  Usage:
+  {% capture options %}
+    <option>
+      test1
+    </option>
+
+    <option>
+      test2
+    </option>
+  {% endcapture %}
+
+  {% render 'input-select',
+    options: options,
+    class: "form__textfield",
+    label: 'Label'
+    name: "contact[body]",
+    id: "first-name",
+    autocomplete: 'country'
+    required: true
+  %}
+
+{% endcomment %}
+
+<div
+  class="{{ class }}"
+>
+  <label for="{{ id }}">
+    {{ label }}
+  </label>
+
+  <select
+    id="{{ id }}"
+    {% if name != blank %} name="{{ name }}"{% endif %}
+    autocomplete="{{ autocomplete }}"
+    {% if required %} required{% endif %}
+  >
+    {{ options }}
+  </select>
+</div>

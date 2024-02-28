@@ -1,0 +1,75 @@
+{% comment %}
+  Render a cart item
+
+  Accepts:
+  - cart: {Object} cart object
+  - cart_header: {HTMLElement} cart header html element
+  - cart_empty_message: {String} message if cart is empty
+  - empty_complement: {String} extra message if cart is empty
+  - empty_btn_text: {String} Button text if cart is empty
+  - empty_btn_url: {String} Button url if cart is empty
+  - cartpage: {String} If it is on cartpage
+  - cart_remove: {String} Text for cart remove item
+
+  Usage:
+  {% render 'cart-item'
+    cart: cart,
+    cart_header: cart_header,
+    cart_empty_message: section.settings.cart_empty,
+    empty_complement: section.settings.empty_complement,
+    empty_btn_text: section.settings.empty_btn_text,
+    empty_btn_url: section.settings.empty_btn_url
+    cartpage: true
+    cart_remove: cart_remove
+  %}
+{% endcomment %}
+{% assign tag = 'a' %}
+
+{% if template == 'cart' %}
+  {% assign tag = 'div' %}
+{% endif %}
+
+<div class="cartitems-js items-container">
+  <div
+    class="cart-items cart-margins__inline"
+    id="cart-items"
+  >
+    {% if cart_header %}
+      {{ cart_header }}
+    {% endif %}
+
+    {% if cart.item_count == 0 %}
+      <div class="cart-items__empty-wrapper">
+        <span class="cart-items__empty">
+          {{ cart_empty_message }}
+        </span>
+
+        {% if empty_complement != blank %}
+          <span class="cart-items__complement">
+            {{ empty_complement }}
+          </span>
+        {% endif %}
+
+        {% if empty_btn_url != blank %}
+          {% render 'link'
+            type: 'btn'
+            class: "btn-1 cart-items__empty-link",
+            content: empty_btn_text,
+            url: empty_btn_url,
+          %}
+        {% endif %}
+      </div>
+    {% else %}
+
+      {% for item in cart.items %}
+        {% render 'cart-item'
+          product: item.product,
+          item: item,
+          forloop: forloop,
+          cart_remove: cart_remove
+        %}
+      {% endfor %}
+    {% endif %}
+
+  </div>
+</div>

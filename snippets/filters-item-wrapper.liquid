@@ -1,0 +1,103 @@
+{% comment %}
+  - Create wrapper (<lil>) of filters item
+  - Logic to deep level 1 and 2
+
+  Usage:
+    {% render 'filters-item-wrapper',
+      filter: filter
+      filter_value: filter_value,
+      label_filter: label_filter
+      forloop: forloop
+    %}
+{% endcomment %}
+<li
+    class="filter-group-display__list-item"
+    data-value="{{ filter_value.value }}"
+>
+  {% comment %}
+    To render  color filter item
+  {% endcomment %}
+  {% if filter.param_name contains 'filter.p.m.custom.extern_colors_filtres_'
+  or filter.param_name contains 'filter.p.m.custom.hardware' %}
+    {% render 'filter-item',
+      type: 'color-image',
+      filter_param_name: filter.param_name,
+      filter_value_value: filter_value.value,
+      filter_value_count: filter_value.count,
+      filter_value_active: filter_value.active,
+      filter_value_param_name: filter_value.param_name,
+      filter_value_label: filter_value.label,
+      forloop_index: forloop.index,
+      label_filter: label_filter
+    %}
+  {% elsif filter.param_name contains 'filter.p.m.custom.volume' %}
+    {% render 'filter-item',
+      type: 'size-image',
+      filter_param_name: filter.param_name,
+      filter_value_value: filter_value.value,
+      filter_value_count: filter_value.count,
+      filter_value_active: filter_value.active,
+      filter_value_param_name: filter_value.param_name,
+      filter_value_label: filter_value.label,
+      forloop_index: forloop.index,
+      label_filter: label_filter
+    %}
+  {% else %}
+    <!-- eslint-disable max-len -->
+    {% render 'filter-item',
+      filter_param_name: filter.param_name,
+      filter_value_value: filter_value.value,
+      filter_value_count: filter_value.count,
+      filter_value_active: filter_value.active,
+      filter_value_param_name: filter_value.param_name,
+      filter_value_label: filter_value.label,
+      forloop_index: forloop.index,
+      label_filter: label_filter
+    %}
+
+    {% comment %}
+      Here start the sub items in filters
+    {% endcomment %}
+    {%- for filter_value_deep2 in filter.values -%}
+      {% comment %}
+        Sum each filter quantity and
+        if this sum is 0 not render accordion and if it is highter than 0 render accordion
+      {% endcomment %}
+
+      {% unless filter_value_deep2.count == 0 and filter_value_deep2.active == false -%}
+
+        {% comment %}
+          filter_value_deep2.label contains ':'
+            To render sub items in parent items and not render parent items in sub items
+        {% endcomment %}
+
+
+        {% if filter_value_deep2.label contains ':' %}
+
+          {% assign filter_deep2_name = filter_value_deep2.label | split: ':' | first %}
+          {% assign filter_deep2_label = filter_value_deep2.label | split: ':' | last %}
+
+          {% if filter_deep2_name == filter_value.label %}
+            <div
+              class="filter-group-display__list-item sub-item"
+              data-value="{{ filter_value_deep2.value }}"
+            >
+              {% render 'filter-item'
+                type: 'sub',
+                filter_param_name: filter.param_name,
+                filter_value_value: filter_value_deep2.value,
+                filter_value_count: filter_value_deep2.count,
+                filter_value_active: filter_value_deep2.active,
+                filter_value_param_name: filter_value_deep2.param_name,
+                filter_value_label: filter_deep2_label,
+                forloop_index: forloop.index,
+                label_filter: label_filter
+              %}
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endunless -%}
+
+    {% endfor -%}
+  {% endif %}
+</li>

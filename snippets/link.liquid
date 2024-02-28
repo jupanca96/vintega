@@ -1,0 +1,69 @@
+{% comment %}
+  Link: Use the button's class to add size, ex: s, m and l
+
+  Accepts:
+  - class: {String} className in button (optional)
+  - content: {String} Text button
+  - icon_arrow: true {Boolean} use to show icon arrow.
+  If use this icon not use icon caret
+  - icon_plus: true {Boolean} use to show icon plus.
+  icons_plus and icon_arrow: Use the same time with icon arrow to show both
+  - icon_close: true {Boolean} use to show icon close.
+  it shows icon close snippet if it is true
+  - icon_caret: true {Boolean} use to show icon plus.
+  If use this icon not use icon arrow
+  - url: {Object} url object liquid tag
+  - target: {String} target values (optional)
+
+  Usage:
+  {% render 'link'
+    type: 'btn' | 'link'
+    class: "btn-1 another-classes",
+    content: "Register",
+    icon_arrow: true
+    icon_plus: true
+    icon_close: true
+    icon_caret: true
+    url: section.settings.url,
+    target: "_blank"
+  %}
+{% endcomment %}
+
+{% case type %}
+  {% when 'btn' %}
+    {% assign class_type = 'btn-link' %}
+  {% when 'link' %}
+    {% assign class_type = 'link-vanilla' %}
+{% endcase %}
+
+<a
+  class="{{ class }} {{ class_type | default: 'link-vanilla' }}"
+  href="{{ url }}"
+  target="{{ target | default: '_self' }}"
+  rel="noreferrer"
+>
+
+  {% if icon_plus %}
+    {% render 'icon-plus' %}
+  {% endif %}
+
+  {% if icon_close %}
+    {% render 'icon-close' %}
+  {% endif %}
+
+  <span>
+    {{ content }}
+  </span>
+
+  {% liquid
+    if icon_arrow or icon_caret
+      if icon_arrow
+        render 'icon-arrow'
+      endif
+
+      if icon_caret
+        render 'icon-caret'
+      endif
+    endif
+  %}
+</a>

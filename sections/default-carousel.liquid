@@ -1,0 +1,42 @@
+{% if article.metafields.custom.collection_carousel != blank %}
+  <div class="slider-section section-space">
+    {% if section.settings.section_title != blank %}
+      <h2 class="slider-section__title wrapper-m">
+        {{ section.settings.section_title }}
+      </h2>
+    {% endif %}
+
+    {% if article.metafields.custom.collection_carousel != blank %}
+      <div class="slider-container wrapper-m">
+        <div class="slider-wrapper">
+          {% render 'slider-content',
+            collection: article.metafields.custom.collection_carousel.value,
+            button_url: article.metafields.custom.collection_carousel.value.url,
+            button_text: section.settings.button_text
+          %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Slider section",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "section_title",
+        "label": "Title",
+        "default": "NOS PRODUITS"
+      },
+      {
+        "type": "text",
+        "id": "button_text",
+        "label": " Button text",
+        "default": "VOIR TOUS"
+      }
+    ]
+  }
+{% endschema %}

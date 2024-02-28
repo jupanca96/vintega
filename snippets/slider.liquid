@@ -1,0 +1,100 @@
+<!-- eslint-disable @html-eslint/require-closing-tags -->
+{% comment %}
+  Renders slide component
+
+  Accepts:
+  - content: {Html} Internal sliders **init with for (iteration)
+  - arrows: {Boolean} Show arrows
+  - pagination: {Boolean} show pagination
+  - perpage: {Number} items per page
+  - wrapper: {String} class to style
+  - infinity: {String} slider infinity
+
+  NOTE: In <content> use className "swiper-slide" in the first item
+
+  Usage:
+  {% render 'slide',
+    wrapper: 'string query'
+    content: snippet_content,
+    arrows: true,
+    pagination: true,
+    perpage: 1
+    id: 'js-id'
+  %}
+{% endcomment %}
+<!-- eslint-enable @html-eslint/require-closing-tags -->
+
+{% liquid
+  if arrows and pagination
+    assign type_slide = 'slider_arrows_pagination'
+  elsif custom_slider
+    assign type_slide = custom_slider
+  else
+    if perpage == 1 and arrows
+      assign type_slide = 'slider_arrows-one'
+    elsif perpage == 1 and arrows != true and pagination == false
+      assign type_slide = 'slider_small'
+    elsif arrows and infinity
+      assign type_slide = 'slider_arrows-infinity'
+    elsif pagination
+      assign type_slide = 'slider_pagination'
+    elsif arrows
+      assign type_slide = 'slider_arrows'
+    else
+      assign type_slide = type_slide
+    endif
+  endif
+%}
+
+<div class="{{ wrapper }} wrapper__slider {% if custom_slider %}defer{% endif %}">
+  <!-- Slider main container -->
+  <div
+    id="slider_{{ id | default: section.id }}"
+    class="swiper {{ type_slide }}"
+    data-autoplay="{{ autoplay }}"
+    data-slides="{{ perpage }}"
+    class="{{ id }}"
+  >
+    <!-- Additional required wrapper -->
+    <div class="swiper-wrapper">
+      <!-- Slides from props snippet -->
+      {{ content }}
+    </div>
+
+    <!-- If we need pagination -->
+    {% if pagination %}
+      <div
+        data-id="slider_{{ id | default: section.id }}"
+        id="bullets-slider_{{ id | default: section.id }}"
+        class="swiper-pagination"
+      >
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- If we need navigation buttons -->
+  {% if arrows %}
+    <button
+      type="button"
+      data-id="slider_{{ id | default: section.id }}"
+      class="swiper-button swiper-button-prev
+      {% if item_max < 4 %}
+        hidden-arrows
+      {% endif %}"
+      aria-label="prev slide"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+    <button
+      type="button"
+      data-id="slider_{{ id | default: section.id }}"
+      class="swiper-button swiper-button-next
+      {% if item_max < 4 %}
+        hidden-arrows
+      {% endif %}"
+      aria-label="next slide"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+  {% endif %}
+</div>

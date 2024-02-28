@@ -1,0 +1,35 @@
+{% comment %}
+  Renders letter icon
+  Accepts:
+  - img: {Object} image object (mandatory)
+  - position: {String} The position for the icon (mandatory)
+
+  Usage:
+  {% render "letter-icon"
+    css_class: 'image',
+    image: image,
+    position: 'top-right' | 'bottom-right' | 'bottom-left' | 'top-left',
+    alt,
+    width: "300",
+    height: "300"
+  %}
+{% endcomment %}
+{% liquid
+  assign w = width | default: '300'
+  assign h = height | default: '300'
+  assign title =  "Icon stamp " | append: shop.name
+%}
+
+{% if image != blank and position != blank %}
+  <figure class="letter-icon letter-icon--{{ position }} {{ css_class }}">
+    {% render "render-image"
+      class: "class_image",
+      title: title,
+      img_src: image,
+      size: "220 300 400 500",
+      alt: title,
+      width: w,
+      height: h
+    %}
+  </figure>
+{% endif %}

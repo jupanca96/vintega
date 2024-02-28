@@ -1,0 +1,46 @@
+{% comment %}
+  Renders card ticket
+  Accepts:
+  - image: { Object } : The image for the block,
+  - subtitle: { String } : The subtitle for the block,
+  - button_url: { String} : The button url
+  - button_text: { String } : The button text
+
+  Usage:
+  {%
+    render 'card-ticket',
+    image: block.settings.image,
+    subtitle: block.settings.subtitle,
+    button_url: block.settings.button_url,
+    button_text: block.settings.button_text,
+  %}
+{% endcomment %}
+
+<div class="cards-content__figure">
+  {% assign img_src = image | img_url: '260x' %}
+  <div class="cards-content__img">
+    {% render "render-image"
+      class: "cards-content__image",
+      title: "Image alt",
+      img_src: img_src,
+      img: image,
+      size: "220 300 400 500",
+      alt: "Image card ticket"
+    %}
+  </div>
+
+  {% if subtitle != blank %}
+    <span class="h6 cards-content__subtitle">
+      {{ subtitle }}
+    </span>
+  {% endif %}
+
+  {% if button_url != blank and button_text != blank %}
+    {% render 'link'
+      type: 'btn',
+      class: "btn-1 btn-m cards-content__link",
+      content: button_text,
+      url: button_url
+    %}
+  {% endif %}
+  </div>

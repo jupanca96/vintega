@@ -1,0 +1,15 @@
+{% assign terms = search.terms %}
+
+{% if search.results_count > 0 %}
+  <span class="collection__products-term">
+    {{ 'templates.search.results_with_count_and_term.terms'
+      | t: terms: terms
+    }}
+  </span>
+{% else %}
+  <span class="collection__products-term">
+    {{ 'templates.search.no_results'
+      | t: terms: terms
+    }}
+  </span>
+{% endif %}

@@ -1,0 +1,194 @@
+<!-- eslint-disable @html-eslint/require-closing-tags -->
+{% comment %}
+  Order images upward base on number in the image name
+
+  Accepts:
+    - type: {string} - what type of image component use: main or thumbnails
+    - popup_image_mobil: {string} - Class to component product media main
+
+    Usage:
+  {% render "order-product-media".
+    type: 'main' || 'thumbnails',
+    popup_image_mobil: 'popup_image_mobil'
+  %}
+
+
+  The next "for cicle" get the largest number in images name.
+  To create an array with that length and compare with images position
+  This form we can upward order
+{% endcomment %}
+
+{% liquid
+assign most = 0
+assign itemsordered = ''
+assign arrayCompare = ''
+assign condition_order = false
+
+for image1 in product.media
+  assign image_position = image1.src | split: 'n_'
+  assign image_position = image_position[1]
+  assign image_position = image_position | split: '_' | first | remove: '.jpg' | plus: 0
+  
+  for image2 in product.media
+    assign image_position_compare = image2.src | split: 'n_'
+    assign image_position_compare = image_position_compare[1]
+    assign image_position_compare = image_position_compare | split: '_' | first | remove: '.jpg' | plus: 0
+
+    if image_position > image_position_compare
+      if image_position > most
+        assign most = image_position
+      else
+        assign most = most
+      endif
+    endif
+  endfor
+endfor
+
+for image in product.media
+  if image.src contains 'n_' and image.src contains '_n'
+    assign condition_order = true
+  else
+    assign condition_order = false
+  endif
+endfor
+%}
+
+{% comment %}
+  1. Creamos una array a partir del número de posición más grande en las imágenes.
+  2. Para poder hacer la comprarción:
+      - Iteramos por el array 'compare' que sería el más grande, y vamos comparando cada posición de la imagen.
+      - Por cada index de compare evaluamos todos los index de product.media
+        y en cada index (loop) comparamos, así aseguramos consecutividad en las posiciones.
+  3. Agrupamos todas las imágenes que hicieron match en un capture
+
+  PDTE: IMÁGENES SIN POSICIÓN DEBEN QUEDAR DE ÚLTIMAS.
+
+  1. Create an array from the largest number in images.
+  2. It can compare:
+     - Doble for
+     - First iteration: "compare array" because is the largest array and with its index it get order images
+     - Second iteration: compare all items of the product.media array with each item of the first loop (compare array)
+  3. If there are images name without number, that push to the end.
+  4. Join all images in a capture variable
+
+{% endcomment %}
+{% assign compare = (1..most) %}
+
+{% capture media %}
+  {% for image in compare %}
+    {% assign indexCompare = forloop.index %}
+    
+    {% for image in product.media %}
+      {% if image.src contains 'n_' and image.src contains '_n' %}
+        {% assign image_position_1 = image.src | split: 'n_' %}
+        {% assign image_position_1 = image_position_1[1] %}
+        {% assign image_position_1 = image_position_1 | split: '_' | first | remove: '.jpg' | plus: 0 %}
+
+        {% if image_position_1 == indexCompare %}
+
+          {% if type == 'main' %}
+            {% assign imgUrl = image | image_url: width: 1440 %}
+            <a
+              class="swiper-slide img-magnifier-container {{ popup_image_mobil }}"
+              data-src="{{ imgUrl }}"
+              href="{{ imgUrl }}"
+              data-pswp-width="1440"
+              data-pswp-height="1440"
+            >
+              {% assign zoom_class = '' %}
+
+              {% unless cart_cardeu %}
+                {% assign zoom_class = 'myimage' %}
+              {% endunless %}
+
+              {% render "render-image"
+                class: zoom_class,
+                img_src: imgUrl,
+                img: image,
+                size: "900 1200 1440",
+                width: "547",
+                height: "547",
+                product: true
+              %}
+            </a>
+          {% elsif type == 'thumbnails' %}
+            {% assign imgUrl = image | image_url: width: 175 %}
+            <div class="swiper-slide image-elements__image-thumbs">
+              {% render "render-image"
+                class: "swiper-image",
+                img_src: imgUrl,
+                img: image,
+                width: "100",
+                height: "100"
+              %}
+            </div>
+          {% endif %}
+
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endcapture %}
+
+{% comment %}
+  - Here, get products without position number and add to end of the elements
+{% endcomment %}
+
+{% capture media_without_position %}
+  {% for image in product.media %}
+    {% unless image.src contains 'n_' and image.src contains '_n' %}
+      {% if type == 'main' %}
+        {% assign imgUrl = image | image_url: width: 1440 %}
+        <a
+          class="swiper-slide img-magnifier-container {{ popup_image_mobil }}"
+          data-src="{{ imgUrl }}"
+          href="{{ imgUrl }}"
+          data-pswp-width="1440"
+          data-pswp-height="1440"
+        >
+          {% assign zoom_class = '' %}
+
+          {% unless cart_cardeu %}
+            {% assign zoom_class = 'myimage' %}
+          {% endunless %}
+
+          {% render "render-image"
+            class: zoom_class,
+            img_src: imgUrl,
+            img: image,
+            size: "900 1200 1440",
+            width: "547",
+            height: "547",
+            product: true
+          %}
+        </a>
+      {% elsif type == 'thumbnails' %}
+        {% assign imgUrl = image | image_url: width: 175 %}
+        <div class="swiper-slide image-elements__image-thumbs">
+          {% render "render-image"
+            class: "swiper-image",
+            img_src: imgUrl,
+            img: image,
+            width: "175",
+            height: "175"
+          %}
+        </div>
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+{% capture join %}
+  {% if condition_order %}
+    {{ media }}
+    {{ media_without_position }}
+  {% else %}
+    {{ media_without_position }}
+  {% endif %}
+{% endcapture %}
+
+{% comment %}
+  Return product images
+{% endcomment %}
+
+{{ join }}

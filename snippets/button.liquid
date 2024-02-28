@@ -1,0 +1,67 @@
+{% comment %}
+    Button:
+     To use design sistem's button review the css classes in _buttons.scss file
+
+    Accepts:
+    - class: {String} className in button (optional)
+    - content: {String} Text button
+    - action: {String} type button, submit/button (Required)
+    - icon_arrow: true {Boolean} use to show icon arrow.
+    - arial_label: {Boolean}
+    - id: {String}
+    - name: {String}
+
+    If use this icon not use icon caret
+    - icon_plus: true {Boolean} use to show icon plus.
+
+    Icons_plus and icon_arrow: Use the same time with icon arrow to show both
+    - icon_caret: true {Boolean} use to show icon plus.
+    If use this icon not use icon arrow
+
+
+    Usage:
+    {% render 'button'
+      class: "btn-1 another-classes",
+      content: "Register",
+      action: "submit|button",
+      arial_label: 'name',
+      name: name,
+      id: id,
+      icon_arrow: true,
+      icon_plus: true,
+      icon_caret: true,
+    %}
+{% endcomment %}
+
+<!-- eslint-disable @html-eslint/require-button-type -->
+<button
+  class="{{ class }}"
+  type="{{ action }}"
+  {% if name != blank %} name="{{ name }}" {% endif %}
+  {% if id != id %} name="{{ id }}" {% endif %}
+  {% if id != blank %} id="{{ id }}" {% endif %}
+  {% if arial_label != blank %} aria-label="{{ arial_label }}" {% endif %}
+  {{ custom_attr }}
+>
+
+  {% if icon_plus %}
+    {% render 'icon-plus' %}
+  {% endif %}
+
+  <span>
+    {{ content }}
+  </span>
+
+  {% liquid
+    if icon_arrow or icon_caret
+      if icon_arrow
+        render 'icon-arrow'
+      endif
+
+      if icon_caret
+        render 'icon-caret'
+      endif
+    endif
+  %}
+</button>
+<!-- eslint-enable @html-eslint/require-button-type -->

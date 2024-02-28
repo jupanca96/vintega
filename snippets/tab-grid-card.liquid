@@ -1,0 +1,62 @@
+{% comment %}
+  Renders Tab grid card
+
+  Accepts:
+  - classname: {String} The class for the snippet,
+  - image: {Object} card_img,
+  - title: {String} card_title,
+  - description: {String} card_description,
+  - link_text: {String} card_link_text,
+  - link_url: {String} card_link_url
+
+  Usage:
+
+  {% render 'tab-grid-card',
+    classname: 'tabs-grid__card',
+    image: card_img,
+    title: card_title,
+    description: card_description,
+    link_text: card_link_text,
+    link_url: card_link_url
+  %}
+{% endcomment %}
+
+<div class="{{ classname }}">
+    {% assign class_img = classname | append: '-image' %}
+    {% assign image_src = image | img_url: icon_size %}
+
+    {% render "render-image"
+      class: class_img,
+      title: image.alt,
+      img: image,
+      img_src: image_src
+      size: icon_size,
+      alt: image.alt,
+      width: icon_size,
+      height: icon_size
+    %}
+
+  <div class="{{ classname }}-content">
+    {% if title != blank %}
+      <span class="h4 {{ classname | append: '-subtitle' }}">
+        {{ title }}
+      </span>
+    {% endif %}
+
+    {% if description != blank %}
+      <div class="{{ classname | append: '-description' }}">
+        {{ description }}
+      </div>
+    {% endif %}
+
+    {% if link_text != blank and link_url != blank %}
+      {% render 'link'
+        type: 'link'
+        class: {{ classname | append: '-link' }},
+        content: link_text,
+        url: link_url,
+        target: "_blank"
+      %}
+    {% endif %}
+  </div>
+</div>

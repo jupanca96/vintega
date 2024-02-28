@@ -1,0 +1,102 @@
+{% comment %}
+  Render card product in upsell cart
+
+  Accepts:
+  - product: {Object} product object
+
+  Usage:
+  {% render 'upsell-product-card'
+    product: upsell_product
+  %}
+{% endcomment %}
+
+{%- liquid
+  assign first_variant = product.selected_or_first_available_variant
+  assign img_url = product.featured_media | img_url: '133x133'
+  assign btn_text = 'products.product.add_to_cart' | t
+  assign available = product.selected_or_first_available_variant.available
+  assign vendor = product.vendor
+
+  if product.featured_image
+    assign image = product.featured_image
+  else
+    assign image = img_url
+  endif
+
+  for tag in product.tags
+    if tag == 'carte-cardeu'
+      assign cart_cardeu = true
+    endif
+  endfor
+-%}
+
+<div class="cart-upsell-container-product swiper-slide">
+  {% render "product-meta-data"
+  product: product
+  index: index %}
+
+  <a class="cart-upsell-container-product__image" href="{{ product.url }}">
+    {% render "render-image"
+      img_src: img_url,
+      img: image,
+      alt: image.alt,
+      size: "50 116"
+      width: "133",
+      height: "133"
+    %}
+  </a>
+
+  <div class="cart-upsell-container-product__mobile-gropup">
+    <a
+      class="cart-upsell-container-product__info"
+      href="{{ product.url }}"
+    >
+      {% unless cart_cardeu %}
+        {% if vendor != blank %}
+          <span class="cart-upsell-container-product__info-vendor subtitle--general">
+            {{ vendor }}
+          </span>
+        {% endif %}
+      {% endunless %}
+
+      <span class="cart-upsell-container-product__info-title">
+        {{ product.title }}
+      </span>
+
+      <div>
+        {% if product.compare_at_price %}
+          <span class="cart-upsell-container-product__info-compare">
+            {{ product.compare_at_price | money }}
+          </span>
+        {% endif %}
+
+        <span class="cart-upsell-container-product__info-price">
+          {{ product.price | money }}
+        </span>
+      </div>
+    </a>
+
+    <div class="cart-upsell-container-product__btn">
+
+      <form
+        data-product="{{ product.id }}"
+        class="add-product-cart-upsell"
+        data-form="upsell"
+      >
+
+        <input
+          type="hidden"
+          name="id"
+          value="{{ first_variant.id }}"
+        >
+
+        {% render 'button-add-cart'
+          btn_type: 'btn-1 upsell-btn',
+          class: 'btn-add-to-cart',
+          available: available,
+          upsell_button: true
+        %}
+      </form>
+    </div>
+  </div>
+</div>

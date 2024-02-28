@@ -1,0 +1,123 @@
+{% liquid
+  assign title = section.settings.heading
+  assign subtitle = section.settings.section_text
+%}
+
+{% if title != blank and subtitle != blank %}
+  <div class="wrapper-xm">
+    <h2 class="h4 cards-content__title">
+      {{ title }}
+    </h2>
+
+    <div class="cards-content__text">
+      {{ subtitle }}
+    </div>
+  </div>
+{% endif %}
+
+{% if section.blocks.size == 4 %}
+  {% assign cards_class = 'cards-content__container--grid' %}
+{% else %}
+  {% assign cards_class = 'cards-content__container--flex' %}
+{% endif %}
+
+{% if section.blocks.size > 0 %}
+  <div
+    class="wrapper-m cards-content__container cards-content__container--desktop {{ cards_class }}"
+  >
+    {% for block in section.blocks %}
+      {%
+        render 'card-ticket',
+        image: block.settings.image,
+        subtitle: block.settings.subtitle,
+        button_url: block.settings.button_url,
+        button_text: block.settings.button_text,
+      %}
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Cards content",
+  "class": "cards-content section-space",
+  "templates": [
+    "page"
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "content",
+      "name": "Cards content info",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Block image",
+          "info": "The image must be set in order to the block appears"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Block subtitle",
+          "info": "The subtitle for each blog",
+          "default": "Title goes here"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Block button url",
+          "info": "This is the button url for each block",
+          "default": "/"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Block button text",
+          "info": "This is the button text for each block",
+          "default": "CTA BUTTON"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Cards settings (Only for 4 blocks)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section title",
+      "info": "It is the main section title",
+      "default": "Où sommes-nous localisés?"
+    },
+    {
+      "type": "text",
+      "id": "section_text",
+      "label": "Section text",
+      "info": "It is the main section text",
+      "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel felis vitae magna pharetra interdum at ut purus. Donec dictum auctor libero.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cards content",
+      "blocks": [
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

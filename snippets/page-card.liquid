@@ -1,0 +1,27 @@
+{% comment %}
+  Renders a page card
+
+  Accepts:
+  - page: {Object} page Liquid object
+
+  Usage:
+  {% render 'page-card'
+    page: page
+  %}
+{% endcomment %}
+
+<div class="page-card">
+  <a
+    class="page-card--head"
+    href="{{ page.url }}"
+  >
+    <div class="page-card--head-images">
+      <div class="info">
+        <span>
+          {{ page.title }}
+        </span>
+      </div>
+      <span class="badge">{{ 'templates.search.page' | t }}</span>
+    </div>
+  </a>
+</div>

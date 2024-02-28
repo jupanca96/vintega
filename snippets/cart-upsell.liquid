@@ -1,0 +1,142 @@
+{% comment %}
+  Render Upsell Section
+
+  Accepts:
+  - cart: {Object} cart object
+  - collection: {Object} collection object with upsell products
+  - title: {String} section heading
+  - cartpage: {String} If it is on cartpage
+  - limit: {Number} It is the limit for products in upsell
+
+  Usage:
+  {% render 'cart-upsell'
+    cart: cart,
+    default_collection: section.settings.upsell_collection,
+    title: section.settings.upsell_title
+    cartpage: true
+    limit: 16
+  %}
+{% endcomment %}
+
+{% assign limit_products = limit | default: 16 %}
+
+{% if cartpage %}
+  {% assign upsell_class = 'h3' %}
+{% else %}
+  {% assign upsell_class = 'h6' %}
+{% endif %}
+
+
+  <div
+    class="cart-upsell"
+  >
+
+    {% comment %}
+      Shows metafield product if at least one product is available
+    {% endcomment %}
+    {% liquid
+      if cart.items.size > 0
+        assign available_counter = 0
+        assign first_item = cart.items[0]
+
+        if first_item
+          if first_item.product.metafields.custom.products_upsell
+            for item_metafield in first_item.product.metafields.custom.products_upsell.value
+
+              for line_item_all in cart.items
+
+                if item_metafield.id == line_item_all.product.id
+                  assign in_cart = line_item_all.product.id
+                  break
+                endif
+
+              endfor
+
+              if item_metafield.id == in_cart
+                continue
+              else
+                if item_metafield.available
+                  assign available_counter = available_counter | plus: 1
+                endif
+              endif
+
+            endfor
+
+          endif
+        endif
+
+        if available_counter > 0
+          assign iterator_items = cart.items[0].product.metafields.custom.products_upsell.value
+        endif
+      endif
+    %}
+
+    {% capture snippet_content %}
+      {% if cart.items.size <= 0 %}
+        {% render 'upsell-cart-logic'
+          default_collection: default_collection,
+          limit_products: limit_products,
+          cartpage: cartpage
+        %}
+      {% else %}
+        {% if available_counter > 0 %}
+          {% render 'upsell-cart-logic'
+            metafield_products: iterator_items,
+            limit_products: limit_products,
+            cartpage: cartpage
+          %}
+        {% else %}
+          {% render 'custom-carousel-logic'
+            current_product: cart.items[0].product,
+            type: 'cart',
+            cartpage: cartpage,
+            limit_products: limit_products
+          %}
+        {% endif %}
+      {% endif %}
+
+    {% endcapture %}
+
+    {% if snippet_content != blank %}
+      <span class="{{ upsell_class }} cart-upsell-title">
+        {{ title }}
+      </span>
+    {% endif %}
+
+    {% if cartpage %}
+      {% if snippet_content != blank %}
+        <div id="cartpage-upsell-js">
+          <div id="cartpage-upsell-slider">
+            {% liquid
+              assign slider_css_class = 'cart__slider'
+
+              if iterator_items <= 3
+              assign slider_css_class = slider_css_class | append: ' without-arrows'
+              endif
+            %}
+
+            {% render 'slider',
+              id: 'cart-slider',
+              custom_slider: "slider_defer",
+              arrows: true,
+              content: snippet_content,
+              wrapper: 'cart__slider'
+            %}
+          </div>
+        </div>
+      {% endif %}
+    {% else %}
+      {% if snippet_content != blank %}
+        <div id="upsell-js">
+          <div id="cart-upsell-slider">
+            {% render 'slider-upsell'
+              content: snippet_content,
+              class: "cart-upsell__slider",
+              pagination: true
+              type: 'horizontal'
+            %}
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>

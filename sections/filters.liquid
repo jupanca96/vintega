@@ -1,0 +1,121 @@
+<div class="wrapper">
+  <div class="collection-filters__actives">
+
+    {%- liquid
+      assign filter_length = 0
+
+      for filter in collection.filters
+        for filter_value in filter.active_values
+          assign filter_length = forloop.length
+        endfor
+      endfor
+    -%}
+
+    {%- if filter_length != 0 -%}
+      <a
+        href="{{ collection.url }}?sort_by={{ collection.sort_by }}"
+        class="active-filters__clear">
+        {{ 'products.facets.clear_all' | t }}
+      </a>
+    {%- endif -%}
+
+    {%- for filter in collection.filters -%}
+      {%- if filter.type == "price_range" -%}
+        {%- if filter.min_value.value != nil or
+          filter.max_value.value != nil
+        -%}
+          <div class="active-filters__tag">
+            {%- assign min_value = filter.min_value.value | default: 0 -%}
+            {%- assign max_value =
+              filter.max_value.value | default: filter.range_max
+            -%}
+            {{ min_value | money }} - {{ max_value | money }}
+
+            <a
+              class="active-filters__remove-filter"
+              href="{{ filter.url_to_remove }}"
+            >
+              ✕
+            </a>
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        {%- for filter_value in filter.active_values -%}
+          <span
+            class="active-filters__tag"
+            href="{{ filter_value.url_to_remove }}"
+          >
+            {{ filter_value.label }}
+
+            <a
+              class="active-filters__remove-filter"
+              href="{{ filter.url_to_remove }}"
+            >
+              ✕
+            </a>
+          </span>
+        {%- endfor -%}
+      {%- endif- %}
+    {%- endfor -%}
+  </div>
+</div>
+
+<div class="collection-filters">
+  <div class="wrapper">
+    <div class="collection-filters__controls">
+      <div class="filter-option">
+        <button
+          type="button"
+          id="filter-open"
+          class="flex"
+        >
+          {% render 'icon-filter' %}
+        </button>
+        <label>
+          <input
+              class="clear-filter-js hidden"
+              type="radio"
+              name="filter"
+          >
+          <div class="filter-design"></div>
+          <span class="filter-label">
+              Clear all
+          </span>
+        </label>
+      </div>
+
+      <div>
+        <select id="sort-by">
+          <!-- eslint-disable-next-line max-len -->
+          {% assign sort_by = collection.sort_by | default: collection.default_sort_by %}
+          {% for option in collection.sort_options %}
+            <!-- eslint-disable @html-eslint/no-extra-spacing-attrs -->
+            <option
+              value="{{ option.value }}"
+              {% if option.value == sort_by %} selected="selected"{% endif %}
+            >
+              {{ option.name }}
+            </option>
+            <!-- eslint-enable @html-eslint/no-extra-spacing-attrs -->
+          {% endfor %}
+        </select>
+
+        <span>
+          {{ 'sections.collection_template.count_products'
+            | t: count: collection.products_count
+          }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% render 'filtering-store' %}
+
+{% schema %}
+  {
+    "name": "filters",
+    "tag": "section",
+    "settings": []
+  }
+{% endschema %}

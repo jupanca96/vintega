@@ -1,0 +1,91 @@
+{%- if predictive_search.performed -%}
+
+{% assign item_results = 'products' | split: ',' %}
+
+<div id="predictive-search-results">
+  {% for object in item_results %}
+    {% assign element = predictive_search.resources[object] %}
+
+    {%- if element.size > 0 -%}
+      <h3 id="predictive-search-products" class="predictive-search__heading">
+        {{ object }}
+      </h3>
+
+      <ul>
+        {%- for item in element -%}
+          {% if item.selected_or_first_available_variant.available %}
+            {% assign item_available = 'is_available' %}
+            {% else %}
+            {% assign item_available = 'not_available' %}
+          {% endif %}
+          <li class="predictive-search__list-item {{item_available}}" role="option">
+            {% case object %}
+              {% when "products" %}
+                {% render 'item-predictive-search'
+                  item: item,
+                  item_url: item.url,
+                  item_img_src: item.featured_media.src,
+                  item_img: item.featured_media,
+                  item_alt: item.featured_media.alt,
+                  item_title: item.title,
+                  item_is_available: item.selected_or_first_available_variant.available
+                %}
+              {%  when "collections" or "pages" %}
+                {% render 'item-predictive-search'
+                  item_url: item.url,
+                  item_img_src: item.featured_image.src,
+                  item_img: item.featured_image,
+                  item_alt: item.featured_image.alt,
+                  item_title: item.title,
+                %}
+              {% when "articles" %}
+                {% render 'item-predictive-search'
+                  item_url: item.url,
+                  item_img_src: item.image.src,
+                  item_img: item.image,
+                  item_alt: item.image.alt,
+                  item_title: item.title,
+                %}
+            {% endcase %}
+          </li>
+        {%- endfor -%}
+      </ul>
+      <ul class="result__button">
+        <li class="predictive-search__list-item" role="option">
+          <button
+            type="submit"
+            class="btn-1 predictive-search__item"
+            tabindex="-1"
+          >
+            {{ section.settings.btn_text }}
+          </button>
+        </li>
+      </ul>
+    {% else %}
+      <span class="predictive__empty">{{ section.settings.empty_text }}</span>
+    {%- endif -%}
+  {% endfor %}
+</div>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Search blogs collection",
+    "tag": "section",
+    "class": "wrapper margin-wrapper",
+    "settings": [
+      {
+        "type": "text",
+        "id": "btn_text",
+        "label": "Button search text",
+        "default": "VOIR TOUS"
+      },
+      {
+        "type": "text",
+        "id": "empty_text",
+        "label": "Empty seach text",
+        "default": "Aucun produit n'a été trouvé pour cette recherche"
+      }
+    ]
+  }
+{% endschema %}

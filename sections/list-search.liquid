@@ -1,0 +1,68 @@
+<div class="result__search--header">
+  <h2>{{ 'templates.search.title' | t }}</h2>
+  {%  render 'predictive-search'
+    visible: true,
+    search_params: "product",
+    limit_search: 10
+  %}
+</div>
+{% paginate search.results by 24 %}
+
+  <div class="result__search--list">
+    <div class="result__search--list-head">
+      {{ 'templates.search.results_with_count.other'
+        | t : count:  search.results_count
+      }}
+
+    </div>
+    <div class="grid">
+
+      {%- for item in search.results -%}
+        {% assign lazy_load = false %}
+        {%- if forloop.index > 2 -%}
+          {%- assign lazy_load = true -%}
+        {%- endif -%}
+
+          {%- case item.object_type -%}
+            {%- when 'product' -%}
+              {% render 'product-card',
+                product: item,
+              %}
+            {%- when 'article' -%}
+              {% render 'article-card',
+                article: item,
+              %}
+            {%- when 'page' -%}
+              {% render 'page-card',
+                page: item,
+              %}
+            {%- when 'collection' -%}
+              <p>collection</p>
+          {%- endcase -%}
+
+      {%- endfor -%}
+
+    </div>
+  </div>
+  {%- if paginate.pages > 1 -%}
+    {% render 'pagination', paginate: paginate %}
+  {%- endif -%}
+</div>
+{% endpaginate %}
+
+{% if search.results_count == 0 %}
+  <span class="result__search--empty">
+    {{ "templates.search.no_results"
+      | t: terms: search.terms
+    }}
+  </span>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Main search",
+  "tag": "section",
+  "class": "wrapper result__search",
+  "settings": []
+}
+{% endschema %}

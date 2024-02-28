@@ -1,0 +1,1305 @@
+<!-- eslint-disable max-len -->
+
+{% assign customerId = customer.id %}
+{% comment %} {% assign customerId = 6650002571496 %} {% endcomment %}
+
+<div class="v-tab-box sale-account" id="v-sale">
+  <div v-if="!hasSelection">
+
+    <div class="sale-account__title">
+      <span class="v-account-title">Mes ventes</span>
+    </div>
+
+    <filterable
+      :refresh="refreshLeads"
+      :show-filter="false"
+      :endpoint="'api/leads'"
+      :params="{...{'client': '{{ customerId }}'},...listParams}"
+      :sortable="[]"
+      :filter-group="[]"
+      ref="filterable"
+    >
+      <template
+        slot-scope="{ items, remove, sortingClass, sortData }"
+        slot="content"
+      >
+        <div
+          class="sale-account__item"
+          v-for="item in items.data"
+          v-bind:key="item.id"
+        >
+          <div>
+            <table>
+              <tbody>
+                <tr class="sale-account__item-info">
+                  <td
+                    class="sale-account__item-image"
+                  >
+                    <img v-if="item.image" :src="item.image">
+                  </td>
+                  <td class="sale-account__item-text">
+                    <div class="sale-account__item-order-num">
+                      <div>
+                        Demande #${item.lead_number}
+                      </div>
+
+                      <div>
+                        ${item.created|dateFormat('D/M/Y')}
+                      </div>
+                    </div>
+                    <div class="sale-account__item-status">
+                      <a class="btn-1">STATUT : ${item.status_label}</a>
+                    </div>
+                    <div class="sale-account__item-btn-toggle">
+                      <a
+                        href="javascript:;"
+                        @click="toggleDetailAccordian(item.identifier)"
+                        class="open-acc"
+                      >
+                        Voir la demande
+                        {% render 'icon-caret' %}
+                        <span data-v-149c717c="" class="icon-angle-down"></span>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            v-if="selected === item.identifier"
+            class="sale-account__item-detail"
+          >
+            <ul class="sale-account__item-detail-accordion">
+              <li>
+                <a
+                  href="javascript:;"
+                  @click="toggleSelectedItemAccord(0)"
+                  class="sale-account__item-detail-title"
+                >
+                  ${item.offer_title}
+                  {% render 'icon-caret' %}
+                </a>
+                <div
+                  v-if="selected === item.identifier && selectedItemAccord === 0"
+                  class="sale-account__item-detail-content description"
+                >
+                  <p v-html="item.offer_description"></p>
+                  <a
+                    v-if="item.status === 'status_bag_ready_to_send' && item.download_url"
+                    :href="item.download_url"
+                    target="_blank"
+                    class="Button"
+                  >
+                    Télécharger son etiquette d'envoi
+                  </a>
+
+                  <a
+                    v-if="item.status === 'status_online' && item.link"
+                    :href="item.link"
+                    target="_blank"
+                    class="Button"
+                  >
+                    Cliquer pour voir le sac en ligne
+                  </a>
+
+                  <div class="smb-account__second-form-container" v-if="item.status === 'status_price_modification'">
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="acceptTheLeadPriceModification(item.identifier, {{ customerId }})"
+                      >
+                        <span>Accepter</span>
+                      </a>
+                    </div>
+                    <span class="smb-account__second-form-sep">
+                      OU
+                    </span>
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="toggleSelectedItemAccord(2)"
+                      >
+                        Ouvrir une discussion avec l'équipe Vintega
+                      </a>
+                    </div>
+                  </div>
+
+                  <div v-if="item.status === 'status_to_accept'">
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="acceptTheLead(item.identifier, {{ customerId }})"
+                      >
+                        <span>ACCEPTER</span>
+                        <span>ET RECEVOIR ${item.price}€</span>
+                      </a>
+                    </div>
+
+                    <br />
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="toggleSelectedItemAccord(2)"
+                      >
+                        Ouvrir une discussion avec l'équipe Vintega
+                      </a>
+                    </div>
+
+                  </div>
+
+                  <div class="smb-account__second-form-container" v-if="item.status === 'status_partially_accepted'">
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="handleTheBagDeposit(item.identifier, {{ customerId }})"
+                      >
+                        <span>Déposer mon sac chez Vintega</span>
+                      </a>
+                    </div>
+                    <span class="smb-account__second-form-sep">
+                      OU
+                    </span>
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="handleTheBag(item.identifier, {{ customerId }})"
+                      >
+                        <span>Envoyer mon sac par la poste</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div v-if="item.status === 'status_bag_to_send' || item.status === 'status_bag_to_deposit'">
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="toggleIsAddress(item, {{ customerId }})"
+                        v-if="item.status === 'status_bag_to_send'"
+                      >
+                        Renseigner mon RIB et mon adresse postale
+                      </a>
+                    </div>
+
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="toggleIsAddress(item, {{ customerId }})"
+                        v-if="item.status === 'status_bag_to_deposit'">
+                        Renseigner mon RIB
+                      </a>
+                    </div>
+                    <form
+                      v-if="isAddress"
+                      @submit.prevent="updateLeadAddress"
+                      novalidate
+                    >
+                      <div class="">
+                        <div class="form__textfield-label size-s form__textfield-label--spaced">
+                          <label
+                            class="control-label mb-10"
+                            for="person_name"
+                          >
+                            NOM & PRÉNOM
+                          </label>
+                          <input
+                            id="person_name"
+                            type="text"
+                            name="person_name"
+                            :value="address.person_name"
+                            @input="updateAddressInput"
+                            required
+                          />
+                          <input-error
+                            :errors="leadFormErrors"
+                            :name="'person_name'"
+                          ></input-error>
+                        </div>
+
+                        <div class="form__textfield-label size-s form__textfield-label--spaced">
+                          <label
+                            class="control-label mb-10"
+                            for="iban"
+                          >
+                            IBAN
+                          </label>
+                          <input
+                            id="iban"
+                            type="text"
+                            name="iban"
+                            :value="address.iban"
+                            @input="updateAddressInput"
+                            required
+                          />
+                          <input-error
+                            :errors="leadFormErrors"
+                            :name="'iban'"
+                          ></input-error>
+                        </div>
+
+                        <div class="form__textfield-label size-s form__textfield-label--spaced">
+                          <label
+                            class="control-label mb-10"
+                            for="bic"
+                          >
+                            BIC / SWIFT
+                          </label>
+                          <input
+                            id="bic"
+                            type="text"
+                            name="bic"
+                            :value="address.bic"
+                            @input="updateAddressInput"
+                            required
+                          />
+                          <input-error
+                            :errors="leadFormErrors"
+                            :name="'bic'"
+                          ></input-error>
+                        </div>
+                        <div
+                          class="form__textfield-label size-s form__textfield-label--spaced"
+                          v-if="item.status === 'status_bag_to_send'"
+                        >
+                            <label
+                              class="control-label mb-10"
+                              for="address"
+                            >
+                              Addresse de collecte du sac
+                            </label>
+                            <textarea
+                              id="address"
+                              name="address"
+                              :value="address.address"
+                              @input="updateAddressInput"
+                              required></textarea>
+                            <input-error
+                              :errors="leadFormErrors"
+                              :name="'address'"
+                            ></input-error>
+                        </div>
+
+                        <div class="form-group text-right">
+                          <vue-button-spinner
+                            class="btn-2"
+                            :is-loading="leadFormLoading"
+                            :disabled="leadFormLoading"
+                          >
+                            Enregistrer
+                          </vue-button-spinner>
+                        </div>
+                      </div>
+                    </form>
+
+                    <br />
+                    <div class="smb-account__second-form">
+                      <a
+                        href="javascript:;"
+                        class="btn-2"
+                        @click="toggleSelectedItemAccord(2)"
+                      >
+                        Ouvrir une discussion avec l'équipe Vintega
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="click">
+                <a
+                  href="javascript:;"
+                  @click="toggleSelectedItemAccord(1)"
+                  class="sale-account__item-detail-title"
+                >
+                  RÉCAPITULATIF DE VOTRE DEMANDE
+                  {% render 'icon-caret' %}
+                </a>
+                <div
+                  v-if="selected === item.identifier && selectedItemAccord === 1"
+                  class="sale-account__item-detail-content"
+                >
+                  <div class="product-summary">
+                    <div class="product-summary__content">
+                      <ul>
+                        <li>Marque : ${item.brand}</li>
+                        <li>Année d'Achat : ${item.year_of_purchase}</li>
+                        <li>Couleur : ${item.color_label} </li>
+                        <li>Matière : ${item.material_label} </li>
+                        <li>Dimensions : ${item.dimension}</li>
+                        <li>Hauteur : ${item.height}${item.unit} </li>
+                        <li>Longueur : ${item.width}${item.unit}</li>
+                        <li>Etat du sac : ${item.item_condition} </li>
+                        <li>Accessoires : ${item.holdings}</li>
+                        <li>Commentaires : ${item.remarks}</li>
+                      </ul>
+                      <ul>
+                        <li>
+                          Coordonées :
+                        </li>
+                        <li>
+                          Prénom : ${item.customer.first_name}
+                        </li>
+                        <li>
+                          Nom : ${item.customer.last_name}
+                        </li>
+                        <li>
+                          Adresse email : ${item.customer.email}
+                        </li>
+                        <li>
+                          Numéro de téléphone : ${item.customer.phone}
+                        </li>
+                        <li>
+                          <span v-if="item.address">
+                            Adresse de collecte du sac : ${item.address}
+                          </span>
+                        </li>
+                      </ul>
+                      <div class="product-summary__img-container">
+                        <button
+                          type="button"
+                          @click="selectLead(item, {{ customerId }})"
+                          class="btn-1"
+                        >
+                          Modifier
+                        </button>
+                        <div class="product-summary__img" v-if="item.media">
+                          <ul>
+                            <li v-for="image in item.media">
+                              <img :src="image.url" class="img-fluid">
+                              <a
+                                @click="removeLeadAttachment(item.identifier, image.identifier, {{ customerId }})"
+                                class="remove-btn"
+                              >
+                                X
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <a
+                  href="javascript:;"
+                  @click="toggleSelectedItemAccord(2)"
+                  class="sale-account__item-detail-title"
+                >
+                  DISCUSSION
+                  {% render 'icon-caret' %}
+                </a>
+
+                <div
+                  v-if="selected === item.identifier && selectedItemAccord === 2"
+                  class="sale-account__item-detail-content discussion"
+                >
+                  <filterable
+                    :show-filter="false"
+                    :endpoint="`api/leads/${item.identifier}/comments`"
+                    :params="{...{'client': '{{ customerId }}'},...listParams}"
+                    :sortable="[]"
+                    :filter-group="[]"
+                  />
+                    <template
+                      slot-scope="{ items, remove, sortingClass, sortData }"
+                      slot="content"
+                    >
+                      <div
+                        class="discussion__comment"
+                        v-for="comment in items.data"
+                        :class="{'staff': comment.awaiting === 'client', 'client': comment.awaiting === 'staff'}"
+                      >
+                        <div
+                          class="media"
+                          :class="{'staff': comment.awaiting === 'client', 'client': comment.awaiting === 'staff'}"
+                        >
+                          <div class="discussion__media-body">
+                            <div class="discussion__comment-head">
+                              <h3 v-if="comment.awaiting !== 'staff'">
+                                Olivia
+                              </h3>
+                              <h4 v-if="comment.awaiting === 'staff'">
+                                ${_.get(comment, 'author.first_name', 'You')}
+                              </h4>
+                              <p class="discussion__comment-date">
+                                ${_.get(comment, 'created', null)|dateFormat('DD MMMM YYYY, h:mm a')}
+                              </p>
+                            </div>
+
+                            <p class="discussion__comment-text" v-html="_.get(comment, 'comment', null)"></p>
+
+                            <template v-if="comment.media">
+                              <hr v-if="comment.media.length"/>
+
+                              <template v-for="attachment in comment.media">
+                                <span class="discussion__comment-attachment">
+                                  <a :href="attachment.url" target="_blank">
+                                    <img :src="attachment.url" width="80" height="80" :title="attachment.name">
+                                  </a>
+                                </span>
+                              </template>
+                            </template>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+
+                    <template slot="paging">
+                      <div></div>
+                    </template>
+                  </filterable>
+
+                  <div>
+                    <form
+                      @submit.prevent="replyForm(item.identifier)"
+                      novalidate
+                    >
+                        <textarea
+                          cols="30"
+                          rows="10"
+                          name="comment"
+                          aria-label=""
+                          placeholder=""
+                          required=""
+                          :value="replyFormComment.comment"
+                          @input="setReplyComment"
+                        ></textarea>
+                        <input-error
+                          :errors="replyFormErrors"
+                          :name="'comment'"
+                        ></input-error>
+
+                        <div class="sale-account__input-file">
+                          <img id="file_upload" src="" alt="" class="upload-img">
+                          <div class="input-file-upload">
+                            <span class="upload-label">
+                              Chargement de vos photos au format jpg, png.
+                            </span>
+                            <input
+                              type="file"
+                              name="attachments"
+                              v-on:change="handleReplyAttachments"
+                              multiple
+                            />
+                          </div>
+                          ${selectedAttachments} fichier(s) sélectionné(s)
+                        </div>
+                        <vue-button-spinner
+                          class="btn-1"
+                          :isLoading="replyFormLoading"
+                          :disabled="replyFormLoading"
+                        >
+                          Envoyer
+                        </vue-button-spinner>
+                    </form>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {% comment %}
+          When there are not bags in process o sold out
+        {% endcomment %}
+        <div v-if="!_.get(items, 'meta.total', 0)" class="sale-account__item--empty">
+          <p id="customer-id">
+            customer id: {{ customerId }}
+          </p>
+
+          <div class="sell__wrapper">
+            <p>
+              {{ 'customer.sell_my_bag.my_sells.description' | t }}
+             </p>
+            <a href="/pages/sell-my-bag-new" class="btn-2 btn btn-blue ads account__btn--empty">
+              {{ 'customer.sell_my_bag.my_sells.button_text' | t }}
+            </a>
+          </div>
+        </div>
+      </template>
+
+      <template slot="paging">
+        <div></div>
+      </template>
+    </filterable>
+  </div>
+
+  <div v-if="hasSelection">
+    <di class="sale-account__btn-retour">
+      <a
+        href="javascript:;"
+        class="btn-1"
+        @click="back"
+      >
+        Retour
+      </a>
+    </di>
+
+    <div class="v-sell-form-wrap smb__container">
+      <div class="wizard">
+        <form @submit.prevent="updateLead">
+          <div class="v-step active">
+            <div class="smb__form-step">
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>De quelle marque est votre sac ?</label>
+                <select
+                  name="brand"
+                  :value="selectedLead.brand"
+                  @input="updateInput"
+                  class="form__textfield-label--spaced"
+                >
+                  <option value=""> Merci de choisir un élément </option>
+                  <option value="Alaia"> Alaia </option>
+                  <option value="Alexander Mc Queen">
+                    Alexander Mc Queen
+                  </option>
+                  <option value="Balenciaga"> Balenciaga </option>
+                  <option value="Balmain"> Balmain </option>
+                  <option value="Bottega Veneta"> Bottega Veneta </option>
+                  <option value="Burberry"> Burberry </option>
+                  <option value="Bvlgari"> Bvlgari </option>
+                  <option value="Celine"> Celine </option>
+                  <option value="Chanel"> Chanel </option>
+                  <option value="Chloe"> Chloe </option>
+                  <option value="Delvaux"> Delvaux </option>
+                  <option value="Dolce &amp; Gabbana">
+                    Dolce &amp; Gabbana
+                  </option>
+                  <option value="Dior"> Dior </option>
+                  <option value="Fendi"> Fendi </option>
+                  <option value="Givenchy"> Givenchy </option>
+                  <option value="Gucci"> Gucci </option>
+                  <option value="Hermes"> Hermes </option>
+                  <option value="Loewe"> Loewe </option>
+                  <option value="Louis Vuitton"> Louis Vuitton </option>
+                  <option value="Maison Martin Margiela">
+                    Maison Martin Margiela
+                  </option>
+                  <option value="Miu Miu"> Miu Miu </option>
+                  <option value="Prada"> Prada </option>
+                  <option value="Proenza Shoulder"> Proenza Shoulder </option>
+                  <option value="Roger Vivier"> Roger Vivier </option>
+                  <option value="Saint Laurent"> Saint Laurent </option>
+                  <option value="Stella Mc Cartney"> Stella Mc Cartney </option>
+                  <option value="Valentino"> Valentino </option>
+                  <option value="Versace"> Versace </option>
+                  <option value="Autre"> Autre </option>
+                </select>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'brand', null)"
+                >
+                  <span v-for="message in _.get(leadFormErrors, 'brand', [])">
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Année d’achat</label>
+
+                <div class="input-container">
+                  <input
+                    name="year_of_purchase"
+                    @input="updateInput"
+                    :value="selectedLead.year_of_purchase"
+                    type="text"
+                    placeholder="DATE"
+                  />
+                </div>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'year_of_purchase', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'year_of_purchase', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Couleur :</label>
+                <select
+                  name="color"
+                  :value="selectedLead.color"
+                  @input="updateInput"
+                >
+                  <option value=""> Please Select </option>
+                  <option value="Argent"> Argent </option>
+                  <option value="Bordeaux"> Bordeaux </option>
+                  <option value="Blanc "> Blanc </option>
+                  <option value="Bleu"> Bleu </option>
+                  <option value="Camel"> Camel </option>
+                  <option value="Gris"> Gris </option>
+                  <option value="Imprimer / Patchwork">
+                    Imprimer / Patchwork
+                  </option>
+                  <option value="Jaune"> Jaune </option>
+                  <option value="Marron"> Marron </option>
+                  <option value="Multicolores"> Multicolores </option>
+                  <option value="Noir"> Noir </option>
+                  <option value="Or"> Or </option>
+                  <option value="Orange"> Orange </option>
+                  <option value="Rouge"> Rouge </option>
+                  <option value="Rose"> Rose </option>
+                  <option value="Vert"> Vert </option>
+                  <option value="Violet "> Violet </option>
+                  <option value="Autre"> Autre </option>
+                </select>
+
+                <div v-if="selectedLead.color == 'Autre'">
+                  <input
+                    min="0" name="other_color"
+                    @input="updateInput"
+                    :value="selectedLead.other_color"
+                    type="text"
+                    placeholder="Autre"
+                  />
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(leadFormErrors, 'other_color', null)"
+                  >
+                    <span v-for="message in _.get(leadFormErrors, 'other_color', [])">
+                      ${ message }
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'color', null)"
+                >
+                  <span v-for="message in _.get(leadFormErrors, 'color', [])">
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Matière</label>
+                <select
+                  name="material"
+                  @input="updateInput"
+                  :value="selectedLead.material"
+                  class="form__textfield-label--spaced"
+                >
+                  <option value=""> Please Select </option>
+                  <option value="Bois"> Bois </option>
+                  <option value="Coton"> Coton </option>
+                  <option value="Cuir"> Cuir </option>
+                  <option value="Cuir Vernis"> Cuir Vernis </option>
+                  <option value="Cuir Exotique "> Cuir Exotique </option>
+                  <option value="Daim"> Daim </option>
+                  <option value="Denim"> Denim </option>
+                  <option value="Jersey"> Jersey </option>
+                  <option value="Laine"> Laine </option>
+                  <option value="Lin"> Lin </option>
+                  <option value="Metal"> Metal </option>
+                  <option value="Nylon"> Nylon </option>
+                  <option value="Polyester "> Polyester </option>
+                  <option value="Satin"> Satin </option>
+                  <option value="Sequins"> Sequins </option>
+                  <option value="Soie"> Soie </option>
+                  <option value="Synthétique"> Synthétique </option>
+                  <option value="Toile"> Toile </option>
+                  <option value="Tweed"> Tweed </option>
+                  <option value="Veau facon poulain">
+                    Veau facon poulain
+                  </option>
+                  <option value="Velours"> Velours </option>
+                  <option value="Autre"> Autre </option>
+                </select>
+
+                <div v-if="selectedLead.material == 'Autre'" class="input-container">
+                  <input
+                    min="0"
+                    name="other_material"
+                    @input="updateInput"
+                    :value="selectedLead.other_material"
+                    type="text" placeholder="Autre"
+                  />
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(leadFormErrors, 'other_material', null)"
+                    >
+                      <span v-for="message in _.get(leadFormErrors, 'other_material', [])">
+                        ${ message }
+                      </span>
+                    </div>
+                </div>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'material', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'material', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Dimensions </label>
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <select
+                    name="unit"
+                    @input="updateInput"
+                    :value="selectedLead.unit"
+                  >
+                    <option value=""> Merci de choisir un élément </option>
+                    <option value="cm"> cm </option>
+                    <option value="in"> in </option>
+                  </select>
+
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(leadFormErrors, 'unit', null)"
+                  >
+                    <span v-for="message in _.get(leadFormErrors, 'unit', [])">
+                      ${ message }
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <div class="input-container">
+                    <input
+                      min="0" name="height"
+                      @input="updateInput"
+                      :value="selectedLead.height"
+                      type="number"
+                      placeholder="00 cm (hauteur)"
+                    />
+
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(leadFormErrors, 'height', null)"
+                    >
+                      <span
+                        v-for="message in _.get(leadFormErrors, 'height', [])"
+                      >
+                        ${ message }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <div class="input-container">
+                    <input
+                      name="width"
+                      @input="updateInput"
+                      :value="selectedLead.width"
+                      type="number"
+                      placeholder="00 cm (largeur)"
+                    />
+
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(leadFormErrors, 'width', null)"
+                    >
+                      <span
+                        v-for="message in _.get(leadFormErrors, 'width', [])"
+                      >
+                        ${ message }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Quelle est la condition de votre sac ?</label>
+                <select
+                  name="item_condition"
+                  @input="updateInput"
+                  :value="selectedLead.item_condition"
+                >
+                  <option value=""> Please Select </option>
+                  <option value="A l Etat Neuf "> A l Etat Neuf </option>
+                  <option value="Excellent"> Excellent </option>
+                  <option value="Tres bon"> Tres bon </option>
+                  <option value="Bon"> Bon </option>
+                  <option value="Correct "> Correct </option>
+                </select>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'item_condition', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'item_condition', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+
+              </div>
+
+              <div class="open-popup-link__wrapper">
+                <a
+                  href="#test-popup"
+                  class="open-popup-link"
+                >
+                  En savoir plus sur les conditions des sacs !
+                </a>
+              </div>
+
+              <div class="smb__form-check-container">
+                <label class="smb__form-check-title">Vous détenez :</label>
+
+                <p>
+                  Ces éléments seront à fournir lors de l’envoi de votre sac !
+                </p>
+
+                <div class="form__checkbox">
+                  <input
+                    type="checkbox"
+                    id="cadenas"
+                    name="holdings"
+                    @input="selectHoldings"
+                    value="Cadenas et clés"
+                    :checked="_.includes(selectedLead.holdings, 'Cadenas et clés')"
+                  />
+
+                  <span class="slider"></span>
+
+                  <label for="cadenas">Cadenas et clés</label>
+                </div>
+
+                <div class="form__checkbox">
+                  <input
+                    type="checkbox"
+                    id="dustbag"
+                    name="holdings"
+                    @input="selectHoldings"
+                    value="dustbag"
+                    :checked="_.includes(selectedLead.holdings, 'dustbag')"
+                  />
+
+                  <span class="slider"></span>
+
+                  <label for="dustbag">Dustbag</label>
+                </div>
+
+                <div class="form__checkbox">
+                  <input
+                    type="checkbox"
+                    id="Certificat"
+                    name="holdings"
+                    @input="selectHoldings"
+                    value="Certificat"
+                    :checked="_.includes(selectedLead.holdings, 'Certificat')"
+                  />
+
+                  <span class="slider"></span>
+
+                  <label for="Certificat">Certificat d’authentification</label>
+                </div>
+
+                <div class="form__checkbox">
+                  <input
+                    type="checkbox"
+                    id="Carte"
+                    name="holdings"
+                    @input="selectHoldings"
+                    value="Carte"
+                    :checked="_.includes(selectedLead.holdings, 'Carte')"
+                  />
+
+                  <span class="slider"></span>
+
+                  <label for="Carte">Carte d’authenticité</label>
+                </div>
+
+                <div class="form__checkbox">
+                  <input
+                    type="checkbox"
+                    id="Boite"
+                    name="holdings"
+                    @input="selectHoldings"
+                    value="Boite"
+                    :checked="_.includes(selectedLead.holdings, 'Boite')"
+                  />
+
+                  <span class="slider"></span>
+
+                  <label for="Boite">Boite</label>
+                </div>
+
+                <p>
+                  Ces éléments seront à fournir lors de l’envoi de votre sac !
+                </p>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'holdings', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'holdings', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Commentaire :</label>
+                <textarea
+                  name="remarks"
+                  @input="updateInput"
+                  :value="selectedLead.remarks"
+                ></textarea>
+                <p>( Facultatif )</p>
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'remarks', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'remarks', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="v-step v-step-two active">
+            <div class="smb__form-step">
+
+              <h3>Prise De Photos</h3>
+
+              <div
+                class="text-danger"
+                v-if="_.has(leadFormErrors, 'attachments', null)"
+              >
+                <span
+                  v-for="message in _.get(leadFormErrors, 'attachments', [])"
+                >
+                  ${ message }
+                </span>
+              </div>
+
+              <div class="smb__form-photos">
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': leadFormAttachments.first}"
+                    :style="handleFirstStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br /> ( Vue de face )
+                    </button>
+
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="firstAttach"
+                      v-on:change="handleFirstAttachment"
+                    />
+
+                    <a
+                      @click="removeAttachment('first')"
+                      v-if="leadFormAttachments.first"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': leadFormAttachments.second}"
+                    :style="handleSecondStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br /> ( Vue de dos )
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="secondAttach"
+                      v-on:change="handleSecondAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('second')"
+                      v-if="leadFormAttachments.second"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': leadFormAttachments.third}"
+                    :style="handleThirdStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br /> (Vue de dessous )
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="thirdAttach"
+                      v-on:change="handleThirdAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('third')"
+                      v-if="leadFormAttachments.third"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': leadFormAttachments.fourth}"
+                    :style="handleFourthStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br /> (  Vue de l’intérieur )
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="fourthAttach"
+                      v-on:change="handleFourthAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('fourth')"
+                      v-if="leadFormAttachments.fourth"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': leadFormAttachments.fifth}"
+                    :style="handleFifthStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br /> ( Numéro de série )
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="fifthAttach" v-on:change="handleFifthAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('fifth')"
+                      v-if="leadFormAttachments.fifth"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': leadFormAttachments.sixth}"
+                    :style="handleSixthStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br /> ( Label de la marque)
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="sixthAttach"
+                      v-on:change="handleSixthAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('sixth')"
+                      v-if="leadFormAttachments.sixth"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="v-step active">
+            <div class="smb__form-step">
+              <h3>Vos Coordonnées </h3>
+
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Prénom*</label>
+
+                <div class="input-container">
+                  <input
+                    name="first_name"
+                    @input="updateInput"
+                    :value="selectedLead.first_name"
+                    type="text"
+                    placeholder="Prénom"
+                  />
+                </div>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'first_name', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'first_name', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Nom de famille*</label>
+
+                <div class="input-container">
+                  <input
+                    name="last_name"
+                    @input="updateInput"
+                    :value="selectedLead.last_name"
+                    type="text"
+                    placeholder="Nom de famille"
+                  />
+                </div>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'last_name', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'last_name', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Votre adresse mail*</label>
+
+                <div class="input-container">
+                  <input
+                    name="email"
+                    @input="updateInput"
+                    :value="selectedLead.email"
+                    type="text"
+                    placeholder="ADRESSE E-MAIL"
+                  />
+                </div>
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'email', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'email', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>
+                  Votre numéro de téléphone*
+                </label>
+                <input
+                  name="phone"
+                  @input="updateInput"
+                  :value="selectedLead.phone"
+                  type="text"
+                  placeholder="NUMERO DE TELEPHONE"
+                />
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(leadFormErrors, 'phone', null)"
+                >
+                  <span
+                    v-for="message in _.get(leadFormErrors, 'phone', [])"
+                  >
+                    ${ message }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <vue-button-spinner
+            class="btn-1 sale-account__btn-submit"
+            :isLoading="leadFormLoading"
+            :disabled="leadFormLoading"
+          >
+            Mettre à jour
+          </vue-button-spinner>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  window._APP_WRAP_MOUNT = "#v-sale";
+
+  var origin   = window.location.host;
+  var _locale = "fr";
+  origin = origin.split(".");
+
+  if(origin) {
+    origin = origin.shift();
+    if(origin) {
+
+      origin = origin.toLowerCase();
+      var locales = ["de", "es", "fr", "pt", "it", "en"];
+      if(locales.includes(origin)) {
+        _locale = origin;
+
+      }
+    }
+  }
+
+  window._APP_LOCALE = _locale;
+  window._APP_CUSTOMER = {{customerId}};
+  window._APP_SUCCESS_MESSAGE = "Demand updated successfully";
+  window._APP_REPLY_SUCCESS_MESSAGE = "Reply submitted successfully";
+  window._APP_INFO_MESSAGE = "OOPS! Error Occurred";
+
+  let locale = (window.hasOwnProperty("_APP_LOCALE") && window._APP_LOCALE)? window._APP_LOCALE:'en';
+
+</script>
+<script src="https://smb.vintega.eu/widget/js/manifest.js"></script>
+<script src="https://smb.vintega.eu/widget/js/vendor.js"></script>
+<script src="https://smb.vintega.eu/widget/js/app.js"></script>

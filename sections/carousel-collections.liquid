@@ -1,0 +1,104 @@
+{%
+  assign collection_list = collection.metafields.custom.collection_collections_slider_1.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_2.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_3.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_4.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_5.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_6.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_7.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_8.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_9.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_10.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_11.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_12.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_13.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_14.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_15.value
+  | append: '[|]'
+  | append: collection.metafields.custom.collection_collections_slider_16.value
+  | split: '[|]'
+%}
+
+{% capture capture_collection_elements %}
+  {% for item in collection_list limit: 16 %}
+    {% if collection_list != blank %}
+      {% liquid
+        assign collection_carousel = item | split: ','
+        assign collection_carousel_img = collection_carousel[0] | split: '|'
+        assign collection_carousel_img_url = collection_carousel_img | first | remove: '"' | remove: '['
+        assign collection_carousel_alt = collection_carousel_img | last | remove: '['
+        assign collection_carousel_title = collection_carousel[1] | remove: '"' | strip
+        assign collection_carousel_url = collection_carousel[2] | remove: '"' | strip
+      %}
+
+      {% if collection_carousel_alt == blank %}
+        {% assign collection_carousel_alt = collection_carousel_title %}
+      {% endif %}
+
+      <div
+        class="carousel-collections__slide swiper-slide"
+      >
+        <a
+          href="{{ collection_carousel_url | remove: "]" }}"
+        >
+          {% render "render-image"
+            class: "class_image",
+            img_src: collection_carousel_img_url,
+            alt: collection_carousel_alt,
+            width: "100",
+            height: "100"
+          %}
+
+          <span>
+            {{ collection_carousel_title }}
+          </span>
+        </a>
+      </div>
+    {% endif %}
+
+  {% endfor %}
+{% endcapture %}
+
+{% if capture_collection_elements != blank %}
+  <div class="carousel-collections">
+    <div class="carousel-collections__wrapper">
+      <div
+        class="carousel-collections__slides carousel-collections__slides{% if collection_list.size > 7 %}--slider{% else %}--flex{% endif %}"
+      >
+        {% if collection_list.size > 7 %}
+          {% assign id_slider = 'collections-js' %}
+        {% else %}
+          {% assign id_slider = '' %}
+        {% endif %}
+
+        {% render 'slider',
+          custom_slider: ' ',
+          arrows: true,
+          content: capture_collection_elements,
+          id: id_slider
+        %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Carousel collections",
+  "tag": "section"
+}
+{% endschema %}

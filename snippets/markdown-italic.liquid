@@ -1,0 +1,36 @@
+{% comment %}
+  @description: Make a string bold according to markdown patterns
+  @author: Luis Avila
+
+  Accepts:
+  - lineStrong: {String} information
+
+  Usage:
+  {% render 'markdown-bold'
+    lineStrong: dataLine,
+  %}
+{% endcomment %}
+
+{% for lineitalic in lineItalic %}
+  {% if forloop.index == 1 %}
+    {% assign lineInit = lineitalic %}
+  {% endif %}
+  {% if lineInit == blank %}
+    {%- comment -%} Linear starts with bold {%- endcomment -%}
+    {% assign residue = forloop.index | modulo: 2 %}
+
+    {% if residue == 1 %}
+      {{ lineitalic }}
+    {% else %}
+      <i>{{ lineitalic }}</i>
+    {% endif %}
+  {% else %}
+    {%- comment -%} Linear does not start with bold {%- endcomment -%}
+    {% assign residue = forloop.index | modulo: 2 %}
+    {% if residue == 1 %}
+      {{ lineitalic }}
+    {% else %}
+      <i>{{ lineitalic }}</i>
+    {% endif %}
+  {% endif %}
+{% endfor %}

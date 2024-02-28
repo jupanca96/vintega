@@ -1,0 +1,296 @@
+{% comment %}
+  Renders items menu dinamict column
+  Accepts:
+  - order_column: {Boolean} - is column dianmic or not
+  - link: {Object} object item link column
+
+  NOTA: css inline to use for calculate space in grid for position items
+
+  Usage:
+  {% render 'site-nav-columns'
+    order_column: order_column,
+    link: link
+  %}
+{% endcomment %}
+{%- assign columns = order_column | split: '|' -%}
+<style>
+  :root {
+    --template-drop-columns:"
+      {%- for link in columns -%}
+        {%- case link -%}
+          {%- when 'items' -%}
+
+            {%- for i in (1..2) -%}
+              {{- link | append: ' ' -}}
+            {%- endfor -%}
+
+          {%- when 'icons' -%}
+
+            {%- for i in (1..4) -%}
+              {{- link | append: ' '  -}}
+            {%- endfor -%}
+
+          {%- else -%}
+
+          {%- for i in (1..2) -%}
+            {{- link | append: ' '  -}}
+          {%- endfor -%}
+
+        {%- endcase -%}
+
+      {%- endfor -%}
+    "
+  }
+</style>
+
+{% if type_content == 'columsWithoutIcons' %}
+  {%- assign count = 0 -%}
+
+  <div class="column-items__container">
+    {% for childlink in link.links %}
+      {%- assign child_first_type = childlink.title | split: '[' -%}
+      {%- assign get_type_column = child_first_type | last | remove: ']' -%}
+
+      {% if get_type_column contains ':' %}
+        {%- assign type_column = get_type_column | split: ':' | first -%}
+        {%- assign image_cta = get_type_column | split: ':' | last -%}
+      {% else %}
+        {%- assign type_column = get_type_column -%}
+      {% endif %}
+
+      {%- if  type_column != 'image' -%}
+        {%- assign count = count | plus: 1 -%}
+
+        <div class="column-{{ type_column }}">
+          <ul class="">
+              <li>
+                <a
+                  href="{{ childlink.url }}"
+                  class="child-title
+                  {% if childlink.title contains 'blank' %}
+                    child-title--blank
+                  {% endif %}"
+                >
+                  {{ child_first_type | first }}
+                </a>
+
+                <ul class="child-list">
+                  {% for grandchildlink in childlink.links %}
+                    {% case type_column %}
+                      {% when 'items' %}
+                        <li>
+                          <a
+                            href="{{ grandchildlink.url }}"
+                          >
+                            {{ grandchildlink.title }}
+                          </a>
+                        </li>
+                    {% endcase %}
+
+                  {% endfor %}
+                </ul>
+              </li>
+          </ul>
+        </div>
+      {%- endif -%}
+    {% endfor %}
+  </div>
+  {% comment %} {%- assign count = 0 -%} {% endcomment %}
+
+  <div class="column-image__container">
+
+    {% for childlink in link.links %}
+      {%- assign child_first_type = childlink.title | split: '[' -%}
+      {%- assign get_type_column = child_first_type | last | remove: ']' -%}
+
+      {% if get_type_column contains ':' %}
+        {%- assign type_column = get_type_column | split: ':' | first -%}
+        {%- assign image_cta = get_type_column | split: ':' | last -%}
+      {% else %}
+        {%- assign type_column = get_type_column -%}
+      {% endif %}
+
+      {%- if  type_column == 'image' -%}
+        {%- assign count = count | plus: 1 -%}
+
+        <div class="column-{{ type_column }}">
+          <ul class="">
+            {%- assign item_image_title = childlink.title | split: '[' -%}
+            {%- assign title_text = item_image_title | first -%}
+            {%- assign content_text_split = item_image_title
+              | last
+              | split: '|'
+            -%}
+            {%- assign content_text_split = content_text_split[1] | split: '-' -%}
+            {%- assign content_text = content_text_split | first -%}
+            {%- assign content_text_bg = content_text_split | last -%}
+            {%- assign cta_text = item_image_title
+              | last
+              | split: '|'
+              | last
+              | remove: ']'
+            -%}
+            {%- assign image_item = item_image_title
+              | last
+              | split: ':'
+              | last
+              | split: '|'
+              | first
+              | file_url
+            -%}
+              <li>
+                <div class="item__image nav-article">
+                  {% render 'render-image'
+                    img_src: image_item,
+                    width: "400px",
+                    height: "400px"
+                  %}
+
+                  <div class="item__image-content">
+                    <div class="item__image-text {{ content_text_bg }}">
+                      <div class="item__image-title flex">{{ title_text }}</div>
+                      <div class="item__image-description flex">
+                        {{ content_text }}
+                      </div>
+                    </div>
+
+                    {% render 'link'
+                      type: 'btn'
+                      class: "btn-1 item__image-cta",
+                      content: cta_text,
+                      url: childlink.url,
+                    %}
+                  </div>
+                </div>
+              </li>
+          </ul>
+        </div>
+      {%- endif -%}
+    {% endfor %}
+  </div>
+
+{% else %}
+  {% for childlink in link.links %}
+    {%- assign child_first_type = childlink.title | split: '[' -%}
+    {%- assign get_type_column = child_first_type | last | remove: ']' -%}
+
+    {% if get_type_column contains ':' %}
+      {%- assign type_column = get_type_column | split: ':' | first -%}
+      {%- assign image_cta = get_type_column | split: ':' | last -%}
+    {% else %}
+      {%- assign type_column = get_type_column -%}
+    {% endif %}
+
+    <div class="column-{{ type_column }}">
+      <ul class="">
+        {%- if  type_column != 'image' -%}
+          <li>
+              <a
+                href="{{ childlink.url }}"
+                class="child-title
+                {% if childlink.title contains 'blank' %}
+                  child-title--blank
+                {% endif %}"
+              >
+                {{ child_first_type | first }}
+              </a>
+
+            <ul class="child-list
+              {% if type_column == 'icons' %}
+                grid grid-3
+              {% endif %}"
+            >
+              {% for grandchildlink in childlink.links %}
+
+                {% case type_column %}
+                  {% when 'icons' %}
+                    {%- assign image_title = grandchildlink.title
+                      | split: '['
+                    -%}
+                    {%- assign title_item = image_title | first -%}
+                    {%- assign image_icon = image_title
+                      | last
+                      | remove_first: ']'
+                      | file_url
+                    -%}
+                    <li>
+                      <a
+                        class="flex"
+                        href="{{ grandchildlink.url }}"
+                      >
+                        {% render 'render-image'
+                          img_src: image_icon
+                        %}
+
+                        <span>{{ title_item }}</span>
+
+                      </a>
+                    </li>
+                  {% when 'items' %}
+                    <li>
+                      <a
+                        href="{{ grandchildlink.url }}"
+                      >
+                        {{ grandchildlink.title }}
+                      </a>
+                    </li>
+                {% endcase %}
+
+              {% endfor %}
+            </ul>
+          </li>
+        {%- else -%}
+
+        {%- assign item_image_title = childlink.title | split: '[' -%}
+        {%- assign title_text = item_image_title | first -%}
+        {%- assign content_text_split = item_image_title
+          | last
+          | split: '|'
+        -%}
+        {%- assign content_text_split = content_text_split[1] | split: '-' -%}
+        {%- assign content_text = content_text_split | first -%}
+        {%- assign content_text_bg = content_text_split | last -%}
+        {%- assign cta_text = item_image_title
+          | last
+          | split: '|'
+          | last
+          | remove: ']'
+        -%}
+        {%- assign image_item = item_image_title
+          | last
+          | split: ':'
+          | last
+          | split: '|'
+          | first
+          | file_url
+        -%}
+          <li>
+            <div class="item__image nav-article">
+              {% render 'render-image'
+                img_src: image_item,
+                width: "400px",
+                height: "400px"
+              %}
+
+              <div class="item__image-content">
+                <div class="item__image-text {{ content_text_bg }}">
+                  <div class="item__image-title flex">{{ title_text }}</div>
+                  <div class="item__image-description flex">
+                    {{ content_text }}
+                  </div>
+                </div>
+
+                {% render 'link'
+                  type: 'btn'
+                  class: "btn-1 item__image-cta",
+                  content: cta_text,
+                  url: childlink.url,
+                %}
+              </div>
+            </div>
+          </li>
+        {%- endif -%}
+      </ul>
+    </div>
+  {% endfor %}
+{% endif %}

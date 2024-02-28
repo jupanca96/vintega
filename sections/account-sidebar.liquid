@@ -1,0 +1,129 @@
+{% assign link_lists = linklists[section.settings.menu].links %}
+
+{% if request.path contains 'account/addresses' %}
+  {% assign is_address = true %}
+{% endif %}
+
+{%- for option in link_lists -%}
+  {% if is_address and option.url contains 'account/addresses' %}
+    {% assign option_selected = option %}
+    {% assign option_index = forloop.index0 %}
+    {% break %}
+  {% elsif forloop.first %}
+    {% assign option_selected = option %}
+    {% assign option_index = 0 %}
+  {% endif %}
+{% endfor %}
+
+<nav>
+  <ul
+    class="account-sidebar__desktop"
+    data-selected="{{ link_lists[0].handle }}"
+  >
+    {% for link in link_lists %}
+      {% if is_address %}
+        {% if link.url contains 'account/addresses' %}
+          {% assign active_class = 'active' %}
+        {% else %}
+          {% assign active_class = '' %}
+        {% endif %}
+      {% elsif forloop.first %}
+        {% assign active_class = 'active' %}
+      {% else %}
+        {% assign active_class = '' %}
+      {% endif %}
+
+      {% assign link_class = 'account-sidebar__item ' | append: active_class %}
+
+      {% assign data_id_mes_alert = link.handle %}
+      {% assign title_link = link.title %}
+      {% assign show_alert = true %}
+
+      {% if link.title contains '[alert]' %}
+        {% assign data_id_mes_alert = 'alert' %}
+        {% assign title_link = link.title | split: '[alert]' | first %}
+        {% assign show_alert = settings.mes_alerts_enable %}
+      {% endif %}
+
+      {% if show_alert %}
+        <li
+          class="{{ link_class }}"
+          data-id="{{ data_id_mes_alert }}"
+        >
+          {% render 'link'
+            type: 'link'
+            class: 'account-sidebar__link',
+            content: title_link,
+            icon_arrow: true
+            url: link.url
+          %}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+  <div
+    class="account-sidebar__mobile"
+  >
+    <select
+      name="account-select"
+      class="account-sidebar__select hidden"
+    >
+      {%- for option in link_lists -%}
+        <option
+          value="{{ option.handle }}"
+          {% if forloop.index0 == option_index %}
+            selected
+          {% endif %}
+        >
+          {{ option.title }}
+        </option>
+      {%- endfor -%}
+    </select>
+
+    <div
+      class="account-sidebar__options"
+      data-active="false"
+    >
+      <div
+        class="custom-select__selected"
+        data-id="{{ option_selected.handle }}"
+      >
+        <span>{{ option_selected.title }}</span>
+        {% render 'icon-caret' %}
+      </div>
+
+      <ul
+        class="custom-select__items"
+        data-selected="{{ link_lists[option_index].handle }}"
+      >
+        {%- for option in link_lists -%}
+          <li data-id="{{ option.handle }}">
+            {{ option.title | link_to: option.url }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Account sidebar",
+  "class": "account-sidebar",
+  "tag": "aside",
+  "templates": [
+    "customers/account",
+    "customers/addresses"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "menu",
+      "label": "Menu",
+      "info": "It is the menu handle to be selected (e.g: account-menu)",
+      "default": "account-menu"
+    }
+  ]
+}
+{% endschema %}

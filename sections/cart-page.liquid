@@ -1,0 +1,134 @@
+{% liquid
+  assign link_text = section.settings.link_text
+  assign link_url = section.settings.link_url
+  assign title = 'sections.cart.title' | t
+  assign table_header_product = 'sections.cart.headings.product' | t
+  assign table_header_qty = 'sections.cart.headings.quantity' | t
+  assign table_header_total = 'sections.cart.headings.total' | t
+  assign cart_remove = 'sections.cart.delete' | t
+  assign subtotal = 'sections.cart.subtotal' | t
+  assign shipping_info = 'sections.cart.taxes_and_shipping_at_checkout' | t
+  assign checkout_btn = 'sections.cart.checkout' | t
+  assign empty_msg = 'sections.cart.empty' | t
+%}
+
+<div
+  id="cart-page"
+  class="cartpage-header"
+>
+  <h1 class="cartpage-header__title">
+    {{ title }}
+  </h1>
+
+  {% if link_text != blank and link_url != blank %}
+    {% render 'link'
+      type: 'link'
+      class: "cartpage-header__link",
+      content: link_text,
+      url: link_url,
+      target: "_blank"
+    %}
+  {% endif %}
+</div>
+
+<div class="cartpage-items">
+  {% render 'cart-items'
+    cart: cart
+    cart_empty_message: empty_msg
+    cartpage: true
+    cart_remove: cart_remove
+  %}
+</div>
+
+
+{% if cart.item_count > 0 %}
+  <div id="container-cart-page">
+    <div class="cartpage-footer">
+      <h2 class="cartpage-footer__total-text">
+        {{ subtotal }}
+      </h2>
+
+      <div class="cartpage-footer__info">
+        <span id="total-price" class="cartpage-footer__info--price">
+          {{ cart.total_price
+            | money_without_currency
+            | append: cart.currency.symbol
+          }}
+        </span>
+
+        <span class="cartpage-footer__info--shipping">
+          {{ shipping_info }}
+        </span>
+      </div>
+      <div class="btn-1 cartpage-footer__btn">
+        <a href="/checkout?locale={{ localization.language.iso_code }}">
+          {% render 'button'
+            class: "cartpage-footer__btn--btn",
+            content: checkout_btn,
+            type: 1
+            size: 3
+            action: "button"
+          %}
+        </a>
+      </div>
+    </div>
+
+    {% render 'cart-discount' cart: cart %}
+  </div>
+{% endif %}
+
+
+{% render 'cart-upsell'
+  cart: cart,
+  collection: section.settings.upsell_collection
+  title: section.settings.upsell_title,
+  class_slider: 'slider_upsell',
+  cartpage: true,
+  limit: section.settings.upsell_limit
+%}
+
+{% schema %}
+{
+  "name": "Cart-page",
+  "class": "cartpage wrapper-m",
+  "settings": [
+    {
+      "type": "header",
+      "content": "CTA"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link text",
+      "default": "Continuer mes achats"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link url",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Cross sell"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Products upsell"
+    },
+    {
+      "type": "number",
+      "id": "upsell_limit",
+      "label": "Products limit in upsell",
+      "default": 16
+    },
+    {
+      "type": "text",
+      "id": "upsell_title",
+      "label": "Upsell title",
+      "default": "CELA POURRAIT VOUS INTÉRESSER..."
+    }
+  ]
+}
+{% endschema %}

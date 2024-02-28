@@ -1,0 +1,63 @@
+{% if section.settings.button_text != blank %}
+  {% render 'button'
+    class: "btn-1 calendly__button",
+    content: section.settings.button_text,
+    action: "button",
+    arial_label: true,
+    name: section.settings.button_text,
+    id: "calendly-button-js"
+  %}
+{% endif %}
+
+<div
+  class="calendly__modal modal"
+  id="calendly-modal-js"
+>
+  <button
+    class="calendly__modal-close-btn"
+    id="calendly-close-btn-js">
+    {% render  'icon-close-insta' %}
+  </button>
+
+  <iframe
+    class="calendly__modal-iframe"
+    data-active="false"
+    src="{{ section.settings.calendar_url }}"
+    width="1440px"
+    height="700px"
+    frameborder="0"
+  >
+  </iframe>
+</div>
+
+{% schema %}
+{
+  "name": "Calendly button",
+  "tag": "section",
+  "class": "calendly section-space",
+  "templates": [
+    "page",
+    "customers/account"
+  ],
+  "settings": [
+    {
+      "type": "url",
+      "id": "calendar_url",
+      "label": "Calendly url",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "info": "It is the button text",
+      "default": "VOIR LES DISPONIBILITÉS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Calendly button"
+    }
+  ]
+}
+{% endschema %}

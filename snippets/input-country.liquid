@@ -1,0 +1,51 @@
+{% comment %}
+  Renders a input country phone
+
+  Accepts:
+  - input_id: {String} selector input (phone)
+  - input_ref: {String} selector with class or id (#phone)
+  - is_required: {Bollean} required input or no
+  - input_name: {String} name input
+  - placeholder_ref: {String} placeholder input
+  - button_action: {String} button action form current input
+
+  Usage:
+  {% render 'input-country' 
+    input_id: "phone",
+    input_ref: "#phone",
+    is_required: false,
+    input_name: "contact[phone]",
+    placeholder_ref: phone_label,
+    button_action: ".send-contact"
+  %}
+{% endcomment %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.css">
+
+{% render 'preload-css', asset: 'input-country.css' %}
+
+
+<div class="form__textfield-notlabel coutry-custom">
+  <div
+    id="config-input"
+    data-inputid="{{ input_ref }}"
+    data-isrequired="{{ is_required }}"
+    data-buttonaction="{{ button_action }}"
+  ></div>
+
+  <input
+    type="tel"
+    name="{{ input_name }}"
+    id="{{ input_id }}"
+    placeholder="{{ placeholder_ref }}"
+    {{ params }}
+  >
+
+  <div
+    tabindex="-1"
+    autofocus
+    id="message-error"
+    class=" form__message--error hidden"
+  >
+    {{ 'templates.contact.form.error_country' | t }}
+    </div>
+</div>

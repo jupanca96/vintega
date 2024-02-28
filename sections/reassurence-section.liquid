@@ -1,0 +1,85 @@
+<div class="reassurence__wrapper wrapper-m">
+  {% for block in section.blocks %}
+  <div class="reassurence__card">
+    {% if block.settings.reassurence_icon != blank %}
+      {% assign icon = block.settings.reassurence_icon | split: '|' %}
+      {% assign icon_url = icon | first | append: '.svg' | file_url %}
+      {% assign icon_alt = icon | last %}
+
+      {% render "render-image"
+        class: 'reassurence__icon'
+        title: icon_alt,
+        img_src: icon_url,
+        size: "220 300 400 500",
+        alt: icon_alt,
+        width: "100",
+        height: "100"
+      %}
+    {% endif %}
+
+    {% if block.settings.reassurence_title != blank %}
+      <div class="reassurence__title">
+        {{ block.settings.reassurence_title }}
+      </div>
+    {% endif %}
+
+    {% if block.settings.reassurence_text != blank %}
+      <div class="reassurence__text">
+        {{ block.settings.reassurence_text }}
+      </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Reasurence",
+  "tag": "section",
+  "class": "reassurence",
+  "blocks": [
+    {
+      "type": "reassurence",
+      "name": "Reassurecen",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "reassurence_icon",
+          "label": "Reassurence icon",
+          "default": "fast_estimation|alt",
+          "info": "Use svg extension with this format: name-file|alt"
+        },
+        {
+          "type": "richtext",
+          "id": "reassurence_title",
+          "label": "Reassurence text",
+          "default": "<p>LIVRAISON PARTOUT DANS LE MONDE</p>"
+        },
+        {
+          "type": "richtext",
+          "id": "reassurence_text",
+          "label": "Reassurence text",
+          "default": "<p>Nos sacs partent depuis Paris et arrive chez vous en moins d'une semaine</p></p>"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "reassurence"
+      },
+      {
+        "type": "reassurence"
+      },
+      {
+        "type": "reassurence"
+      },
+      {
+        "type": "reassurence"
+      }
+    ]
+  }
+}
+{% endschema %}

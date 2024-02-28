@@ -1,0 +1,107 @@
+<div class="collection__filters">
+  <div class="collection-filters">
+    <div class="collection-filters__controls">
+      {%- liquid
+        assign terms = search.terms | escape
+        assign search_url_remove = '?q=' | append: terms | append: '&options%5Bprefix%5D=last'
+      -%}
+
+      <a href="{{ routes.search_url | append : search_url_remove }}" class="btn-2 collection-filters__remove">
+        {{ 'products.facets.clear_all' | t }}
+      </a>
+
+      {%- liquid
+        assign filter_length = 0
+
+        for filter in search.filters
+          for filter_value in filter.active_values
+            assign filter_length = forloop.length
+          endfor
+
+          if filter.min_value.value != nil or filter.max_value.value != nil
+            assign filter_length = filter_length | plus: 1
+          endif
+        endfor
+
+      -%}
+
+      {%- if filter_length != 0 -%}
+        <div class="collection-filters__actives">
+
+          {%- for filter in search.filters -%}
+            {%- if filter.type == "price_range" -%}
+              {%- if filter.min_value.value != nil or
+                filter.max_value.value != nil
+              -%}
+                <div class="active-filters__tag">
+                  {%- assign min_value = filter.min_value.value | default: 0 -%}
+                  {%- assign max_value =
+                    filter.max_value.value | default: filter.range_max
+                  -%}
+                  {{ min_value | money }} - {{ max_value | money }}
+
+                  <a
+                    class="active-filters__remove-filter"
+                    href="{{ filter.url_to_remove }}"
+                  >
+                    ✕
+                  </a>
+                </div>
+              {%- endif -%}
+            {%- else -%}
+              {%- for filter_value in filter.active_values -%}
+                <span
+                  class="active-filters__tag"
+                  href="{{ filter_value.url_to_remove }}"
+                >
+                  {{ filter_value.label }}
+
+                  <a
+                    class="active-filters__remove-filter"
+                    href="{{ filter.url_to_remove }}"
+                  >
+                    ✕
+                  </a>
+                </span>
+              {%- endfor -%}
+            {%- endif- %}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {% capture items_filter_custom %}
+    {% if section.blocks.size > 0 %}
+      <ul class="filter-group-display__list">
+        {% for block in section.blocks %}
+          <li class="filter-group-display__list-item">
+            <a
+              href="{{ block.settings.collection.url }}"
+            >
+              {{ block.settings.collection.title }}  ({{ block.settings.collection.all_products_count }})
+            </a>
+          </li>
+
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endcapture %}
+
+  {% if items_filter_custom != blank %}
+    {% capture custom_acc %}
+      {% render 'accordion-item',
+        title: section.settings.custom_acc_title,
+        content: items_filter_custom,
+        active: false,
+        css_class: 'custom-filters'
+      %}
+    {% endcapture %}
+  {% endif %}
+
+  {% render 'filtering-store'
+    sort_by_component: sort_by_component,
+    is_search: true,
+    items_filter_custom: custom_acc
+  %}
+</div>

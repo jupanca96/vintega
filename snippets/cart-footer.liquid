@@ -1,0 +1,45 @@
+{% comment %}
+  Render footer in cart
+
+  Accepts:
+  - cart: {Object} cart object
+  - shipping_info: {String} shipping info in cart
+
+  Usage:
+  {% render 'cart-footer'
+    cart: cart,
+    shipping_info: section.settings.shipping_info
+  %}
+{% endcomment %}
+
+{%- capture total_attr -%}data-total="{{ cart.total_price }}"{%- endcapture -%}
+
+<div id="container-footer-js">
+  {% if cart.item_count > 0 %}
+    <div class="cart-footer cart-margins__inline">
+      <div class="cart-footer__shipping">
+        <span>{{ shipping_info }}</span>
+      </div>
+
+      <div
+        class="cart-footer__button"
+        id="cart-footer__button"
+      >
+        {% capture content_button %}
+          {{ "sections.cart.checkout" | t }}
+        {% endcapture %}
+
+        <a href="/checkout?locale={{ localization.language.iso_code }}">
+          {% render 'button',
+            class: 'btn-1 cart-footer__button--btn',
+            content: content_button,
+            custom_attr: total_attr,
+            type: 1,
+            size: 1,
+            action: 'button'
+          %}
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>

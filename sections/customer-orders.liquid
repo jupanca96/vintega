@@ -1,0 +1,174 @@
+{% assign order_details_text = "customer.orders.details" | t %}
+
+{%- if customer.orders.size == 0 -%}
+  {% assign empty_class = 'customer__wrapper--empty' %}
+{%- endif -%}
+
+<div class="customer__wrapper {{ empty_class }}">
+  <div class="customer__orders-wrapper">
+    {% paginate customer.orders by 20 %}
+      {%- if customer.orders.size > 0 -%}
+        <div
+          class="grid customer__order-list--header customer__order-list"
+        >
+          <span>{{ "customer.orders.order_number" | t }}</span>
+          <span>{{ "customer.orders.date" | t }}</span>
+          <span>{{ "customer.orders.product" | t }}</span>
+          <span>{{ "customer.orders.total" | t }}</span>
+        </div>
+
+        {%- for order in customer.orders -%}
+          {% assign order_product = order.line_items[0].product %}
+
+          <div class="grid customer__order-list">
+            <a
+              class="customer__badge"
+              href="{{ order.customer_url }}"
+              title="{{ 'customer.orders.order_number_link'
+                | t: number: order.name }}"
+              aria-label="{{ 'customer.orders.order_number_link'
+                | t: number: order.name }}"
+            >
+              {{ order.name }}
+            </a>
+
+            <div class="customer__date">
+              <span>
+                {{ order.created_at | time_tag: format: 'date' }}
+              </span>
+            </div>
+
+            <div>
+              <div
+                class="cart-items__container"
+              >
+                <div class="cart-items__container--product-title">
+                  <div class="cart-items__container--image">
+                    {% assign imgUrl = order_product.featured_media
+                      | image_url: '82x110'
+                    %}
+                    {% assign image = order_product.featured_image %}
+                    {% render "render-image"
+                      class: "",
+                      attr: "data-live-item-image",
+                      img_src: imgUrl,
+                      img: image,
+                      width: "82",
+                      height: "110"
+                    %}
+                  </div>
+                </div>
+
+                <div class="cart-items__container--product-info">
+                  {% if order_product.vendor != blank %}
+                    <div class="cart-items__container--vendor subtitle--general">
+                      <span>
+                        {{ order_product.vendor }}
+                      </span>
+                    </div>
+                  {% endif %}
+
+                  <div class="cart-items__container--title">
+                    <span>
+                      {{ order_product.title }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="customer__price">
+              <span>
+                {{ order.total_price | money }}
+              </span>
+            </div>
+
+            {% render 'button'
+              class: "btn-2 customer__details",
+              content: order_details_text,
+              action: "button"
+            %}
+          </div>
+
+        {% endfor %}
+      {%- else -%}
+        <div class="customer__orders--empty">
+          <p>{{ section.settings.empty_orders }}</p>
+
+          {% render 'link'
+            type: 'btn'
+            class: "btn-2 customer__orders--empty account__btn--empty",
+            content: section.settings.empty_btn_text,
+            url: section.settings.empty_btn_url,
+          %}
+        </div>
+      {%- endif -%}
+
+      {%- if paginate.pages > 1 -%}
+        {% render 'pagination',
+          paginate: paginate
+        %}
+      {%- endif -%}
+    {% endpaginate %}
+  </div>
+
+  {% if section.settings.btn_text and section.settings.btn_url and customer.orders.size > 0 %}
+    {% render 'link'
+      type: 'btn'
+      class: "btn-1 customer__refund",
+      content: section.settings.btn_text,
+      url: section.settings.btn_url,
+    %}
+  {% endif %}
+</div>
+
+<div class="customer__individual">
+  {% for order in customer.orders %}
+    {% render 'customer-order', order: order %}
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Customer orders",
+  "class": "customer__orders",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text",
+      "info": "It is the text for main button",
+      "default": "COMMENT EFFECTUER UN RETOUR"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button url",
+      "info": "It is the url for main button",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "empty_orders",
+      "label": "Empty orders",
+      "info": "It is the text for empty orders",
+      "default": "Vous n'avez actuellement aucune commande"
+    },
+    {
+      "type": "text",
+      "id": "empty_btn_text",
+      "label": "Empty button text",
+      "info": "It is the text for button when there are no orders",
+      "default": "VOIR TOUS LES SACS"
+    },
+    {
+      "type": "url",
+      "id": "empty_btn_url",
+      "label": "Empty button url",
+      "info": "It is the url for button when there are no orders",
+      "default": "/"
+    }
+  ]
+}
+{% endschema %}

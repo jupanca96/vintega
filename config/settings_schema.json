@@ -1,0 +1,400 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Gradibase",
+    "theme_version": "0.0.1",
+    "theme_author": "Gradiweb",
+    "theme_documentation_url": "https:\/\/github.com\/gradiweb\/dawn",
+    "theme_support_url": "https:\/\/github.com\/gradiweb\/dawn"
+  },
+  {
+    "name": "t:settings_schema.colors.name",
+    "settings": [
+      {
+        "type": "color",
+        "id": "colors_brand",
+        "default": "#003BC3",
+        "label": "Color brand",
+        "info": "To use in a predominant color on the page"
+      },
+      {
+        "type": "color",
+        "id": "colors_secondary",
+        "default": "#F7F1EC",
+        "label": "Color secondary"
+      },
+      {
+        "type": "header",
+        "content": "Accent colors"
+      },
+      {
+        "type": "color",
+        "id": "colors_accent_1",
+        "default": "#A5E610",
+        "label": "Accent primary"
+      },
+      {
+        "type": "color",
+        "id": "colors_accent_2",
+        "default": "#FF5FA2",
+        "label": "Accent secondary"
+      },
+      {
+        "type": "color",
+        "id": "colors_accent_3",
+        "default": "#FF6801",
+        "label": "Accent tertiary"
+      },
+      {
+        "type": "header",
+        "content": "Background"
+      },
+      {
+        "type": "color_background",
+        "id": "colors_bg_1",
+        "label": "Principal background",
+        "default": "#CCCCCC"
+      },
+      {
+        "type": "color_background",
+        "id": "colors_bg_2",
+        "label": "Secondary background",
+        "default": "#666666"
+      },
+      {
+        "type": "header",
+        "content": "Text"
+      },
+      {
+        "type": "color",
+        "id": "colors_txt",
+        "default": "#000000",
+        "label": "Text body"
+      },
+      {
+        "type": "color",
+        "id": "colors_title",
+        "default": "#003BC3",
+        "label": "Titles"
+      },
+      {
+        "type": "color",
+        "id": "colors_link",
+        "default": "#003BC3",
+        "label": "Link"
+      },
+      {
+        "type": "header",
+        "content": "Buttons"
+      },
+      {
+        "type": "paragraph",
+        "content": "Customize button 1"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_color_1",
+        "default": "#FFFFFF",
+        "label": "Color 1"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_bg_1",
+        "default": "#003BC3",
+        "label": "Background 1"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_border_1",
+        "default": "#003BC3",
+        "label": "Border 1"
+      },
+      {
+        "type": "paragraph",
+        "content": "Customize button 2"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_color_2",
+        "default": "#003BC3",
+        "label": "Color 2"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_bg_2",
+        "default": "#FFF",
+        "label": "Background 2"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_border_2",
+        "default": "#003BC3",
+        "label": "Border 2"
+      },
+      {
+        "type": "paragraph",
+        "content": "Customize button hover"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_color_hover",
+        "default": "#003BC3",
+        "label": "Color Hover"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_bg_hover",
+        "default": "#FFF",
+        "label": "Background Hover"
+      },
+      {
+        "type": "color",
+        "id": "colors_btn_border_hover",
+        "default": "#003BC3",
+        "label": "Border Hover"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.social-media.name",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:settings_schema.social-media.settings.header.content"
+      },
+      {
+        "type": "text",
+        "id": "order_media",
+        "label": "Order icons",
+        "info": "Ex: facebook instagram linkedin",
+        "default": "facebook instagram linkedin"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter_link",
+        "label": "t:settings_schema.social-media.settings.social_twitter_link.label",
+        "default": "t:settings_schema.social-media.settings.social_twitter_link.info",
+        "info": "t:settings_schema.social-media.settings.social_twitter_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "t:settings_schema.social-media.settings.social_facebook_link.label",
+        "default": "t:settings_schema.social-media.settings.social_facebook_link.info",
+        "info": "t:settings_schema.social-media.settings.social_facebook_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest_link",
+        "label": "t:settings_schema.social-media.settings.social_pinterest_link.label",
+        "default": "t:settings_schema.social-media.settings.social_pinterest_link.info",
+        "info": "t:settings_schema.social-media.settings.social_pinterest_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "t:settings_schema.social-media.settings.social_instagram_link.label",
+        "default": "t:settings_schema.social-media.settings.social_instagram_link.info",
+        "info": "t:settings_schema.social-media.settings.social_instagram_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "t:settings_schema.social-media.settings.social_tiktok_link.label",
+        "default": "t:settings_schema.social-media.settings.social_tiktok_link.info",
+        "info": "t:settings_schema.social-media.settings.social_tiktok_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_tumblr_link",
+        "label": "t:settings_schema.social-media.settings.social_tumblr_link.label",
+        "info": "t:settings_schema.social-media.settings.social_tumblr_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_snapchat_link",
+        "label": "t:settings_schema.social-media.settings.social_snapchat_link.label",
+        "info": "t:settings_schema.social-media.settings.social_snapchat_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "t:settings_schema.social-media.settings.social_youtube_link.label",
+        "info": "t:settings_schema.social-media.settings.social_youtube_link.info"
+      },
+      {
+        "type": "text",
+        "id": "social_vimeo_link",
+        "label": "t:settings_schema.social-media.settings.social_vimeo_link.label",
+        "info": "t:settings_schema.social-media.settings.social_vimeo_link.info"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.favicon.name",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "t:settings_schema.favicon.settings.favicon.label",
+        "info": "t:settings_schema.favicon.settings.favicon.info"
+      }
+    ]
+  },
+  {
+    "name": "Variants color",
+    "settings": [
+      {
+        "type": "text",
+        "id": "variants_color",
+        "label": "Variants color",
+        "info": "Allow render the color variable",
+        "default": "Color"
+      }
+    ]
+  },
+  {
+    "name": "Font body",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "body_font",
+        "label": "Body font",
+        "default": "poppins_n2"
+      }
+    ]
+  },
+  {
+    "name": "User registration",
+    "settings": [
+      {
+        "type": "text",
+        "id": "phone_warning",
+        "label": "Repeated phone number warning"
+      }
+    ]
+  },
+  {
+    "name": "Use to disabled new features",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Mes alerts settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "mes_alerts_enable",
+        "label": "Mes alerts enable",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Plus photos settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "plus_photos_enable",
+        "label": "Plus photos enable",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Mes alerts settings",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title_mes_alerts",
+        "label": "Text title",
+        "default": "NE PASSEZ PAS Á COTÉ DES CESPIÉCES"
+      },
+      {
+        "type": "text",
+        "id": "subtitle_mes_alerts",
+        "label": "Text subtitle",
+        "default": "Étre notifie pour des piéces similares"
+      },
+      {
+        "type": "text",
+        "id": "title_btn_open_alerts",
+        "label": "Button text",
+        "default": "CREATE AN ALERT"
+      },
+      {
+        "type": "text",
+        "id": "modal_title_mes_alerts",
+        "label": "Mes alerts - modal title",
+        "default": "Configurer une alerte"
+      },
+      {
+        "type": "richtext",
+        "id": "modal_description_mes_alerts",
+        "label": "Mes alerts - modal description",
+        "default": "<p>Soyez informé par email ou par téléphone lorsqu'un nouvel article correspondant à vos spécifications est disponible à la vente.<\/p>"
+      },
+      {
+        "type": "text",
+        "id": "modal_title_mes_alerts_notlogin",
+        "label": "Mes alerts - modal title not login",
+        "default": "Vous avez déjà un compte ?"
+      },
+      {
+        "type": "richtext",
+        "id": "modal_description_mes_alerts_notlogin",
+        "label": "Mes alerts - modal description not login",
+        "default": "<p>Pour créer une alerte, vous devez vous connecter à votre compte Vintega, où vous pouvez modifier, supprimer et créer toutes vos alertes.<\/p>"
+      },
+      {
+        "type": "text",
+        "id": "modal_open_mes_alerts",
+        "label": "Modal open create alert icon",
+        "default": "alert-icon|Icon",
+        "info": "name-file|alt"
+      },
+      {
+        "type": "text",
+        "id": "modal_open_mes_alerts_blue",
+        "label": "Modal open create alert blue icon",
+        "default": "blue-alert-icon|Icon",
+        "info": "name-file|alt"
+      }
+    ]
+  },
+  {
+    "name": "Colors table to filters",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "colors_table_filters",
+        "label": "Colors table"
+      },
+      {
+        "type": "textarea",
+        "id": "colors_table_filters_details",
+        "label": "Hardware colors table"
+      },
+      {
+        "type": "text",
+        "id": "colors_table_filters_default",
+        "label": "Default colors table",
+        "default": "vert_color.png"
+      }
+    ]
+  },
+  {
+    "name": "Sizes table to filters",
+    "settings": [
+      {
+        "type": "textarea",
+        "id": "sizes_table_filters",
+        "label": "Sizes table"
+      },
+      {
+        "type": "text",
+        "id": "sizes_table_filters_default",
+        "label": "Sizes table default",
+        "default": "vert_color.png"
+      }
+    ]
+  }
+]

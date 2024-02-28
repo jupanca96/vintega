@@ -1,0 +1,226 @@
+<div class="wrapper-m">
+  {% if section.settings.title != blank %}
+    <h2 class="h4 tabs-grid__title">
+      {{ section.settings.title }}
+    </h2>
+  {% endif %}
+
+  {% assign btn_1_text = section.settings.button_1_text %}
+  {% assign btn_2_text = section.settings.button_2_text %}
+
+  {% if btn_1_text != blank or btn_2_text != blank %}
+    <div class="tabs-grid__navigation">
+      <button
+        type="button"
+        class="btn-1 tabs-grid__navigation-btn active"
+        id="js-tabs-grid-btn-1"
+      >
+        {{ btn_1_text }}
+      </button>
+
+      <button
+        type="button"
+        class="btn-2 tabs-grid__navigation-btn"
+        id="js-tabs-grid-btn-2"
+      >
+        {{ btn_2_text }}
+      </button>
+    </div>
+  {% endif %}
+
+  {% assign block_1 = 0 %}
+  {% assign block_2 = 0 %}
+
+  {% for block in section.blocks %}
+
+    {% if block.type == 'block-1' %}
+      {% assign block_1 = block_1 | plus: 1 %}
+    {% endif %}
+
+    {% if block.type == 'block-2' %}
+      {% assign block_2 = block_2 | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+
+  {% if block_1 > 0 and block_2 > 0 %}
+    {% assign swiper_class = 'swiper' %}
+  {% endif %}
+
+  <div class="tabs-grid__container {{ swiper_class }}">
+    <div class="swiper-wrapper">
+      {% if block_1 > 0 %}
+        <div class="tabs-grid__content swiper-slide">
+          {% for block in section.blocks %}
+            {% if block.type == 'block-1' %}
+              {% render 'tab-grid-card',
+                classname: 'tabs-grid__card',
+                image: block.settings.card_img,
+                title: block.settings.card_title,
+                description: block.settings.card_description,
+                link_text: block.settings.card_link_text,
+                link_url: block.settings.card_link_url,
+                icon_size: section.settings.icon_size
+              %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if block_2 > 0 %}
+        <div class="tabs-grid__content swiper-slide">
+          {% for block in section.blocks %}
+            {% if block.type == 'block-2' %}
+              {% render 'tab-grid-card',
+                classname: 'tabs-grid__card',
+                image: block.settings.card_img,
+                title: block.settings.card_title,
+                description: block.settings.card_description,
+                link_text: block.settings.card_link_text,
+                link_url: block.settings.card_link_url,
+                icon_size: section.settings.icon_size
+              %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Tabs grid content",
+  "class": "tabs-grid section-space",
+  "max_blocks": 12,
+  "templates": [
+    "page"
+  ],
+  "blocks": [
+    {
+      "type": "block-1",
+      "name": "Group 1 block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card title",
+          "default": "Le titre est ici"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_img",
+          "label": "Card image"
+        },
+        {
+          "type": "richtext",
+          "id": "card_description",
+          "label": "Card description",
+          "default": "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>"
+        },
+        {
+          "type": "text",
+          "id": "card_link_text",
+          "label": "Card link text",
+          "default": "Voir plus"
+        },
+        {
+          "type": "url",
+          "id": "card_link_url",
+          "label": "Card link url",
+          "default": "/"
+        }
+      ]
+    },
+    {
+      "type": "block-2",
+      "name": "Group 2 block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card title",
+          "default": "Le titre est ici"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_img",
+          "label": "Card image"
+        },
+        {
+          "type": "richtext",
+          "id": "card_description",
+          "label": "Card description",
+          "default": "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>"
+        },
+        {
+          "type": "text",
+          "id": "card_link_text",
+          "label": "Card link text",
+          "default": "Voir plus"
+        },
+        {
+          "type": "url",
+          "id": "card_link_url",
+          "label": "Card link url"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "info": "It is the main section title",
+      "default": "Comment ça marche ?"
+    },
+    {
+      "type": "text",
+      "id": "button_1_text",
+      "label": "First button text",
+      "info": "It is the text for first button"
+    },
+    {
+      "type": "text",
+      "id": "button_2_text",
+      "label": "Second button text",
+      "info": "It is the text for second button"
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "Icon size",
+      "options": [
+        {
+          "value": "65",
+          "label": "65px"
+        },
+        {
+          "value": "140",
+          "label": "140px"
+        }
+      ],
+      "default": "65"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tabs grid content",
+      "blocks": [
+        {
+          "type": "block-1"
+        },
+        {
+          "type": "block-1"
+        },
+        {
+          "type": "block-2"
+        },
+        {
+          "type": "block-2"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

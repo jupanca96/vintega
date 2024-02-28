@@ -1,0 +1,174 @@
+{% comment %}
+  Pagination
+
+  Accepts:
+  - product {object}
+
+  Usage:
+    {% render 'plus-photo'
+      product: product,
+      section:section
+    %}
+
+{% endcomment %}
+
+<button
+  class="photo-plus__open"
+  id="js-btn-photo-plus-open"
+  aria-label="{{ section.settings.title_plus_photo }}"
+>
+  {% liquid
+    assign modal_open_icon = section.settings.modal_open_plus_photo | split: '|'
+    assign modal_open_icon_url = modal_open_icon | first | append: '.svg' | file_url
+    assign modal_open_icon_alt = modal_open_icon | last
+  %}
+
+  {% if section.settings.modal_open_plus_photo != blank %}
+    {% render "render-image"
+      class: 'icon-camera',
+      title: modal_open_icon_alt,
+      img_src: modal_open_icon_url,
+      alt: modal_open_icon_alt,
+      width: "20",
+      height: "20"
+    %}
+  {% endif %}
+
+  {% if section.settings.title_plus_photo != blank %}
+    <span>
+      {{ section.settings.title_plus_photo }}
+    </span>
+  {% endif %}
+</button>
+
+{% liquid
+  assign first_name_label = 'customer.register.first_name' | t | append: ' (*)'
+  assign last_name_label = 'customer.register.last_name' | t | append: ' (*)'
+  assign email_label = 'customer.register.email' | t | append: ' (*)'
+  assign phone_label = 'customer.register.phone' | t
+  assign newsletter_label = 'newsletter.description' | t | prepend: '<span class="form__checkbox-label">' | append: '</span>'
+  assign button_text = 'products.plus_photo.button' | t
+%}
+
+{%- capture text_btn -%}data-text="{{ button_text }}"{%- endcapture -%}
+
+{% capture plus_photo_form %}
+  <form
+    class="plus-photo-form"
+    id="js-plus-photo-form"
+    data-product-id="{{ product.id }}"
+  >
+    {% render 'input'
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      type: "text",
+      name: "first_name",
+      id: "first-name",
+      value: customer.first_name,
+      label: first_name_label,
+      required: true
+    %}
+
+    {% render 'input'
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      type: "text",
+      name: "last_name",
+      id: "last-name",
+      value: customer.last_name,
+      label: last_name_label,
+      required: true
+    %}
+
+    {% render 'input'
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      type: "email",
+      name: "email",
+      id: "email",
+      value: customer.email,
+      label: email_label,
+      required: true
+    %}
+    <div class="form__textfield-label size-s form__textfield-label--spaced">
+      <label for="">{{ phone_label }}</label>
+    {% render 'input-country' 
+      input_id: "phone",
+      input_ref: "#phone",
+      is_required: false,
+      input_name: "phone",
+      placeholder_ref: "",
+      button_action: "#js-btn-photo-plus-submit"
+    %}
+    </div>
+
+    <span
+      id="js-error-phone"
+      class="form__message form__message--error photo-plus__error-phone"
+      style="display: none;"
+    >
+      {% render 'icon-error' %}
+      {{ 'templates.contact.form.error_phone' | t }}
+    </span>
+
+    {% render 'input'
+      class: "form__checkbox form__textfield-label--spaced",
+      type: "checkbox",
+      name: "newslatter",
+      id: "newsletter-plus-photo",
+      value: false,
+      placeholder: newsletter_label
+    %}
+
+    {% render 'button'
+      class: "btn-1",
+      content: button_text,
+      action: "submit",
+      arial_label: button_text,
+      name: button_text,
+      id: 'js-btn-photo-plus-submit',
+      custom_attr: text_btn
+    %}
+  </form>
+
+
+
+  <div
+    id="js-photo-plus-response"
+    style="display: none;"
+  >
+    {% if section.settings.modal_success_title_plus_photo != blank %}
+      <span class="description-modal__title success-message">
+        {{ section.settings.modal_success_title_plus_photo }}
+      </span>
+    {% endif %}
+
+    <div class="description-modal__description">
+      <div class="description-modal__description-text success-message">
+        {{ section.settings.modal_success_description_plus_photo }}
+        <p
+          class="photo-plus__response "
+        >
+          {{ 'products.plus_photo.response' | t }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <small
+    class="photo-plus__response-error"
+    id="js-photo-plus-response-error"
+    style="display: none;"
+  >
+    {{ 'products.plus_photo.error_response' | t }}
+  </small>
+
+  <div class="klaviyo-form-VysP9z" id="js-klaviyo-plus-photo"></div>
+{% endcapture %}
+
+{% render 'modal-description-product'
+  css_class: 'plus-photo-modal',
+  modal_id: 'js-plus-photo-modal',
+  modal_id_close: 'js-plus-photo-modal-close',
+  moda_title: section.settings.modal_title_plus_photo,
+  modal_description: section.settings.modal_description_plus_photo,
+  grid: plus_photo_form
+%}

@@ -1,0 +1,71 @@
+{% comment %}
+  Renders a input search predictive
+
+  Accepts:
+  - visible: {Boolean} true o false, is visible input search (required)
+  - search_params: {String} type result search (optional) - defaul "product"
+  - limit_search: {Number} limit result suggest (optional) -
+   default "5" max "10"
+
+  Usage:
+  {%  render 'predictive-search'
+    visible: false | true,
+    search_params: "product,article,collection,page",
+    limit_search: 10
+  %}
+{% endcomment %}
+<div
+  id="search-predictive"
+  class="predictive__search"
+  data-active="{{ visible }}"
+  data-show="{{ visible }}"
+  data-config-params="{{ search_params }}"
+  data-config-limit="{{ limit_search }}"
+>
+  <predictive-search
+    class="predictive__search--form"
+  >
+    <form
+      action="{{ routes.search_url }}"
+      method="get"
+      role="search"
+    >
+      <div class="form__textfield search__form--textfield">
+        <div class="input-container">
+          <input
+            id="Search"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            role="combobox"
+            aria-expanded="false"
+            aria-owns="predictive-search-results-list"
+            aria-controls="predictive-search-results-list"
+            aria-haspopup="listbox"
+            aria-autocomplete="list"
+            autocorrect="off"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="{{ 'general.search.search' | t }}"
+          />
+          <label for="Search">
+            {{ 'general.search.search' | t }}
+          </label>
+          <input
+            name="options[prefix]"
+            type="hidden"
+            value="last"
+          />
+          <input type="hidden" name="type" value="{{ search_params }}"/>
+
+          <button type="submit" class="predictive__search-zoom-button">
+            {% render 'icon-zoom' %}
+          </button>
+        </div>
+      </div>
+        <div id="predictive-search-list" tabindex="-1">
+        </div>
+    </form>
+  </predictive-search>
+</div>

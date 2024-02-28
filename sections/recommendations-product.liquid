@@ -1,0 +1,110 @@
+  {% liquid
+    assign current_product = product
+
+    for tag in product.tags
+      if tag == 'carte-cardeu'
+        assign cart_cardeu = true
+      endif
+    endfor
+  %}
+
+  {%- if cart_cardeu -%}
+    {% if section.settings.default_collection != blank %}
+      {%- if section.settings.recommendation_title != blank -%}
+        <span  class="slider-section__title wrapper-m h2">
+          {{ section.settings.recommendation_title }}
+        </span>
+      {%- endif -%}
+
+      <div class="slider-container wrapper-m">
+        {% render 'slider-content',
+          collection: section.settings.default_collection,
+          limit: 50,
+          button_url: section.settings.default_collection.url,
+          button_text: section.settings.default_collection_text_btn,
+        %}
+      </div>
+    {% endif %}
+  {% else %}
+    {%- if section.settings.recommendation_title != blank -%}
+      <span class="h2 slider-section__title wrapper-m">
+        {{ section.settings.recommendation_title }}
+      </span>
+    {%- endif -%}
+
+    <div class="slider-container wrapper-m">
+
+      {% capture capture_slides_join %}
+        {% render 'custom-carousel-logic'
+          current_product: current_product,
+          type: 'product',
+          cartpage: false,
+          limit_products: section.settings.custom_upsell_limit
+        %}
+      {% endcapture %}
+
+      {% if capture_slides_join != blank %}
+        {% render 'slider-content',
+          limit: section.settings.custom_upsell_limit,
+          slider_content: capture_slides_join,
+          button_url: section.settings.default_url_text_btn,
+          button_text: section.settings.text_custom_upsell
+        %}
+      {% endif %}
+
+    </div>
+  {% endif %}
+
+
+{% schema %}
+{
+  "name": "Recommendation",
+  "tag": "section",
+  "class": "recommendation slider-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "recommendation_title",
+      "default": "PRODUITS SIMILAIRES",
+      "label": "Title"
+    },
+    {
+      "type": "header",
+      "content": "Custom upsell settings"
+    },
+    {
+      "type": "number",
+      "id": "custom_upsell_limit",
+      "label": "Limit",
+      "default": 15
+    },
+    {
+      "type": "text",
+      "id": "text_custom_upsell",
+      "label": "Text custom upsell",
+      "default": "Voir tous"
+    },
+    {
+      "type": "url",
+      "id": "default_url_text_btn",
+      "label": "Link for button of custom upsell",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Default collection settings"
+    },
+    {
+      "type": "collection",
+      "id": "default_collection",
+      "label": "Default collection"
+    },
+    {
+      "type": "text",
+      "id": "default_collection_text_btn",
+      "label": "Text button",
+      "default": "voir tous"
+    }
+  ]
+}
+{% endschema %}

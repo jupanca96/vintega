@@ -1,0 +1,26 @@
+{% comment %}
+  {% render 'status-tag'
+    tags,
+    current_variant
+  %}
+{% endcomment %}
+
+<div class="product-card__status-tag-wrapper">
+  {% for tag in tags %}
+    {% if tag contains 'statustag' %}
+      {% assign status_tag = tag | split: '-' %}
+      {% assign status_tag = status_tag | last | split: '|' %}
+      {% assign status_tag_text = status_tag | first %}
+      {% assign status_tag_color = status_tag | last %}
+
+      {% if status_tag_text != blank %}
+        <span
+          class="product-card__status-tag"
+          style="background-color: {{ status_tag_color | default: '#FF6801' }};"
+        >
+          {{ status_tag_text }}
+        </span>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+</div>

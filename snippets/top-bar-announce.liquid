@@ -1,0 +1,69 @@
+{% comment %}
+  Top bar
+
+  Accepts:
+  - show_announce: {Bollean} show or hidden top bar
+  - blocks_text_announce: {array} text announce
+  Usage:
+  {% render 'top-bar-announce'
+    show_announce: "true or false",
+    blocks_text_announce: "[text,text,text]",
+    text_color: section.settings.top_bar_text_color
+    bg_color: section.settings.top_bar_bg_color
+  %}
+{% endcomment %}
+
+{% if show_announce and blocks_text_announce.size >= 1 %}
+  <div
+    class="top__bar {% unless hide_sticky %} hide-sticky {% endunless %}"
+  >
+    <div class=" top__bar--content">
+      {% for block in blocks_text_announce %}
+
+        <div class="top__bar--message">
+          {{ block.settings.heading }}
+        </div>
+      {% endfor %}
+
+    </div>
+
+    <style>
+      .top__bar {
+        background-color: {{ section.settings.top_bar_bg_color }};
+      }
+
+      .top__bar--content {
+        width: {{ blocks_text_announce.size | append: '00%' }};
+        animation: slide {{ blocks_text_announce.size | times: section.settings.top_bar_speed | append: 's' }} infinite alternate;
+      }
+
+      .top__bar--message,
+      .top__bar--content {
+        color: {{ section.settings.top_bar_text_color }};
+      }
+
+      {% unless blocks_text_announce.size == 1 %}
+        @keyframes slide {
+          {% if blocks_text_announce.size == 2 %}
+            0% {margin-left: 0;}
+            47.5% {margin-left: 0;}
+
+            52.5% {margin-left: -100%;}
+            100% {margin-left: -100%;}
+          {% elsif blocks_text_announce.size == 3 %}
+            0% {margin-left: 0;}
+            30% {margin-left: 0;}
+
+            35% {margin-left: -100%;}
+            65% {margin-left: -100%;}
+
+            70% {margin-left: -200%;}
+            100% {margin-left: -200%;}
+          {% endif %}
+        }
+      {% endunless %}
+
+
+    </style>
+  </div>
+{% endif %}

@@ -1,0 +1,81 @@
+{% comment %}
+  Use snippet to render cada detail of description.
+  If there are not any items in own metafields, this search in migration metafields
+
+  Use:
+    title: {String} section title
+    metafield: {String} Metafield or string with structure: tem/item/item
+    modal: If it use icon to modal
+
+  {% render 'description-product-item'
+    title: 'title'
+    metafield: product.metafields.custom.accessories.value
+    size: true,
+    first_element: ''
+    modal: true || false
+  %}
+{% endcomment %}
+
+{% liquid
+  assign items = metafield
+
+  if size
+    assign items = metafield | split: '/'
+  endif
+
+  for item in items
+    assign items_length = forloop.index
+  endfor
+
+  if first_element != blank
+    assign items_length = items_length | plus: 1
+  endif
+
+  if metafield != blank and items_length > 0
+    assign validation = true
+  endif
+%}
+
+{% if validation or first_element != blank %}
+  <div class="descript-product-item">
+
+    <span class="descript-product-item__title">
+      {% if modal %}
+        {{ title }}
+        <button type="button" id="js-shoulder-strap-modal-open">
+          {% liquid
+            assign modal_open_icon = section.settings.modal_open_icon | split: '|'
+            assign modal_open_icon_url = modal_open_icon | first | append: '.svg' | file_url
+            assign modal_open_icon_alt = modal_open_icon | last
+          %}
+
+          {% if section.settings.modal_open_icon != blank %}
+            {% render "render-image"
+              class: 'icon-incognito',
+              title: modal_open_icon_alt,
+              img_src: modal_open_icon_url,
+              alt: modal_open_icon_alt,
+              width: "20",
+              height: "20"
+            %}
+          {% endif %}
+        </button>
+      {% else %}
+        {{ title }}
+      {% endif %}
+    </span>
+
+    <ul class="descript-product-item__sub-items-container {% if items_length > 1 %}with-bullet{% endif %}">
+      {% if first_element != blank %}
+        <li class="descript-product-item__sub-item">
+          {{ first_element }}
+        </li>
+      {% endif %}
+      {% for item in items %}
+        <li class="descript-product-item__sub-item">
+          {{ item }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

@@ -1,0 +1,200 @@
+{% comment %}
+  Get metaobjects data, structure data and create form
+
+  Use:
+    id: {String} Use this param to change id but the same structure
+
+  {% render 'mes-alerts-form'
+    id: 'more-text',
+    add_btn: add_btn
+  %}
+{% endcomment %}
+
+
+<form
+  class="mes-alerts-form"
+  id="js-mes-alerts{% if id != blank %}-{{ id }}{% endif %}-form"
+  data-customer-id="{{ customer.id }}"
+>
+  {% liquid
+    assign button_text = settings.title_btn_open_alerts
+
+    if request.page_type contains 'customers' and id
+      assign button_text = 'customer.mes_alerts.texts_component.open_edit_submit' | t
+    endif
+
+    assign brand_text = 'products.mes_alerts.text_selects.designer' | t
+    assign model_text = 'products.mes_alerts.text_selects.model' | t
+    assign color_text = 'products.mes_alerts.text_selects.color' | t
+    assign material_text = 'products.mes_alerts.text_selects.material' | t
+    assign condition_text = 'products.mes_alerts.text_selects.condition' | t
+  %}
+
+  {%- capture text_btn -%}
+    data-user-email="{{ customer.email }}"
+    data-text="{{ button_text }}"
+    disabled
+  {%- endcapture -%}
+
+  {% for item in shop.metaobjects.alerts_data.values %}
+    {% liquid
+      assign brands = item.brands.value.item_brand.value
+      assign colors = item.colors.value.item_color.value
+      assign materials = item.materials.value.item_material.value
+      assign conditions = item.conditions.value.item_condition.value
+    %}
+
+
+    {% capture options_brands %}
+      <option value="" selected> {{ brand_text }} </option>
+
+      {% for brand in brands %}
+        <option
+          value="{{ brand.value | downcase }}"
+          data-models='{{ brand.models }}'
+          data-model-word="{{ model_text }}"
+        >
+          {{ brand.value }}
+        </option>
+      {% endfor %}
+    {% endcapture %}
+
+    {% assign brand_id = "js-mes-alerts-brand"  %}
+    {% if id != blank %}
+      {% assign brand_id = "js-mes-alerts-" | append: id | append: '-brand' %}
+    {% endif %}
+
+    {% render 'input-select',
+      options: options_brands,
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      label: brand_text,
+      name: "designer",
+      id: brand_id,
+    %}
+
+    {% capture options_brands %}
+      <option value="" selected> {{ model_text }} </option>
+    {% endcapture %}
+
+    {% assign models_id = "js-mes-alerts-model" %}
+    {% assign model_css_class = "form__textfield-label size-s form__textfield-label--spaced models-select" %}
+    {% if id != blank %}
+      {% assign models_id = "js-mes-alerts-" | append: id | append: '-model' %}
+      {% assign model_css_class = "form__textfield-label size-s form__textfield-label--spaced models-select-" | append: id %}
+    {% endif %}
+
+    {% render 'input-select',
+      options: options_brands,
+      class: model_css_class,
+      label: model_text,
+      name: "model",
+      id: models_id,
+    %}
+
+    <small
+      class="mes-alerts__response-model-error form__message form__message--error hidden"
+      id="js-mes-alerts{% if id != blank %}-{{ id }}{% endif %}-response-model-error"
+    >
+      {% render 'icon-error' %}
+      {{ 'products.mes_alerts.model_error_response' | t }}
+    </small>
+
+    {% capture options_colors %}
+      <option value="" selected> {{ color_text }} </option>
+
+      {% for color in colors %}
+        <option value="{{ color | downcase }}">
+          {{ color }}
+        </option>
+      {% endfor %}
+    {% endcapture %}
+
+    {% render 'input-select',
+      options: options_colors,
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      label: color_text,
+      name: "color",
+      id: "js-mes-alerts-color",
+    %}
+
+    {% capture options_materials %}
+      <option value="" selected> {{ material_text }} </option>
+
+      {% for material in materials %}
+        <option value="{{ material | downcase }}">
+
+          {{ material }}
+        </option>
+      {% endfor %}
+    {% endcapture %}
+
+    {% render 'input-select',
+      options: options_materials,
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      label: material_text,
+      name: "material",
+      id: "js-mes-alerts-material",
+    %}
+
+    {% capture options_conditions %}
+      <option value="" selected> {{ condition_text }} </option>
+
+      {% for condition in conditions %}
+        <option value="etat_{{ condition | downcase }}">
+
+          {{ condition }}
+        </option>
+      {% endfor %}
+    {% endcapture %}
+
+    {% render 'input-select',
+      options: options_conditions,
+      class: "form__textfield-label size-s form__textfield-label--spaced",
+      label: condition_text,
+      name: "condition",
+      id: "js-mes-alerts-condition",
+    %}
+  {% endfor %}
+
+  {% assign submit_id = "js-btn-mes-alerts-submit" %}
+    {% if id != blank %}
+      {% assign submit_id = "js-mes-alerts-" | append: id | append: '-submit' %}
+    {% endif %}
+
+
+  {% if button_text != blank %}
+    {% render 'button'
+      class: "btn-1",
+      content: button_text,
+     action: "submit",
+      arial_label: button_text,
+      name: button_text,
+      id: submit_id,
+      custom_attr: text_btn
+    %}
+  {% endif %}
+
+  {% if add_btn %}
+    {{ add_btn }}
+  {% endif %}
+
+  <small
+    class="mes-alerts__response-error form__message form__message--error hidden"
+    id="js-mes-alerts{% if id != blank %}-{{ id }}{% endif %}-response-error"
+    data-text-response-error="{{ 'products.mes_alerts.general_error_response' | t }}"
+    data-text-response-minimum-one-error="{{ 'products.mes_alerts.minimum_one_error_response' | t }}"
+    data-text-response-limit-alerts-error="{{ 'products.mes_alerts.limit_alerts_error_response' | t }}"
+  >
+  </small>
+</form>
+
+<small
+  class="mes-alerts__response {% if id != blank %}mes-alerts__response--{{ id }}{% endif %} form__message hidden"
+  id="js-mes-alerts{% if id != blank %}-{{ id }}{% endif %}-response"
+>
+  {% if request.page_type contains 'customers' and id %}
+    {{ 'customer.mes_alerts.update_message.text_confirm' | t }}
+  {% else %}
+    {{ 'products.mes_alerts.response' | t }}
+  {% endif %}
+</small>

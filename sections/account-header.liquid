@@ -1,0 +1,38 @@
+<h1 class="customer__title">
+  {{ section.settings.title }}
+</h1>
+
+{% render 'link'
+  type: 'link'
+  class: "customer__nav-link",
+  content: section.settings.logout_text,
+  icon_close: true
+  url: routes.account_logout_url
+%}
+
+{% schema %}
+{
+  "name": "Account header",
+  "class": "account__header wrapper-s",
+  "tag": "section",
+  "templates": [
+    "customers/account"
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "info": "It is the section title",
+      "default": "MON COMPTE"
+    },
+    {
+      "type": "text",
+      "id": "logout_text",
+      "label": "Logout button text",
+      "info": "It is the logout button text",
+      "default": "SE DÉCONNECTER"
+    }
+  ]
+}
+{% endschema %}

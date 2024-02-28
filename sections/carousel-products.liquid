@@ -1,0 +1,166 @@
+{% assign collection_1 = section.settings.collection_1 %}
+{% assign collection_2 = section.settings.collection_2 %}
+
+{%- if section.settings.heading != blank -%}
+  <h2>{{ section.settings.heading }}</h2>
+{%- endif -%}
+
+{% capture snippet_content_1 %}
+  {% assign products_1 = collection_1.products %}
+
+  {% for product in products_1 %}
+    <div class="swiper-slide">
+      {% render 'product-card'
+        product: product
+        is_simple: true
+      %}
+    </div>
+  {% endfor %}
+{% endcapture %}
+
+{% capture snippet_content_2 %}
+  {% assign products_2 = collection_2.products %}
+
+  {% for product in products_2 %}
+    <div class="swiper-slide">
+      {% render 'product-card'
+        product: product,
+        is_simple: true
+      %}
+    </div>
+  {% endfor %}
+{% endcapture %}
+
+<div class="carousel-products__navigation">
+  <button
+    type="button"
+    class="carousel-products__navigation-btn active"
+    id="js-carousel-product-btn-1"
+  >
+    {{ collection_1.title }}
+  </button>
+
+  <button
+    type="button"
+    class="carousel-products__navigation-btn"
+    id="js-carousel-product-btn-2"
+  >
+    {{ collection_2.title }}
+  </button>
+</div>
+
+<div class="carousel-products__slides-container swiper">
+  <div class="carousel-products__toggle swiper-wrapper">
+    {% if collection_1 != blank %}
+      <div
+        class="carousel-products__slide swiper-slide"
+        id="js-carousel-product-slide"
+      >
+        {% render 'slider'
+          content: snippet_content_1,
+          arrows: true,
+          item_max: collection_1.products.size,
+          id: 'js-collection-1'
+        %}
+
+        {% if
+          section.settings.link_content_1 != blank
+          and section.settings.link_1 != blank
+        %}
+          <div class="carousel-products__slide-btn">
+            {% render 'link'
+              type: 'btn',
+              class: 'btn-1 btn-m'
+              content: section.settings.link_content_1,
+              url: section.settings.link_1,
+              target: "_blank"
+            %}
+          </div>
+        {% endif %}
+
+      </div>
+    {% endif %}
+
+    {% if collection_2 != blank %}
+      <div
+        class="carousel-products__slide swiper-slide"
+      >
+        {% render 'slider'
+          content: snippet_content_2,
+          arrows: true,
+          item_max: collection_2.products.size,
+          id: 'js-collection-2'
+        %}
+
+        {% if
+          section.settings.link_content_2 != blank
+          and section.settings.link_2 != blank
+        %}
+          <div class="carousel-products__slide-btn">
+            {% render 'link'
+              type: 'btn',
+              class: 'btn-1 btn-m',
+              content: section.settings.link_content_2,
+              url: section.settings.link_2,
+              target: "_blank"
+            %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Carousel products",
+  "tag": "section",
+  "class": "carousel-products wrapper-m section-space",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Heading carousel"
+    },
+    {
+      "type": "header",
+      "content": "Collections carousel"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "First collection"
+    },
+    {
+      "type": "url",
+      "id": "link_1",
+      "label": "Url",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "link_content_1",
+      "label": "Url content",
+      "default": "voir tous"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "Second collection"
+    },
+    {
+      "type": "url",
+      "id": "link_2",
+      "label": "Url",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "link_content_2",
+      "label": "Url content",
+      "default": "voir tous"
+    }
+  ]
+}
+{% endschema %}

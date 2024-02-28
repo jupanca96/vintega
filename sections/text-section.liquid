@@ -1,0 +1,63 @@
+{% capture slide_text_capture %}
+  {% for i in (1..4) %}
+    <div class="text-section--scroll">
+      <div class="text-section__content">
+        {% assign slides = section.settings.heading | split: '|' %}
+        
+        {% for slide in slides %}
+          {% liquid
+            assign content = slide | split: '-'
+            assign text = content | first | strip
+            assign color = content | last | strip
+          %}
+          <!-- eslint-disable @html-eslint/no-inline-styles -->
+          <span style="color: {{ color }};">
+            {{ text }}
+          </span>
+        {% endfor %}
+
+      </div>
+    </div>
+  {% endfor %}
+{% endcapture %}
+
+<div class="text-section--slider">
+  {{ slide_text_capture }}
+
+  <style>
+    .text-section--scroll {
+      animation-duration: {{ section.settings.delay | append: 's' }};
+    }
+  </style>
+</div>
+
+{% schema %}
+{
+  "name": "Text section",
+  "class": "text-section section-space",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Instructions"
+    },
+    {
+      "type": "paragraph",
+      "content": "Format for text color group: (RE)LOVE (RE)WEAR - #003BC3 and if you want more of one separate with a pipe '|'. Ex: (RE)LOVE (RE)WEAR - #FF6801 | (RE)LOVE (RE)WEAR - #003BC3"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Slider text",
+      "default": "<strong>(RE)</strong>LOVE <strong>(RE)</strong>WEAR - #003BC3 | <strong>(RE)</strong>LOVE <strong>(RE)</strong>LOVETEST - #FF6801 | <strong>(RE)</strong>LOVE <strong>(RE)</strong>WEARTEST - #0FC200"
+    },
+    {
+      "type": "number",
+      "id": "delay",
+      "label": "Speed slide",
+      "default": 10,
+      "info": "Seconds are number like these: 1, 2, 3, 4, etc."
+    }
+  ]
+}
+{% endschema %}

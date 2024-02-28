@@ -1,0 +1,119 @@
+{% comment %}
+  Accordion-item
+
+  Accepts:
+
+  Usage:
+  {% render 'reassurence-icons',
+    block: block
+  %}
+
+  Block structure:
+
+{% endcomment %}
+{% assign count = 0 %}
+
+{% capture items %}
+  {% if block.settings.icon_1 != blank %}
+    <div class="sellers-buyers__icon">
+      {% assign icon_1 = block.settings.icon_1 | split: '|' %}
+      {% assign icon_1_url = icon_1 | first | append: '.svg' | file_url %}
+      {% assign icon_1_alt = icon_1 | last %}
+
+      {% render "render-image"
+        class: "class_image",
+        img_src: icon_1_url,
+        size: "220 300 400 500",
+        alt: icon_1_alt,
+        width: "100",
+        height: "100"
+      %}
+
+      {% if block.settings.icon_1_text != blank %}
+        <span>
+        {{ block.settings.icon_1_text }}
+        </span>
+      {% endif %}
+    </div>
+
+    {% assign count = count | plus: 1 %}
+  {% endif %}
+
+  {% if block.settings.icon_2 != blank %}
+    <div class="sellers-buyers__icon">
+      {% assign icon_2 = block.settings.icon_2 | split: '|' %}
+      {% assign icon_2_url = icon_2 | first | append: '.svg' | file_url %}
+      {% assign icon_2_alt = icon_2 | last %}
+
+      {% render "render-image"
+        class: "class_image",
+        img_src: icon_2_url,
+        size: "220 300 400 500",
+        alt: icon_2_alt,
+        width: "100",
+        height: "100"
+      %}
+
+      {% if block.settings.icon_2_text != blank %}
+        <span>
+        {{ block.settings.icon_2_text }}
+        </span>
+      {% endif %}
+    </div>
+    {% assign count = count | plus: 1 %}
+  {% endif %}
+
+  {% if block.settings.icon_3 != blank %}
+    <div class="sellers-buyers__icon">
+      {% assign icon_3 = block.settings.icon_3 | split: '|' %}
+      {% assign icon_3_url = icon_3 | first | append: '.svg' | file_url %}
+      {% assign icon_3_alt = icon_3 | last %}
+
+      {% render "render-image"
+        class: "class_image",
+        img_src: icon_3_url,
+        size: "220 300 400 500",
+        alt: icon_3_alt,
+        width: "100",
+        height: "100"
+      %}
+
+      {% if block.settings.icon_3_text != blank %}
+        <span>
+        {{ block.settings.icon_3_text }}
+        </span>
+      {% endif %}
+    </div>
+    {% assign count = count | plus: 1 %}
+  {% endif %}
+
+  {% if block.settings.icon_4 != blank %}
+    <div class="sellers-buyers__icon">
+      {% assign icon_4 = block.settings.icon_4 | split: '|' %}
+      {% assign icon_4_url = icon_4 | first | append: '.svg' | file_url %}
+      {% assign icon_4_alt = icon_4 | last %}
+
+      {% render "render-image"
+        class: "class_image",
+        img_src: icon_4_url,
+        size: "220 300 400 500",
+        alt: icon_4_alt,
+        width: "100",
+        height: "100"
+      %}
+
+      {% if block.settings.icon_4_text != blank %}
+        <span>
+        {{ block.settings.icon_4_text }}
+        </span>
+      {% endif %}
+    </div>
+    {% assign count = count | plus: 1 %}
+  {% endif %}
+{% endcapture %}
+
+{% if items != blank %}
+  <div class="sellers-buyers__icons-container qty-{{ count }}">
+    {{ items }}
+  </div>
+{% endif %}

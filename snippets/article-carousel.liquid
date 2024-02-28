@@ -1,0 +1,44 @@
+{% comment %}
+  Article carousel
+
+  Accepts:
+  - short_code: Liquid structure
+
+  Usage:
+  {% render 'article-carousel',
+    short_code: image.jpg|alt text|R or L|U or D|"Link redirection of image"|E or I|Here goes the text
+  %}
+{% endcomment %}
+
+{% liquid
+  assign upsell = short_code | strip_html | split: '|'
+  assign collection_handle = upsell | first
+  assign collection_limit = upsell | last
+  assign button_text = 'sections.featured_blog.article_collection_button_text' | t
+%}
+
+{% if upsell.size == 1 %}
+  {% assign collection_limit = collections[collection_handle].all_products_count %}
+{% endif %}
+
+{% assign collection_limit = collection_limit | plus: 0 %}
+
+{% if upsell != blank %}
+  <section class="slider-section section-space section-space--top">
+    <h2 class="slider-section__title">
+      {{ 'sections.featured_blog.article_collection_title' | t }}
+    </h2>
+
+    <div class="slider-container">
+      <div class="slider-wrapper">
+        {% render 'slider-content',
+          collection: collections[collection_handle],
+          limit: collection_limit,
+          button_url: collections[collection_handle].url,
+          button_text: button_text,
+          to_hide_arrows: 4
+        %}
+      </div>
+    </div>
+  </section>
+{% endif %}

@@ -1,0 +1,80 @@
+{%- comment -%}
+  Renders UI cart discount
+
+  Usage:
+  {% render 'cart-discount' cart: cart %}
+{%- endcomment -%}
+
+{% liquid
+  assign currency = shop.money_format | split: ' ' | last
+  assign currency_format = currency | split: '<' | first
+  assign discount_empty = 'sections.cart.discount.empty_code' | t
+  assign label = 'sections.cart.discount.label' | t
+  assign placeholder = 'sections.cart.discount.placeholder' | t
+  assign apply_discount_btn = 'sections.cart.discount.apply' | t
+  assign fee_text = 'sections.cart.discount.fee' | t
+  assign discount_total_text = 'sections.cart.discount.total' | t
+  assign discount_error = 'sections.cart.discount.error' | t
+  assign discount_delete_label = 'sections.cart.discount.delete_label' | t
+  assign discount_delete_info = 'sections.cart.discount.delete_info' | t
+  assign discount_delete_button_1 = 'sections.cart.discount.delete_btn_1' | t
+  assign discount_delete_button_2 = 'sections.cart.discount.delete_btn_2' | t
+%}
+
+{%- capture id_discount_btn -%}data-id="{{ apply_discount_btn }}" disabled{%- endcapture -%}
+{%- capture id_delete_btn -%}data-id="{{ discount_delete_button_2 }}"{%- endcapture -%}
+
+<div class="cart-discount">
+  <form
+    id="discount-validation"
+    class="cart-discount__form"
+    data-active="true"
+  >
+    <div class="cart-discount__form-inputs">
+      {% render 'input',
+        class: 'cart-discount__input',
+        type: 'text',
+        name: 'discount-code',
+        id: 'discount-code',
+        placeholder: placeholder,
+        value: '',
+        label: label
+      %}
+
+      {% render 'button',
+        class: 'btn-2 cart-discount__apply',
+        custom_attr: id_discount_btn,
+        content: apply_discount_btn,
+        action: 'submit'
+        custom_attr: id_discount_btn
+      %}
+    </div>
+
+    <span class="cart-discount__error">{{ discount_error }}</span>
+    <span class="cart-discount__empty">{{ discount_empty }}</span>
+    <span class="cart-discount__info">{{ fee_text }}</span>
+  </form>
+
+  <div class="cart-discount__success">
+    <input
+      type="text"
+      name="discount-applied"
+      disabled
+    >
+
+    {% render 'button',
+      class: 'btn-1 cart-discount__success-btn-2',
+      custom_attr: id_delete_btn,
+      content: discount_delete_button_2,
+      action: 'button'
+    %}
+
+    <p
+      class="cart-discount__value"
+      data-currency="{{ currency_format }}"
+    >
+      <span>{{ discount_total_text }}</span>
+      <span id="total-discount"> </span>
+    </p>
+  </div>
+</div>

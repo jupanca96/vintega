@@ -1,0 +1,267 @@
+{% liquid
+  assign logo = section.settings.logo | append: '.svg' | file_url
+  assign dark_logo = section.settings.dark_logo | append: '.svg' | file_url
+  assign alt_logo = 'Logo ' | append: shop.name
+  assign logo_center = false
+  assign size_items = linklists[section.settings.menu].links.size | plus: 1
+  assign modulo_size_linklist = size_items | modulo: 2
+
+  unless modulo_size_linklist == 0
+    assign logo_center = false
+  endunless
+%}
+
+{% capture snippet_logo %}
+  <div class="header__logo{% if logo_center %} header__logo--center{% endif %}
+    {% if template == 'index' %} {{ section.settings.bg_text_color }}{% endif %}
+    "
+  >
+    <a href="{{ routes.root_url }}">
+      {% if
+        section.settings.logo != blank
+        and section.settings.dark_logo != blank %}
+
+        {% if section.settings.bg == 'white' %}
+          {% assign header_bg_color = 'white-bg' %}
+        {% endif %}
+
+        <img
+          class="logo--light {{ header_bg_color }}"
+          src="{{ logo }}"
+          alt="{{ alt_logo }}"
+          width="140"
+          height="22"
+          loading="lazy"
+        />
+
+        <img
+          class="logo--dark {{ header_bg_color }}"
+          src="{{ dark_logo }}"
+          alt="{{ alt_logo }}"
+          width="140"
+          height="22"
+          loading="lazy"
+        />
+      {% else %}
+        {{ shop.name }}
+      {% endif %}
+    </a>
+
+    <button
+      type="button"
+      class="header__predictive-icon search-js"
+      data-active="true"
+      aria-label="search"
+    >
+      {% render 'icon-zoom' %}
+    </button>
+  </div>
+{% endcapture %}
+
+{% capture snippet_user %}
+  <div
+    class="header__user{% if logo_center %} header__user--center{% endif %}"
+  >
+    {% render 'user-nav' %}
+  </div>
+{% endcapture %}
+
+<div class="header__components">
+  {% render 'top-bar-announce'
+    show_announce: true,
+    blocks_text_announce: section.blocks,
+    text_color: section.settings.top_bar_text_color,
+    bg_color: section.settings.top_bar_bg_color,
+    hide_sticky: section.settings.top_bar_sticky
+  %}
+
+  <div
+    class="header grid
+    {% if logo_center %} header--center{% endif %}
+    {% if template != 'index' %} header--notindex{% endif %}"
+  >
+    {{ snippet_logo }}
+    <nav>
+      {% render 'site-nav'
+        linklist: section.settings.menu,
+        open_first_element: section.settings.open_first_item,
+        snippet_logo: snippet_logo,
+        logo_center: logo_center,
+        snippet_user: snippet_user,
+        size_items: size_items
+      %}
+    </nav>
+    {{ snippet_user }}
+
+    {% render 'predictive-search'
+      visible: false,
+      search_params: "product",
+      limit_search: 3
+    %}
+  </div>
+</div>
+
+{% style %}
+  :root {
+    {% if template == 'index' %}
+      --position-header: fixed;
+      --bg-header: {{ section.settings.bg }};
+      --shadow-header: none;
+
+      {% if section.settings.bg == 'white' %}
+        --bg-header-text-color: black;
+        --shadow-header: 0px 4px 20px rgba(0, 0, 0, 0.08);
+      {% else %}
+        --bg-header-text-color: {{ section.settings.bg_text_color }};
+      {% endif %}
+    {% else %}
+      --position-header: sticky;
+      --shadow-header: 0px 4px 20px rgba(0, 0, 0, 0.08);
+    {% endif %}
+  }
+{% endstyle %}
+
+<script>
+  {% if template == 'index' %}
+    window.shopifyTemplate = 'index'
+  {% endif %}
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "tag": "section",
+  "class": "header__container js-header sticky",
+  "settings": [
+    {
+      "type": "text",
+      "id": "logo",
+      "label": "t:sections.header.settings.logo.label",
+      "default": "logo"
+    },
+    {
+      "type": "text",
+      "id": "dark_logo",
+      "label": "t:sections.header.settings.dark_logo.label",
+      "default": "dark-logo"
+    },
+    {
+      "type": "header",
+      "content": "Menu settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "To customize your megamenu UI, you should come in for navigation and follow the [rules](https://volcano-breath-a68.notion.site/Mega-menu-syntax-d1c940761c3c4e2a9c49d2988603cbc7)"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first_item",
+      "label": "Open first item",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Links outside of linklist"
+    },
+    {
+      "type": "url",
+      "id": "message_url",
+      "default": "/",
+      "label": "Contact url"
+    },
+    {
+      "type": "text",
+      "id": "contact_text",
+      "default": "/",
+      "label": "Contact text",
+      "default": "Contact"
+    },
+    {
+      "type": "header",
+      "content": "Header background settings"
+    },
+    {
+      "type": "select",
+      "id": "bg",
+      "label": "Background header",
+      "default": "transparent",
+      "info": "This setting only work in home page",
+      "options": [
+        {
+          "value": "transparent",
+          "label": "Transparent"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bg_text_color",
+      "label": "Text color",
+      "default": "white",
+      "info": "Setting only work in home page and when background is transparent",
+      "options": [
+        {
+          "value": "black",
+          "label": "Black"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Top bar settings"
+    },
+    {
+      "type": "number",
+      "id": "top_bar_speed",
+      "label": "Top bar speed",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "top_bar_sticky",
+      "label": "Add sticky to the top bar",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "top_bar_bg_color",
+      "label": "Top bar background color",
+      "default": "#003BC3"
+    },
+    {
+      "type": "color",
+      "id": "top_bar_text_color",
+      "label": "Top bar text color",
+      "default": "#fff"
+    }
+  ],
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Top Bar Announce",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "heading",
+          "label": "Message"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

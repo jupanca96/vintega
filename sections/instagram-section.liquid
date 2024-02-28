@@ -1,0 +1,78 @@
+<div class="instagram__header">
+  <a href="{{ section.settings.instagram_url }}" target="_blank">
+    <span
+      class="instagram__account-name h2 headings-home"
+      id="js-instagram-name"
+    >
+      {{ shop.metafields.instagram.settings.username }}
+    </span>
+  </a>
+
+  {% if section.settings.hashtag != blank %}
+    <span class="instagram__hashtag h6">
+      {{ section.settings.hashtag }}
+    </span>
+  {% endif %}
+</div>
+
+<div class="loading"></div>
+<div class="instagram__posts" id="js-instagram-posts"></div>
+<div class="instagram__post-popup" id="js-instagram-post-popup"></div>
+
+{% if section.settings.heading_color %}
+  <style>
+    .instagram__account-name {
+      color: {{ section.settings.heading_color }};
+    }
+  </style>
+{% endif %}
+
+{% if section.settings.instagram_footer_text != blank %}
+  <script>
+    window.instagramComponent = {
+      footerText: '{{ section.settings.instagram_footer_text }}'
+    }
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Instagram",
+  "class": "instagram js-instagram",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading settings"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram url",
+      "default": "/"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#FF6801"
+    },
+    {
+      "type": "text",
+      "id": "hashtag",
+      "label": "Hashtag name",
+      "default": "#vintegalovers"
+    },
+    {
+      "type": "header",
+      "content": "Modal settings"
+    },
+    {
+      "type": "text",
+      "id": "instagram_footer_text",
+      "label": "Instagram footer text",
+      "default": "View on Instagram"
+    }
+  ]
+}
+{% endschema %}

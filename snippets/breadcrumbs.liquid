@@ -1,0 +1,90 @@
+{% comment %}
+  Render breadcrumb
+  Only used in collection and product template
+
+  Usage:
+  {% render 'breadcrumbs' %}
+
+{% endcomment %}
+
+<nav
+  class="breadcrumbs"
+  role="navigation"
+  aria-label="breadcrumbs"
+ >
+  <ol class="breadcrumbs__list">
+    <li class="breadcrumbs__item">
+      <a
+        class="breadcrumbs__link"
+        href="/"
+       >
+       {{ 'accessibility.home' | t }}
+      </a>
+    </li>
+
+    {% if template contains 'product' %}
+
+      {%- if product.collections.size > 0 -%}
+        {% assign collection = product.collections | first %}
+
+        <li class="breadcrumbs__item">
+          <a
+            class="breadcrumbs__link breadcrumbs__collection"
+            href="{{ collection.url }}"
+            title="{{ collection.metafields.custom.hero_title }}"
+          >
+            {{ collection.metafields.custom.hero_title }}
+          </a>
+        </li>
+      {%- endif -%}
+
+      <li
+        class="breadcrumbs__item"
+        aria-current="page"
+      >
+        {{ product.title }}
+      </li>
+
+    {% elsif template contains 'collection' %}
+      <li
+        class="breadcrumbs__item"
+        aria-current="page"
+      >
+        {{ collection.metafields.custom.hero_title }}
+      </li>
+
+    {% elsif template.name == 'blog' %}
+      <li
+        class="breadcrumbs__item"
+        aria-current="page"
+      >
+        {{ blog.title }}
+      </li>
+
+    {% elsif template.name == 'article' %}
+      <li class="breadcrumbs__item">
+        <a
+          class="breadcrumbs__link"
+          href="{{ blog.url }}"
+        >
+          {{ blog.title }}
+        </a>
+      </li>
+
+      <li
+        class="breadcrumbs__item"
+        aria-current="page"
+      >
+        {{ article.title }}
+      </li>
+
+    {% elsif template contains 'page' %}
+      <li
+        class="breadcrumbs__item"
+        aria-current="page"
+      >
+        {{ page.title }}
+      </li>
+    {% endif %}
+  </ol>
+</nav>

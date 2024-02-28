@@ -1,0 +1,151 @@
+{% comment %}
+  Renders a product card
+
+  Accepts:
+  - product: {Object} Product Liquid object
+  - variant: {Object} Specific variant to add to cart
+
+  Usage:
+  {% render 'product-card'
+    product: product
+  %}
+{% endcomment %}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign available = current_variant.available
+
+  if variant != blank
+    assign current_variant = variant
+  endif
+  assign image_feature = product.featured_image | image_url: width: 400
+  assign image_second = product.images[1] | image_url: width: 400
+  if current_variant.compare_at_price == current_variant.price
+    assign hide_price = 'hidden'
+  endif
+
+  for tag in product.tags
+    if tag == 'carte-cardeu'
+      assign cart_cardeu = true
+    endif
+  endfor
+%}
+
+<div
+  class="product-card product-js"
+  data-card="true"
+  data-id="{{ product.id }}"
+  data-available="{{ available }}"
+>
+  {% render 'product-meta-data'
+  product: product
+  index: forloop.index %}
+  <a
+    class="product-card--head"
+    href="{{ product.url }}"
+  >
+    <div class="product-card--head-images">
+      {% render "render-image"
+        class: "product-card__image-2",
+        img_src: image_second,
+        img: product.images[1],
+        size: "150 200 300 400 600",
+        alt: "",
+        width: "100",
+        height: "100"
+      %}
+      {% render "render-image"
+        class: "product-card__image-1",
+        img_src: image_feature,
+        img: product.featured_image,
+        size: "150 200 300 400 600",
+        alt: "",
+        width: "100",
+        height: "100"
+      %}
+
+      {% if product.available %}
+        {% render 'status-tag', tags: product.tags, current_variant: current_variant %}
+      {% endif %}
+    </div>
+    <div class="product-card--head-info">
+
+      {% unless cart_cardeu %}
+        {% if product.vendor != blank %}
+          <span class="product-card__brand">
+            {{ product.vendor }}
+          </span>
+        {% endif %}
+      {% endunless %}
+
+      <span class="product-card__title">
+        {{ product.title }}
+      </span>
+
+      {% if product.metafields.custom.product_condition != blank %}
+        <span class="product-card__condition">
+          {{ 'products.product.condition' | t }} :
+          {{ product.metafields.custom.product_condition.value }}
+        </span>
+      {% endif %}
+
+      <span>
+        {% render 'price'
+          hide_price: hide_price
+          compare_at_price: current_variant.compare_at_price,
+          price: current_variant.price
+        %}
+      </span>
+    </div>
+  </a>
+
+  {% unless is_simple %}
+    <form
+      data-product="{{ product.id }}"
+      class="product-card--form add-product-cart"
+      action="/cart/add"
+    >
+      <input
+        type="hidden"
+        name="id"
+        value="{{ product.selected_or_first_available_variant.id }}"
+      >
+
+      {% render 'button-add-cart'
+        btn_type: 'btn-1',
+        class: 'btn-add-to-cart',
+        available: product.selected_or_first_available_variant.available
+      %}
+    </form>
+  {% endunless %}
+
+  {% unless available %}
+    <style>
+      .product-card[data-available="false"] {
+        opacity: .5;
+      }
+
+      .product-card[data-available="false"] .product.price {
+        display: none;
+      }
+
+      .product-card[data-available="false"]::before {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+        display: block;
+        padding: 2px 8px;
+        transform: translateX(-50%);
+        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 20px;
+        color: var(--color-base-bg-2);
+        content: '{{ 'products.product.sold_out' | t }}';
+        background-color: #F7F1EC;
+        white-space: nowrap;
+      }
+    </style>
+  {% endunless %}
+</div>

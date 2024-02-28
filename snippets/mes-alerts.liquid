@@ -1,0 +1,90 @@
+{% comment %}
+  Trigger component to open the alert form
+  - section: {object} section object (settings)
+  - id: {string} add string to IDs in HTML to change it and use another JS
+  - add_btn: add_btn: Here receive HTML element in a capture variable
+  - is_simple: Render only button,
+  - no_button: no render button
+  - available: add class out-stock (in product page)
+
+  {% render 'mes-alerts'
+    section: section,
+    id: ''
+    is_simple: Render only button,
+    no_button: no render button
+  %}
+
+{% endcomment %}
+{% capture btn_content %}
+  {% liquid
+    assign modal_open_icon = settings.modal_open_mes_alerts | split: '|'
+    assign modal_open_icon_url = modal_open_icon | first | append: '.svg' | file_url
+    assign modal_open_icon_alt = modal_open_icon | last
+
+    assign modal_open_icon_blue = settings.modal_open_mes_alerts_blue | split: '|'
+    assign modal_open_icon_blue_url = modal_open_icon_blue | first | append: '.svg' | file_url
+    assign modal_open_icon_blue_alt = modal_open_icon_blue | last
+  %}
+
+  {% if settings.modal_open_mes_alerts != blank %}
+    {% render "render-image"
+      class: 'alert-icon',
+      title: modal_open_icon_alt,
+      img_src: modal_open_icon_url,
+      alt: modal_open_icon_alt,
+      width: "20",
+      height: "20"
+    %}
+  {% endif %}
+
+  {% if settings.modal_open_mes_alerts_blue != blank %}
+    {% render "render-image"
+      class: 'alert-blue-icon',
+      title: modal_open_icon_blue_alt,
+      img_src: modal_open_icon_blue_url,
+      alt: modal_open_icon_blue_alt,
+      width: "20",
+      height: "20"
+    %}
+  {% endif %}
+
+  {% if settings.title_btn_open_alerts != blank %}
+    <span>
+      {{ settings.title_btn_open_alerts }}
+    </span>
+  {% endif %}
+{% endcapture %}
+
+{% unless is_simple and no_button %}
+  <div class="mes-alerts{% unless available %} mes-alerts--out-of-stock{% endunless %}">
+    {% unless is_simple %}
+      {% if settings.title_mes_alerts != blank %}
+        <span class="mes-alerts__title">
+          {{ settings.title_mes_alerts }}
+        </span>
+      {% endif %}
+
+      {% if settings.subtitle_mes_alerts != blank %}
+        <div class="mes-alerts__subtitle">
+          {{ settings.subtitle_mes_alerts }}
+        </div>
+      {% endif %}
+    {% endunless %}
+
+    {% unless no_button %}
+      {% render 'button'
+        class: "btn-1 mes-alerts__open-btn",
+        content: btn_content,
+        action: "button",
+        arial_label: settings.title_btn_open_alerts,
+        name: settings.title_btn_open_alerts,
+        id: 'js-btn-mes-alets-open',
+      %}
+    {% endunless %}
+  </div>
+{% endunless %}
+
+{% render 'mes-alerts-modal'
+  add_btn: add_btn,
+  id: id
+%}

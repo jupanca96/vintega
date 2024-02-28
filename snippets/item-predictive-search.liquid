@@ -1,0 +1,91 @@
+{% comment %}
+  Renders a item result the predictive search
+
+  Accepts:
+  - item: {Object} Item object
+  - item_url: {String} link url item render
+  - item_img_src: {String} to render url image
+  - item_img: {Object} image object
+  - item_alt: {String} alt in image
+  - item_title: {String} title item render
+  - item_is_available: {Boolean} item has stock
+
+  Usage:
+  {% render 'item-predictive-search'
+    item: item,
+    item_url: item.url,
+    item_img_src: item.featured_media.src,
+    item_img: item.featured_media,
+    item_alt: item.featured_media.alt,
+    item_title: item.title,
+    item_is_available: item.selected_or_first_available_variant.available
+  %}
+{% endcomment %}
+
+{% assign condition = item.metafields.custom.product_condition %}
+
+{%-liquid
+  for tag in item.tags
+    if tag == 'carte-cardeu'
+      assign cart_cardeu = true
+    endif
+  endfor
+-%}
+
+<a
+  href="{{ item.url }}"
+  class="predictive-search__item"  
+  tabindex="-1"
+>
+  <div class="cart-items__container">
+    <div class="cart-items__container--product-title">
+      <div class="cart-items__container--image">
+        {% render "render-image"
+          class: "",
+          attr: "data-live-item-image",
+          img_src: item_url,
+          img: item_img,
+          width: "82",
+          height: "110"
+        %}
+      </div>
+    </div>
+
+    <div class="cart-items__container--product-info">
+      {% if item.vendor != blank %}
+        {% unless cart_cardeu %}
+          <div class="cart-items__container--vendor subtitle--general">
+            <span>{{ item.vendor }}</span>
+          </div>
+        {% endunless %}
+      {% endif %}
+
+      <div class="cart-items__container--title">
+        <span>{{ item_title }}</span>
+      </div>
+
+      {% if condition != blank %}
+        <div class="cart-items__container--condition">
+          <span>{{ condition }}</span>
+        </div>
+      {% endif %}
+
+      <div class="item-price">
+        {% if item.compare_at_price != blank %}
+          <span class="compare-price">
+            {{ item.compare_at_price | money }}
+          </span>
+        {% endif %}
+
+        <span class="price">
+          {{ item.price_min | money }}
+        </span>
+        {% if item_is_available == false %}
+          <span id="predictive_item_sold">
+            {{ 'products.product.sold_out' | t }}
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</a>

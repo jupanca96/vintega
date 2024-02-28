@@ -1,0 +1,147 @@
+<!-- eslint-disable @html-eslint/require-closing-tags -->
+{% comment %}
+  Renders product slider component
+  Accepts:
+  - Product: {object} Product object element
+  - Direction: {string}
+    'horizontal-outside': for horizontal direction
+    'vertical-inside': for vertical direction inside image
+    'vertical-left': for vertical outside image direction left
+    'vertical-right': for vertical outside image direction right
+    'horizontal-inside': for horizontal inside image
+  NOTE: In <content> use className "swiper-slide" in the first item
+  Usage:
+  {% render 'product-media'
+    product: product,
+    direction: horizontal-outside
+  %}
+{% endcomment %}
+<!-- eslint-enable @html-eslint/require-closing-tags -->
+
+{%- liquid
+  if direction == "vertical-inside"
+    assign slide_direction = "vertical-inside-swipper-principal"
+    assign thumbs_direction = "vertical-inside-swipper-thumbs"
+    assign swiper_direction = "vertical-inside-swipper"
+  elsif direction == "horizontal-inside"
+    assign slide_direction = "horizontal-inside-swipper-principal"
+    assign thumbs_direction = "horizontal-inside-swipper-thumbs"
+    assign swiper_direction = "horizontal-inside-swipper"
+  elsif direction == "horizontal-outside"
+    assign slide_direction = "horizontal-swipper-principal"
+    assign thumbs_direction = "horizontal-swipper-thumbs"
+    assign swiper_direction = "horizontal-swipper"
+  elsif direction == "vertical-left" or direction == "vertical-right"
+    assign slide_direction = "vertical-outside-swipper-principal"
+    assign thumbs_direction = "vertical-outside-swipper-thumbs"
+    assign swiper_direction = "vertical-outside-swipper"
+  endif
+
+  assign variants = product.variants
+-%}
+
+{% render 'preload-css', asset: 'photoswipe.css' %}
+
+
+<div class="main-product__media-wrapper{% unless available %} main-product--out-of-stock{% endunless %}">
+  {% comment %}  MAIN SLIDER {% endcomment %}
+  <div class="main-product__slider {{ swiper_direction }} {{ direction }}">
+    {% comment %}  MAIN SLIDER {% endcomment %}
+    <div class="main-product__slider-principal-wrapper">
+      <div
+        class="swiper main-product__slider-principal
+        {% if product.media.size > 1 %}
+          {{ slide_direction }}
+        {% endif %}
+        "
+        data-direction="{{ direction }}"
+      >
+        {% if product.available %}
+          {% render 'status-tag', tags: product.tags %}
+        {% endif %}
+
+        <div
+          id="zoom-gallery-mobile"
+          class="swiper-wrapper"
+        >
+          {% render 'order-product-media'
+            type: 'main',
+            popup_image_mobil: popup_image_mobil
+          %}
+
+        </div>
+      </div>
+
+      <div
+        data-id="slider_{{ id | default: section.id }}"
+        class="swiper-pagination"
+      >
+      </div>
+
+      {% unless cart_cardeu %}
+        <div class="main-product__slider-view">
+          {% if product.metafields.custom.show_360_button.value
+          and product.metafields.custom.show_360_button.value != blank %}
+            <button type="button" id="js-360-image">
+              {% render 'icon-360' %}
+            </button>
+          {% endif %}
+
+          <button
+            class="main-product__zoom-icon"
+            type="button"
+            id="js-zoom"
+          >
+            {% render 'icon-glass-zoom' %}
+          </button>
+        </div>
+      {% endunless %}
+    </div>
+
+    {% assign length_thumbs = product.media.size %}
+
+    {% if length_thumbs > 1 %}
+      {% comment %}  SIDE SLIDER {% endcomment %}
+      <div class="main-product__slider-thumbs-wrapper">
+        <div class="swiper-button swiper-button-prev--main-product swiper-button--product-thumbs {% if  length_thumbs < 10 %} hidden {% endif %}">
+          {% render 'icon-circle-arrow' %}
+        </div>
+          <div class="swiper main-product__slider-thumbs {{ thumbs_direction }} {% if  length_thumbs < 9 %} center-slider {% endif %}">
+            <div class="swiper-wrapper">
+              {% render 'order-product-media'
+                type: 'thumbnails'
+              %}
+            </div>
+          </div>
+
+        <div class="swiper-button swiper-button-next--main-product swiper-button--product-thumbs {% if  length_thumbs < 10 %} hidden {% endif %}">
+          {% render 'icon-circle-arrow' %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% unless available %}
+    <style>
+      .main-product__slider-principal::before {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+        display: block;
+        padding: 2px 8px;
+        transform: translateX(-50%);
+        text-transform: uppercase;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 28px;
+        color: var(--color-base-bg-2);
+        content: '{{ 'products.product.sold_out' | t }}';
+        background-color: #F7F1EC;
+      }
+    </style>
+  {% endunless %}
+</div>
+
+<script defer src="{{ 'photoswipe.umd.min.js' | asset_url }}"></script>
+<script defer src="{{ 'photoswipe-lightbox.umd.min.js' | asset_url }}"></script>

@@ -1,0 +1,111 @@
+{% comment %}
+  Options in product form
+
+  Accepts:
+  - option_radio: {String} Reference options in radio buttons.
+  To render radio buttons include string with: 'Color'
+
+  Usage:
+  {% render 'variants-form'
+    product: product,
+    option_radio: 'Color Material'
+  %}
+{% endcomment %}
+
+{%- liquid
+  assign first_variant = product.selected_or_first_available_variant
+-%}
+
+<div class="variants">
+  <input
+    type="hidden"
+    id="variants"
+    value="{{ product.variants | json | escape }}"
+  />
+  <input
+    type="hidden"
+    id="options"
+    value="{{ product.options | json | escape }}"
+  />
+  <input
+    type="hidden"
+    name="id"
+    value="{{ first_variant.id }}"
+    data-variant="{{ product.handle }}"
+  />
+
+  {%- unless product.has_only_default_variant -%}
+    {%- for option_name in product.options -%}
+
+      {% liquid
+        if forloop.index == 1
+          assign available_value = first_variant.option1 | strip
+        elsif forloop.index == 2
+          assign available_value = first_variant.option2 | strip
+        elsif forloop.index == 3
+          assign available_value = first_variant.option3 | strip
+        endif
+      %}
+
+      <div class="variants--options">
+        <span class="variants--name">
+          {{ option_name }}
+        </span>
+
+        {%- if option_radio contains option_name -%}
+          <div
+            class="variants--radio-container"
+            data-type="{{ option_name }}"
+          >
+            <!-- eslint-disable max-len -->
+            {%- for option_value in product.options_by_name[option_name].values -%}
+              <label
+                class="variant__radio-button"
+                title="{{ option_name }} {{ option_value }}"
+              >
+                <input
+                  class="hidden js-option"
+                  type="radio"
+                  name="{{ option_name }}"
+                  value="{{ option_value }}"
+                  {% if option_value == available_value %}
+                    checked="checked"
+                  {% endif %}
+                />
+                <div
+                  class="variant__radio-button--design option_
+                  {{- option_value | handleize -}}"
+                >
+                </div>
+              </label>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+
+          <div
+            class="variants--select-container form__textfield-notlabel"
+            data-type="{{ option_name }}"
+          >
+            <select
+              name="{{ option_name }}"
+              class="variants--select-tag js-option"
+            >
+              {%- for option_value in product.options_by_name[option_name].values -%}
+                <option
+                  value="{{ option_value }}"
+                  {% if available_value == option_value %}
+                    selected="true"
+                  {% endif %}
+                >
+                  {{ option_value }}
+                </option>
+              {%- endfor -%}
+              <!-- eslint-enable max-len -->
+            </select>
+          </div>
+
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  {%- endunless -%}
+</div>

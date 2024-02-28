@@ -1,0 +1,459 @@
+{% comment %}
+  Render Upsell Section
+
+  Accepts:
+
+  Usage:
+  {% render 'custom-carousel-logic'
+    current_product: product
+    type: 'cart' || 'product'
+    cartpage: true - Only use if type is 'cart'
+    limit_products: limit
+
+  %}
+{% endcomment %}
+
+
+{% comment %}
+  - Used paramrter structure: brand,title,material,color to compare between products
+  - We have 2 structure: current product and every product in collections
+  - The iteration quantity is to each parameter (brand, title, material, color) then we have 4 cicles
+
+  Cicles
+  - Compare parameters
+  - Every cicle remove 1 parameter in the 2 structure to compare
+  - Used product_added_array to validate en every cicle that there are no repeat product
+  - Every cicle the products are save in a encapture variable (chunk1/2/3/4) already are with html structure
+
+  Paginate
+  From liquid is not posible get more of 50 products en all objects, but with paginate tag we can get from 1000 products.
+
+    WARNING:
+      - This only work with follows shopify objects: https://shopify.dev/docs/api/liquid/tags/paginate
+      - Also it is not posible assign objet to variable, because not work.
+      - Only work with direct object
+
+  - To get collection and make handle
+  - Iterate to all current product collections to match with the correct collection, we use paginate to avoid errors
+{% endcomment %}
+
+
+{% liquid
+  assign current_product = current_product
+
+  for tag in current_product.tags
+    if tag == 'carte-cardeu'
+      assign cart_cardeu = true
+    endif
+  endfor
+%}
+
+{% unless cart_cardeu %}
+  {% assign material = current_product.metafields.custom.extern_material.value | first %}
+  {% assign color = current_product.metafields.custom.color_details.value | first %}
+  {% assign handle_collection = 'sac-de-luxe-seconde-main-' | append: current_product.vendor | downcase | handleize %}
+
+  {% assign parameters_upsell = current_product.vendor
+    | append: ','
+    | append: current_product.metafields.custom.modele.value
+    | append: ','
+    | append: material
+    | append: ','
+    | append: color
+    | replace: ', ', ','
+    | replace: ' ,', ','
+  %}
+
+  {% assign limit = limit_products %}
+  {% assign products_added = '' %}
+
+  {% comment %}
+    Iterate 4 times (Quantity parameters - 4 types of validations)
+  {% endcomment %}
+  {% for j in (1..4) %}
+    {% case forloop.index %}
+      {% when 1 %}
+        {% capture chunk_1 %}
+          {% paginate collections by 300 %}
+            {% for collection in collections %}
+              {% if collection.handle == handle_collection %}
+
+                {% paginate collection.products by 2000 %}
+                  {% for product in collection.products %}
+                    {% if product.id != current_product.id
+                      and product.selected_or_first_available_variant.available %}
+                      {% liquid
+                        if i > limit
+                          break
+                        endif
+                      %}
+
+                      {% assign material_1 = product.metafields.custom.extern_material.value | first %}
+                      {% assign color_1 = product.metafields.custom.color_details.value | first %}
+
+                      {% assign product_properties_structure = product.vendor
+                        | append: ','
+                        | append: product.metafields.custom.modele.value
+                        | append: ','
+                        | append: material_1
+                        | append: ','
+                        | append: color_1
+                        | replace: ', ', ','
+                        | replace: ' ,', ','
+                      %}
+
+                      {% if product_properties_structure == parameters_upsell %}
+                        {% unless products_added contains product.handle %}
+
+                          {% comment %} Concat product-handle of the match product to create an array {% endcomment %}
+                          {% assign products_added = products_added | append: ',' | append: product.handle %}
+
+                          {% if type == 'cart'%}
+                            {% if cartpage %}
+                              <div class="swiper-slide">
+                                {% render 'product-card'
+                                  product: product
+                                %}
+                              </div>
+                            {% else %}
+                              {% render 'cart-upsell-product'
+                                product: product
+                                index: forloop.index
+                              %}
+                            {% endif %}
+                          {% elsif type == 'product' %}
+                            <div class="swiper-slide">
+                              {% render 'product-card', product: product, is_simple: true %}
+                            </div>
+                          {% endif %}
+
+                          {% assign i = i | plus: 1 %}
+                        {% endunless %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endpaginate %}
+
+              {% endif %}
+            {% endfor %}
+          {% endpaginate %}
+        {% endcapture %}
+      {% when 2 %}
+        {% capture chunk_2 %}
+          {% paginate collections by 300 %}
+            {% for collection in collections %}
+              {% if collection.handle == handle_collection %}
+
+                {% paginate collection.products by 2000 %}
+
+                  {% for product in collection.products %}
+                    {% if product.id != current_product.id
+                      and product.selected_or_first_available_variant.available %}
+                      {% liquid
+                        if i > limit
+                          break
+                        endif
+                      %}
+
+                      {% assign material_2 = product.metafields.custom.extern_material.value | first %}
+                      {% assign color_2 = product.metafields.custom.color_details.value | first %}
+
+                      {% assign product_properties_structure = product.vendor
+                        | append: ','
+                        | append: product.metafields.custom.modele.value
+                        | append: ','
+                        | append: material_2
+                        | append: ','
+                        | append: color_2
+                        | replace: ', ', ','
+                        | replace: ' ,', ','
+                        | split: ','
+                      %}
+
+                      {% assign last = product_properties_structure[3] %}
+                      {% assign product_properties_structure = product_properties_structure | join: ',' | replace: last, '' | split: ',' | join: ',' %}
+
+                      {% assign parameters_upsell = parameters_upsell
+                        | split: ','
+                      %}
+                      {% assign last = parameters_upsell[3] %}
+                      {% assign parameters_upsell = parameters_upsell | join: ',' | replace: last, '' | split: ',' | join: ',' %}
+
+                      {% if product_properties_structure == parameters_upsell %}
+                        {% unless products_added contains product.handle %}
+                          {% comment %} Concat product-handle of the match product to create an array {% endcomment %}
+                          {% assign products_added = products_added | append: ',' | append: product.handle %}
+
+                          {% if type == 'cart'%}
+                            {% if cartpage %}
+                              <div class="swiper-slide">
+                                {% render 'product-card'
+                                  product: product
+                                %}
+                              </div>
+                            {% else %}
+                              {% render 'cart-upsell-product'
+                                product: product
+                                index: forloop.index
+                              %}
+                            {% endif %}
+                          {% elsif type == 'product' %}
+                            <div class="swiper-slide">
+                              {% render 'product-card', product: product, is_simple: true %}
+                            </div>
+                          {% endif %}
+
+
+                          {% assign i = i | plus: 1 %}
+                        {% endunless %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                {% endpaginate %}
+
+              {% endif %}
+            {% endfor %}
+          {% endpaginate %}
+        {% endcapture %}
+      {% when 3 %}
+        {% capture chunk_3 %}
+          {% paginate collections by 300 %}
+            {% for collection in collections %}
+              {% if collection.handle == handle_collection %}
+
+                {% paginate collection.products by 2000 %}
+                  {% for product in collection.products %}
+                    {% if product.id != current_product.id
+                      and product.selected_or_first_available_variant.available %}
+                      {% liquid
+                        if i > limit
+                          break
+                        endif
+                      %}
+
+                      {% assign material_3 = product.metafields.custom.extern_material.value | first %}
+                      {% assign color_3 = product.metafields.custom.color_details.value | first %}
+
+                      {% assign product_properties_structure = product.vendor
+                        | append: ','
+                        | append: product.metafields.custom.modele.value
+                        | append: ','
+                        | append: material_3
+                        | append: ','
+                        | append: color_3
+                        | replace: ', ', ','
+                        | replace: ' ,', ','
+                        | split: ','
+                      %}
+
+                      {% assign last = product_properties_structure[2] %}
+                      {% assign last2 = product_properties_structure[3] %}
+
+                      {% assign product_properties_structure = product_properties_structure
+                        | join: ','
+                        | replace: last, ''
+                        | replace: last2, ''
+                        | split: ','
+                        | join: ',' %}
+
+                      {% assign parameters_upsell = parameters_upsell
+                        | split: ','
+                      %}
+                      {% assign last = parameters_upsell[2] %}
+                      {% assign parameters_upsell = parameters_upsell | join: ',' | replace: last, '' | split: ',' | join: ',' %}
+
+                      {% if product_properties_structure == parameters_upsell %}
+                        {% unless products_added contains product.handle %}
+
+                          {% comment %} Concat product-handle of the match product to create an array {% endcomment %}
+                          {% assign products_added = products_added | append: ',' | append: product.handle %}
+
+                          {% if type == 'cart'%}
+                            {% if cartpage %}
+                              <div class="swiper-slide">
+                                {% render 'product-card'
+                                  product: product
+                                %}
+                              </div>
+                            {% else %}
+                              {% render 'cart-upsell-product'
+                                product: product
+                                index: forloop.index
+                              %}
+                            {% endif %}
+                          {% elsif type == 'product' %}
+                            <div class="swiper-slide">
+                              {% render 'product-card', product: product, is_simple: true %}
+                            </div>
+                          {% endif %}
+
+                          {% assign i = i | plus: 1 %}
+
+                        {% endunless %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endpaginate %}
+
+              {% endif %}
+            {% endfor %}
+          {% endpaginate %}
+        {% endcapture %}
+      {% when 4 %}
+        {% capture chunk_4 %}
+          {% paginate collections by 300 %}
+            {% for collection in collections %}
+              {% if collection.handle == handle_collection %}
+
+                {% paginate collection.products by 2000 %}
+                  {% for product in collection.products %}
+                    {% if product.id != current_product.id
+                      and product.selected_or_first_available_variant.available %}
+                      {% liquid
+                        if i > limit
+                          break
+                        endif
+                      %}
+
+                      {% assign material_4 = product.metafields.custom.extern_material.value | first %}
+                      {% assign color_4 = product.metafields.custom.color_details.value | first %}
+
+                      {% assign product_properties_structure = product.vendor
+                        | append: ','
+                        | append: product.metafields.custom.modele.value
+                        | append: ','
+                        | append: material_4
+                        | append: ','
+                        | append: color_4
+                        | replace: ', ', ','
+                        | replace: ' ,', ','
+                        | split: ','
+                      %}
+
+                      {% assign last = product_properties_structure[1] %}
+                      {% assign last2 = product_properties_structure[2] %}
+                      {% assign last3 = product_properties_structure[3] %}
+
+                      {% assign product_properties_structure = product_properties_structure
+                        | join: ','
+                        | replace: last, ''
+                        | replace: last2, ''
+                        | replace: last3, ''
+                        | split: ','
+                        | join: ','
+                      %}
+
+                      {% assign parameters_upsell = parameters_upsell
+                        | split: ','
+                      %}
+                      {% assign last = parameters_upsell[1] %}
+                      {% assign parameters_upsell = parameters_upsell | join: ',' | replace: last, '' | split: ',' | join: ',' %}
+
+                      {% if product_properties_structure == parameters_upsell %}
+
+                        {% comment %} Make sure that are repeat values {% endcomment %}
+                        {% unless products_added contains product.handle %}
+                          {% comment %} Concat product-handle of the match product to create an array {% endcomment %}
+                          {% assign products_added = products_added | append: ',' | append: product.handle %}
+
+                          {% if type == 'cart'%}
+                            {% if cartpage %}
+                              <div class="swiper-slide">
+                                {% render 'product-card'
+                                  product: product
+                                %}
+                              </div>
+                            {% else %}
+                              {% render 'cart-upsell-product'
+                                product: product
+                                index: forloop.index
+                              %}
+                            {% endif %}
+                          {% elsif type == 'product' %}
+                            <div class="swiper-slide">
+                              {% render 'product-card', product: product, is_simple: true %}
+                            </div>
+                          {% endif %}
+
+                          {% assign i = i | plus: 1 %}
+                        {% endunless %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endpaginate %}
+
+              {% endif %}
+            {% endfor %}
+          {% endpaginate %}
+        {% endcapture %}
+
+    {% endcase %}
+  {% endfor %}
+
+  {% comment %}
+    Create array of the product-handle and filtering with 'uniq' for remove repeat products
+    Also, It use to validat qty products in component to show arros or not
+  {% endcomment %}
+
+  {% assign products_added_array = products_added | split: ',' | uniq %}
+
+
+  {% comment %}
+    - We have 4 chunks
+    - After iterate join all chunks in a main_chunk and get every slide to componente
+  {% endcomment %}
+
+  {% capture main_chunk %}
+    {{ chunk_1 }}
+    {{ chunk_2 }}
+    {{ chunk_3 }}
+    {{ chunk_4 }}
+  {% endcapture %}
+
+  {% comment %}
+    - Validate if it is missing products to fill slider and if it is missing to fill with default collections
+  {% endcomment %}
+
+  {% capture capture_slides_join %}
+    {% if products_added_array.size <= 4 %}
+
+      {{ main_chunk }}
+
+      {% assign limit = limit_products | minus: products_added_array.size %}
+
+      {% for product in default_collection.products limit: limit %}
+
+        {% if type == 'cart' %}
+          {% if cartpage %}
+            <div class="swiper-slide">
+              {% render 'product-card'
+                product: product
+              %}
+            </div>
+          {% else %}
+            {% render 'cart-upsell-product'
+              product: product
+              index: forloop.index
+            %}
+          {% endif %}
+        {% elsif type == 'product' %}
+          <div class="swiper-slide">
+            {% render 'product-card', product: product, is_simple: true %}
+          </div>
+        {% endif %}
+
+      {% endfor %}
+
+    {% else %}
+      {{ main_chunk }}
+    {% endif %}
+  {% endcapture %}
+
+  {% comment %}
+    - Render just slides without wrapper.
+    - To call this snippet is necessary to have wrapper
+  {% endcomment %}
+
+  {{ capture_slides_join }}
+{% endunless %}

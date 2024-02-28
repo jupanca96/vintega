@@ -1,0 +1,29 @@
+{% comment %}
+  Create list of item
+
+
+  Usage:
+    {% render 'filters-item-loop',
+      filter: filter,
+      filter_value: filter_value,
+      label_filter: label_filter
+    %}
+{% endcomment %}
+
+{%- for filter_value in filter.values -%}
+  {% comment %}
+    unless filter_value.label contains ':'
+      To not render sub items in parent items
+  {% endcomment %}
+  {% unless filter_value.label contains ':' %}
+    {% unless filter_value.count == 0 and filter_value.active == false -%}
+      {% render 'filters-item-wrapper',
+        filter: filter,
+        filter_value: filter_value,
+        label_filter: label_filter,
+        forloop: forloop
+      %}
+    {% endunless %}
+  {% endunless %}
+
+{%- endfor -%}

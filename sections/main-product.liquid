@@ -1,0 +1,706 @@
+{% capture redirectScript %}{% render 'bsscommerce-redirect-product-page-logic', product: product, collection: collection %}{% endcapture %}{% assign redirectScript = redirectScript | strip %}{% unless redirectScript contains "Liquid error" %}{% if redirectScript != "" %}<script id="bss-redirect" type="text/javascript">window.location.replace("{{ redirectScript }}")</script>{% endif %}{% endunless %}<!-- eslint-disable max-len -->
+{%-liquid
+  assign price = product.selected_or_first_available_variant.price
+  assign compare_at_price = product.selected_or_first_available_variant.compare_at_price
+  assign available = product.selected_or_first_available_variant.available
+  assign has_variants = product.has_only_default_variant
+
+  for tag in product.tags
+    if tag == 'carte-cardeu'
+      assign class_cart_cardeu = tag
+      assign cart_cardeu = true
+    endif
+  endfor
+-%}
+
+<!-- eslint-enable max-len -->
+{% render 'product-media'
+  product: product,
+  direction: "vertical-left",
+  popup_image_mobil: "popup-image",
+  showLens: 2,
+  available: available,
+  cart_cardeu: cart_cardeu
+%}
+
+<div class="main-product__detail {% unless available %} main-product--out-of-stock{% endunless %}">
+
+  <div class="main-product__header">
+    <h1>
+      {% unless cart_cardeu %}
+        {% if product.vendor != blank %}
+          <span class="product-card__brand">
+            {{ product.vendor }}
+          </span>
+        {% endif %}
+      {% endunless %}
+
+      {{ product.title }}
+    </h1>
+
+    <button
+      type="button"
+      class="certified-open"
+      id="js-certified-modal-open"
+    >
+      {% liquid
+        assign modal_open_icon = section.settings.modal_open_certified | split: '|'
+        assign modal_open_icon_url = modal_open_icon | first | append: '.svg' | file_url
+        assign modal_open_icon_alt = modal_open_icon | last
+      %}
+
+      {% if section.settings.modal_open_certified != blank %}
+        {% render "render-image"
+          class: 'icon-incognito',
+          title: modal_open_icon_alt,
+          img_src: modal_open_icon_url,
+          alt: modal_open_icon_alt,
+          width: "20",
+          height: "20"
+        %}
+      {% endif %}
+
+      {% if section.settings.title_certified != blank %}
+        <span>
+          {{ section.settings.title_certified }}
+        </span>
+      {% endif %}
+    </button>
+  </div>
+
+  {% unless cart_cardeu %}
+    {% if available %}
+      <div id="js-to-render-alma">
+        {% render 'price'
+          compare_at_price: compare_at_price,
+          price: price
+        %}
+      </div>
+    {% endif %}
+  {% endunless %}
+
+  {% if settings.mes_alerts_enable and available == false %}
+    {% render 'mes-alerts'
+      available: available,
+    %}
+  {% endif %}
+
+  <input
+    type="hidden"
+    name="available"
+    value="{{ available }}"
+  />
+
+  <div class="main-product__form">
+    <form
+      class="form-product add-cart-js add-product-cart"
+      data-product="{{ product.id }}"
+      action="/cart/add"
+    >
+      <label
+        class="main-product__form-variants-label{% if cart_cardeu == false or has_variants == true %} hidden{% endif %}"
+      >
+        {% if section.settings.variants_select_label != blank %}
+          <span>
+            {{ section.settings.variants_select_label }}
+          </span>
+        {% endif %}
+
+        {% render 'variants-form'
+          product: product
+        %}
+      </label>
+
+      <div class="main-product__form-wrapper">
+        {% render 'button-add-cart'
+          btn_type: 'btn-1',
+          class: 'btn-add-to-cart product-page-btn',
+          available: available,
+          disabled: true
+        %}
+
+        {% if available %}
+          {% render 'button-add-cart'
+            btn_type: 'btn-2',
+            class: 'btn-add-to-cart',
+            available: available,
+            checkout_button: true
+          %}
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+
+  <div class="main-product__share-btn" id="share-js">
+    {% render 'icon-share' %}
+
+    <span>
+      {{ 'products.product.share' | t }}
+    </span>
+  </div>
+
+  {% assign block_icons_size = 0 %}
+  {% assign block_conditions_size = 0 %}
+  {% assign block_shoulder_strap_size = 0 %}
+  {% assign block_certified_size = 0 %}
+
+  {% for block in section.blocks %}
+    {% if block.type == 'content' %}
+      {% assign block_icons_size = block_icons_size | plus: 1 %}
+    {% elsif block.type == 'conditions' %}
+      {% assign block_conditions_size = block_conditions_size | plus: 1 %}
+    {% elsif block.type == 'shoulder_strap' %}
+      {% assign block_shoulder_strap_size = block_shoulder_strap_size | plus: 1 %}
+    {% elsif block.type == 'certified' %}
+      {% assign block_certified_size = block_certified_size | plus: 1 %}
+    {% endif %}
+
+  {% endfor %}
+
+  {% if block_icons_size > 0 %}
+    <div class="icon-whith-text">
+      {% for block in section.blocks %}
+        {%- assign iconSVG = block.settings.block_icon
+          | append: '.svg'
+          | file_url
+        -%}
+
+        {% if block.type == "content" %}
+          {%- if block.settings.block_text != blank
+            and block.settings.block_icon != blank
+          -%}
+            {% render 'text-with-icon'
+              icon: iconSVG,
+              description: block.settings.block_text
+            %}
+          {%- endif -%}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if class_cart_cardeu %}
+    <div class="main-product__description {{ class_cart_cardeu }}">
+      {{ product.description }}
+    </div>
+  {% endif %}
+
+  {% render 'description-product',
+    accordion_open: section.settings.accordion_open
+  %}
+
+  {% liquid
+    assign drive_metafield = product.metafields.media.drive_url
+    assign photo_1_metafield = product.metafields.media.drive_url
+    assign photo_2_metafield = product.metafields.media.drive_url
+    assign photo_3_metafield = product.metafields.media.drive_url
+    assign photo_4_metafield = product.metafields.media.drive_url
+    assign validate = false
+
+    if drive_metafield != blank or photo_1_metafield != blank
+      assign validate = true
+    endif
+
+    if photo_2_metafield != blank or photo_3_metafield != blank
+      assign validate = true
+    endif
+
+    if photo_4_metafield != blank
+      assign validate = true
+    endif
+  %}
+
+  {% if settings.plus_photos_enable %}
+    {% comment %}
+      If there are no metafields but the client wants to show feature: active next setting
+      If the client doesn't want show disabled next setting
+    {% endcomment %}
+    {% if validate == false and section.settings.plus_photo_enable %}
+      {% render 'plus-photo'
+        product: product,
+        section: section
+      %}
+    {% elsif validate %}
+      {% render 'plus-photo'
+        product: product,
+        section: section
+      %}
+    {% endif %}
+  {% endif %}
+
+  {% if settings.mes_alerts_enable and available %}
+    {% render 'mes-alerts'
+      available: available,
+    %}
+  {% endif %}
+
+  <section class="sticky-cart" style="display:none;"></section>
+</div>
+
+<div
+  class="main-product__slider-view--img-modal"
+  id="js-view-360-img-modal"
+  data-active="false"
+>
+  {% for image in product.media %}
+    {% if forloop.first %}
+      {% render "render-image"
+        class: "main-product__slider-view--img",
+        img_src: imgUrl,
+        img: image,
+        size: "300 400 900",
+        width: "900",
+        height: "506"
+      %}
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% capture condition_capture %}
+  {% if block_conditions_size > 0 %}
+    <div class="description-modal__grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'conditions' %}
+          <div class="description-modal__grid-item">
+            <span>
+              {{ block.settings.condition_title }}
+            </span>
+
+            <div>
+              {{ block.settings.condition_text }}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+    </div>
+  {% endif %}
+{% endcapture %}
+
+{% capture shoulder_strap_capture %}
+  {% if block_shoulder_strap_size > 0 %}
+    <div class="description-modal__grid modal-shoulder-strap">
+      {% for block in section.blocks %}
+        {% if block.type == 'shoulder_strap' %}
+          <div class="description-modal__grid-item">
+            {% if block.settings.shoulder_strap_title != blank %}
+              <span>
+                {{ block.settings.shoulder_strap_title }}
+              </span>
+            {% endif %}
+
+            {% if block.settings.shoulder_strap_img != blank %}
+              <div>
+                {% render "render-image"
+                  img_src: block.settings.shoulder_strap_img.src,
+                  img: block.settings.shoulder_strap_img,
+                  alt: block.settings.shoulder_strap_img.alt,
+                  width: "100",
+                  height: "100"
+                %}
+              </div>
+            {% endif %}
+
+          </div>
+        {% endif %}
+      {% endfor %}
+
+    </div>
+  {% endif %}
+{% endcapture %}
+
+{% capture certified_capture %}
+  {% if block_certified_size > 0 %}
+    <div class="description-modal__grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'certified' %}
+          <div class="description-modal__grid-item">
+            <span>
+              {{ block.settings.certified_title }}
+            </span>
+
+            <div>
+              {{ block.settings.certified_text }}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endcapture %}
+
+{% render 'modal-description-product'
+  modal_id: 'js-condition-modal',
+  modal_id_close: 'js-condition-modal-close',
+  moda_title: section.settings.modal_title,
+  modal_icon: section.settings.modal_icon,
+  modal_description: section.settings.modal_description,
+  grid: condition_capture
+%}
+
+{% render 'modal-description-product'
+  modal_id: 'js-shoulder-strap-modal',
+  modal_id_close: 'js-shoulder-strap-modal-close',
+  moda_title: section.settings.shoulder_strap_modal_title,
+  modal_icon: section.settings.shoulder_strap_modal_icon,
+  modal_description: section.settings.shoulder_strap_modal_description,
+  grid: shoulder_strap_capture
+%}
+
+{% render 'modal-description-product'
+  modal_id: 'js-certified-modal',
+  modal_id_close: 'js-certified-modal-close',
+  moda_title: section.settings.certified_modal_title,
+  modal_icon: section.settings.certified_modal_icon,
+  modal_description: section.settings.certified_modal_description,
+  grid: certified_capture
+%}
+
+{% unless cart_cardeu %}
+  <script>
+    (function(o, v, i, z, e, r) {
+      o[i] = o[i] || function() {(o[i].q = o[i].q || []).push(arguments)};
+      e = v.createElement('script'),r = v.getElementsByTagName('script')[0];
+      e.async = 1;e.src = z;r.parentNode.insertBefore(e, r)
+    })(window, document, 'ovizerViewer', 'https://beta.ovizer.com/prod/ovizer-viewer-360.js');
+
+    ovizerViewer('.main-product__slider-view--img', {
+      onclick: (window.innerWidth < 1008)
+    });
+
+  </script>
+{% endunless %}
+
+<script>
+  Shopify.name = '{{ shop.name }}';
+  Shopify.url = '{{ shop.url }}';
+</script>
+
+{% schema %}
+  {
+    "name": "Product page",
+    "class": "main-product wrapper product-js",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Plus photo settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "plus_photo_enable",
+        "label": "Plus photos enable",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Titles about details product (accordion)"
+      },
+      {
+        "type": "text",
+        "id": "condition_title",
+        "label": "Condition title"
+      },
+      {
+        "type": "text",
+        "id": "description_title",
+        "label": "Description title"
+      },
+      {
+        "type": "text",
+        "id": "exterior_color_subtitle",
+        "label": "Exterior color subtitle"
+      },
+      {
+        "type": "text",
+        "id": "interior_color_subtitle",
+        "label": "Interior subtitle"
+      },
+      {
+        "type": "text",
+        "id": "exterior_materials_subtitle",
+        "label": "Exterior Materials subtitle"
+      },
+      {
+        "type": "text",
+        "id": "interior_materials_subtitle",
+        "label": "Interior Materials subtitle"
+      },
+      {
+        "type": "text",
+        "id": "hardware_subtitle",
+        "label": "Hardware subtitle"
+      },
+      {
+        "type": "text",
+        "id": "reference_subtitle",
+        "label": "Reference subtitle"
+      },
+      {
+        "type": "text",
+        "id": "accessories_subtitle",
+        "label": "Accessories subtitle"
+      },
+      {
+        "type": "text",
+        "id": "size_subtitle",
+        "label": "Size subtitle",
+        "info": "The next 4 items are for the sub-subtitles size"
+      },
+      {
+        "type": "text",
+        "id": "size_depth_subtitle",
+        "label": "Size: depth subtitle"
+      },
+      {
+        "type": "text",
+        "id": "size_width_subtitle",
+        "label": "Size: width subtitle"
+      },
+      {
+        "type": "text",
+        "id": "size_height_subtitle",
+        "label": "Size: height subtitle"
+      },
+      {
+        "type": "text",
+        "id": "size_shoulder_strap_subtitle",
+        "label": "Size: shoulder_strap subtitle"
+      },
+      {
+        "type": "text",
+        "id": "serial_code_subtitle",
+        "label": "Serial Code subtitle"
+      },
+      {
+        "type": "text",
+        "id": "year_of_production_subtitle",
+        "label": "Year of production subtitle"
+      },
+      {
+        "type": "text",
+        "id": "shoulder_strap_subtitle",
+        "label": "Shoulder strap subtitle"
+      },
+      {
+        "type": "header",
+        "content": "Modal general settings"
+      },
+      {
+        "type": "text",
+        "id": "modal_open_icon",
+        "label": "Modal open icon",
+        "default": "incognito|Icon",
+        "info": "name-file|alt"
+      },
+      {
+        "type": "text",
+        "id": "modal_open_blue_icon",
+        "label": "Modal open blue icon",
+        "default": "incognito-blue|Icon",
+        "info": "name-file|alt"
+      },
+      {
+        "type": "text",
+        "id": "modal_open_certified",
+        "label": "Modal open certified icon",
+        "default": "certified-medal|Icon",
+        "info": "name-file|alt"
+      },
+      {
+        "type": "text",
+        "id": "modal_open_plus_photo",
+        "label": "Modal open plus photo icon",
+        "default": "camera-icon|Icon",
+        "info": "name-file|alt"
+      },
+      {
+        "type": "header",
+        "content": "Condition modal settings"
+      },
+      {
+        "type": "text",
+        "id": "modal_title",
+        "label": "Modal title",
+        "default": "Conditions"
+      },
+      {
+        "type": "richtext",
+        "id": "modal_description",
+        "label": "Modal description",
+        "default": "<p>Pour mieux vous projeter, veuillex trouver le porté de 4 sacs selon sa taille de bandouliere. On estime qu´un sac se porte en croisé bandouliere quand sa bandouliere mesure plus de 90cm.</p>"
+      },
+      {
+        "type": "text",
+        "id": "modal_icon",
+        "label": "Modal icon",
+        "default": "medal|Icon",
+        "info": "name-file|alt"
+      },
+      {
+        "type": "header",
+        "content": "Shoulder strap modal settings"
+      },
+      {
+        "type": "text",
+        "id": "shoulder_strap_modal_title",
+        "label": "Modal title",
+        "default": "Bandouliere"
+      },
+      {
+        "type": "richtext",
+        "id": "shoulder_strap_modal_description",
+        "label": "Modal description",
+        "default": "<p>Pour mieux vous projeter, veuillex trouver le porté de 4 sacs selon sa taille de bandouliere. On estime qu´un sac se porte en croisé bandouliere quand sa bandouliere mesure plus de 90cm.</p>"
+      },
+      {
+        "type": "header",
+        "content": "Certified modal settings"
+      },
+      {
+        "type": "text",
+        "id": "title_certified",
+        "label": "Icon text title",
+        "default": "Certified par Vintega"
+      },
+      {
+        "type": "text",
+        "id": "certified_modal_title",
+        "label": "Modal title",
+        "default": "Bandouliere"
+      },
+      {
+        "type": "richtext",
+        "id": "certified_modal_description",
+        "label": "Modal description",
+        "default": "<p>Pour mieux vous projeter, veuillex trouver le porté de 4 sacs selon sa taille de bandouliere. On estime qu´un sac se porte en croisé bandouliere quand sa bandouliere mesure plus de 90cm.</p>"
+      },
+      {
+        "type": "header",
+        "content": "Plust photo modal settings"
+      },
+      {
+        "type": "text",
+        "id": "title_plus_photo",
+        "label": "Icon text title",
+        "default": "RECEVEZ PLUS DE PHOTOS !"
+      },
+      {
+        "type": "text",
+        "id": "modal_title_plus_photo",
+        "label": "Plus photo - modal title",
+        "default": "Recevez plus de photos"
+      },
+      {
+        "type": "richtext",
+        "id": "modal_description_plus_photo",
+        "label": "Plus photo - modal description",
+        "default": "<p>Tell us your email address, and within a few minutes receive photos taken by our customers of the model RétroMilano Uno Ring.</p>"
+      },
+      {
+        "type": "text",
+        "id": "modal_success_title_plus_photo",
+        "label": "Plus photo - success title",
+        "default": "Plus de photos success"
+      },
+      {
+        "type": "richtext",
+        "id": "modal_success_description_plus_photo",
+        "label": "Plus photo - success description",
+        "default": "<p>First message</p>"
+      },
+      {
+        "type": "header",
+        "content": "Accordions settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "accordion_open",
+        "label": "Accordion manage",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Variants settings"
+      },
+      {
+        "type": "text",
+        "id": "variants_select_label",
+        "label": "Variants select label",
+        "default": "SÉLECTIONNER LA VALEUR"
+      }
+    ],
+    "blocks": [
+      {
+        "name": "Icon",
+        "type": "content",
+        "limit": 3,
+        "settings": [
+          {
+            "type": "text",
+            "id": "block_icon",
+            "label": "Name icon (.svg)"
+          },
+          {
+            "type": "richtext",
+            "id": "block_text",
+            "label": "Text"
+          }
+        ]
+      },
+      {
+        "name": "Conditions",
+        "type": "conditions",
+        "limit": 6,
+        "settings": [
+          {
+            "type": "text",
+            "id": "condition_title",
+            "label": "Condition title"
+          },
+          {
+            "type": "richtext",
+            "id": "condition_text",
+            "label": "Text"
+          }
+        ]
+      },
+      {
+        "name": "Shoulder strap",
+        "type": "shoulder_strap",
+        "limit": 4,
+        "settings": [
+          {
+            "type": "text",
+            "id": "shoulder_strap_title",
+            "label": "Heading"
+          },
+          {
+            "type": "image_picker",
+            "id": "shoulder_strap_img",
+            "label": "Image",
+            "info": "Size image: 218x145px"
+          }
+        ]
+      },
+      {
+        "name": "Certified",
+        "type": "certified",
+        "limit": 4,
+        "settings": [
+          {
+            "type": "text",
+            "id": "certified_title",
+            "label": "Condition title"
+          },
+          {
+            "type": "richtext",
+            "id": "certified_text",
+            "label": "Text"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

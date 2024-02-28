@@ -1,0 +1,107 @@
+<div class="wrapper-xl">
+  <div class="newsletter__container">
+    <span class="newsletter__title">
+      {{ section.settings.title }}
+    </span>
+
+    <div class="newsletter__text">
+      {{ section.settings.description }}
+    </div>
+
+    {% form 'customer',
+      class: 'newsletter-form',
+      id: 'contact_account_form'
+    %}
+      <input
+        type="hidden"
+        name="return_to"
+        value="/account?customer_posted=true"
+      >
+      <input
+        type="hidden"
+        name="contact[tags]"
+        value="newsletter-account"
+      />
+
+      <div class="grid newsletter-form__wrapper">
+        <div class="newsletter-form__input-wrapper">
+          <div class="form__textfield-notlabel">
+            <div id="klaviyo-form-my-account">
+              <div class="klaviyo-form-TvKjEs"></div>
+            </div>
+          </div>
+        </div>
+
+        {%- if form.errors -%}
+          <small
+            class="newsletter-form__message form__message"
+            id="Newsletter-error--{{ section.id }}"
+          >
+            <!-- eslint-disable max-len -->
+            {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+            <!-- eslint-enable max-len -->
+          </small>
+        {%- else -%}
+          <!-- eslint-disable max-len -->
+          <small
+            class="newsletter-form__message newsletter-form__message--error form__message error-js"
+            id="Newsletter-error--{{ section.id }}"
+          >
+          <!-- eslint-enable max-len -->
+
+            {{ 'newsletter.registered' | t }}
+          </small>
+        {%- endif -%}
+      </div>
+
+      {%- if form.posted_successfully? -%}
+        <!-- eslint-disable max-len -->
+        <span
+          class="newsletter-form__message newsletter-form__message--success form__message"
+          id="Newsletter-success--{{ section.id }}"
+          tabindex="-1"
+          autofocus
+        >
+          {{ 'newsletter.success' | t }}
+        </span>
+        <!-- eslint-enable max-len -->
+      {%- endif -%}
+    {% endform %}
+  </div>
+
+  {% render 'link'
+    type: 'btn',
+    class: "btn-2 unsubscribe__button",
+    content: section.settings.button_text,
+    url: "https://manage.kmail-lists.com/subscriptions/unsubscribe?cy=TN9Cge",
+  %}
+</div>
+
+{% schema %}
+  {
+    "name": "Newsletter",
+    "class": "newsletter",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "button_text",
+        "label": "Account unsubscribe button text",
+        "info": "Only available for account",
+        "default": "SE DÉSABONNER"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Account title",
+        "default": "Inscrivez-vous à notre Newsletter et recevez jusqu'à 200€ en bon d'achat !"
+      },
+      {
+        "type": "text",
+        "id": "description",
+        "label": "Account description",
+        "default": "Pour vous désabonner de la Newsletter, veuillez cliquer sur le bouton suivant"
+      }
+    ]
+  }
+{% endschema %}

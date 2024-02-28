@@ -1,0 +1,21 @@
+{% comment %}
+Button
+Accepts:
+- class: {String} className in button (optional)
+- type: {String} type button, 1/2/3 (Required)
+Usage:
+{% render 'button-social'
+type: google|facebook
+%}
+{% endcomment %}
+
+{% if type == "google" %}
+  <div id="g-button"></div>
+{% elsif type == "facebook"  %}
+  <button
+    class="buttons__social--media btn {{ class }}"
+    type="button"
+  >
+    {% render 'icon-social-facebook' %}
+  </button>
+{% endif %}

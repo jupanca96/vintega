@@ -1,0 +1,37 @@
+{% comment %}
+  Render Sort elements in collections
+
+  Usage:
+  {% render 'sorting'
+    type: 'search' || 'collection'
+  %}
+{% endcomment %}
+
+{% if type == 'search' %}
+  {% assign typePage = search %}
+{% else %}
+  {% assign typePage = collection %}
+{% endif %}
+
+{% capture options %}
+  <!-- eslint-disable-next-line max-len -->
+  {% assign sort_by = typePage.sort_by | default: typePage.default_sort_by %}
+  {% for option in typePage.sort_options %}
+    <!-- eslint-disable @html-eslint/no-extra-spacing-attrs -->
+    <option
+      value="{{ option.value }}"
+      {% if option.value == sort_by %} selected="selected"{% endif %}
+    >
+      {{ option.name }}
+    </option>
+    <!-- eslint-enable @html-eslint/no-extra-spacing-attrs -->
+  {% endfor %}
+{% endcapture %}
+
+<div class="collection-filters__sort-by">
+  {% render 'input-select',
+    options: options,
+    class: "form__textfield",
+    id: "sort-by",
+  %}
+</div>

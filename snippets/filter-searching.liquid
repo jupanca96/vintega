@@ -1,0 +1,22 @@
+{% comment %}
+  - Input to filter searching
+
+  Usage:
+    {% render 'filter-searching' %}
+{% endcomment %}
+
+
+<div class="form__textfield size-s filter__input-searching">
+  <div class="input-container">
+    <input
+      type="text"
+      class="js-filters-searching"
+      placeholder="{{ 'general.search.search' | t }}"
+      autocorrect="off"
+      autocomplete="off"
+      autocapitalize="off"
+    />
+
+    {% render 'icon-glass' %}
+  </div>
+</div>

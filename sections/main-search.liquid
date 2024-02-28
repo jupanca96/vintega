@@ -1,0 +1,182 @@
+<div class="blogs-wrapper--header">
+  <div class="blogs-wrapper--search">
+    <div class="blog__header">
+      <div class="blogs-wrapper--title">
+        <h1>{{ 'templates.search.title' | t }}</h1>
+      </div>
+
+      {% render 'predictive-search'
+        visible: true,
+        search_params: "product",
+        limit_search: 3
+      %}
+
+      {% render 'terms-search' %}
+    </div>
+
+  </div>
+</div>
+<div class="js-empty-state">
+  {% if search.results_count > 0 %}
+    <div class="collection collection__container wrapper-without-limit">
+      {% render 'filters-component'
+        type: 'search'
+        section: section
+      %}
+
+
+      <div class="collection__products-grid"">
+        <div id="js-filter-rendering">
+          <div class="collection__products-count-wrapper">
+            <button
+              type="button"
+              class="btn-2"
+              id="filter-open"
+            >
+              {% render 'icon-filter' %}
+              {{ 'products.facets.filter_and_sort' | t }}
+            </button>
+
+            {% render 'filters-applied', type: 'search' %}
+
+            {% if search.results_count > 0 %}
+              {% render 'sorting' type: 'search' %}
+            {% endif %}
+          </div>
+
+          {% paginate search.results by section.settings.pagination %}
+
+            {% liquid
+              assign filter_value_url_join = ''
+
+              for filter in search.filters
+
+                for filter_value in filter.values
+                  if filter_value.active == true
+                    assign filter_value_url_join = filter_value.url_to_add | append: '&'
+                  endif
+                endfor
+              endfor
+
+              assign filter_value_url_join = filter_value_url_join | split: template
+              assign filter_value_url_join = filter_value_url_join | last | replace: '?', ''
+            %}
+
+            <div id="list-products">
+              <div
+                class="item-list"
+              >
+                {% for product in search.results %}
+                  {% if product.object_type == 'product' %}
+                    {% render 'product-card'
+                      product: product,
+                      is_simple: true
+                    %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              {%- liquid
+                assign sort_by = search.sort_by | default: search.default_sort_by
+                assign search_url = '/' | append: template
+                assign terms = search.terms | escape
+
+                assign current_url_search = 'q=' | append: terms | append: '&options%5Bprefix%5D=last'
+              -%}
+
+              {% render 'infinity-scroll'
+                container: ".item-list",
+                item: ".product-card",
+                page_current: paginate.current_page,
+                section_render: "main-search",
+                current_url: search_url,
+                current_url_filters: filter_value_url_join,
+                current_url_search: current_url_search
+              %}
+            </div>
+          {% endpaginate %}
+        </div>
+      </div>
+    </div>
+  {% else %}
+      <div class="search__empty wrapper-without-limit">
+        <h2 class="search__empty-title">
+          {{ 'templates.search.empty_state' | t }}
+        </h2>
+
+        {%- liquid
+          assign terms = search.terms | escape
+          assign search_url_remove = '?q=' | append: terms | append: '&options%5Bprefix%5D=last'
+        -%}
+
+        <a href="{{ routes.search_url | append : search_url_remove }}" class="btn-2 collection-filters__remove js-remove-filter">
+          {{ 'products.facets.clear_all' | t }}
+        </a>
+      </div>
+  {% endif %}
+</div>
+
+
+{% schema %}
+  {
+    "name": "Search blogs collection",
+    "tag": "section",
+    "class": "search",
+    "settings": [
+      {
+        "type": "range",
+        "id": "pagination",
+        "label": "Search by page",
+        "unit": "Pr",
+        "min": 3,
+        "max": 24,
+        "step": 3,
+        "default": 12
+      },
+      {
+        "type": "text",
+        "id": "custom_acc_title",
+        "label": "Title of custom filters",
+        "default": "Collection du moment"
+      },
+      {
+        "type": "checkbox",
+        "id": "accordion_open",
+        "label": "Accordion manage toggle",
+        "default": false,
+        "info": "This settings only work if next setting 'Accordion open first item' is true"
+      },
+      {
+        "type": "checkbox",
+        "id": "accordion_open_first",
+        "label": "Accordion open first item",
+        "default": false,
+        "info": "This settings only work if above setting 'Accordion manage toggle' is true. If it is true every accordion will be open"
+      },
+      {
+        "type": "checkbox",
+        "id": "all_closed",
+        "label": "Every accordion close",
+        "default": true,
+        "info": "If this checkbox is true the settings above doesn't work"
+
+      }
+    ],
+    "blocks": [
+      {
+        "type": "custom-filters",
+        "name": "Custom filter",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Add collection"
+          }
+
+        ]
+      }
+
+
+    ]
+  }
+{% endschema %}

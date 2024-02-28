@@ -1,0 +1,183 @@
+{% if canonical_url contains 'createurs' %}
+  {% assign heading = 'h1' %}
+{% else %}
+  {% assign class_heading = ' h2' %}
+  {% assign heading = 'span' %}
+{% endif %}
+
+{% if section.settings.collage_title != blank %}
+  <{{ heading }} class="collage-custom__title{{ class_heading }}">
+    {{ section.settings.collage_title }}
+  </{{ heading }}>
+{% endif %}
+
+
+{% assign collection_quantity = section.blocks.size %}
+
+{% for block in section.blocks %}
+  {% if block.settings.card_img == blank %}
+    {% assign collection_quantity = collection_quantity | minus: 1 %}
+  {% endif %}
+{% endfor %}
+
+{%- capture nested_cards -%}
+  <div class="collage-custom__nested">
+    {% for block in section.blocks %}
+      {% liquid
+        assign card_title = block.settings.card_title
+        assign card_img = block.settings.card_img
+        assign card_link = block.settings.card_link
+        assign enable_background = section.settings.enable_collection_background
+      %}
+
+      {% if card_img != blank %}
+        {% if forloop.index > 1 and forloop.index < 6 %}
+          {% render 'collection-card',
+            classname: 'collage-custom__card',
+            title: card_title,
+            image: card_img,
+            link: card_link,
+            enable_background: enable_background
+          %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+{%- endcapture -%}
+
+<div class="collage-custom__container collage-custom__grid--{{ collection_quantity }}">
+  {% for block in section.blocks %}
+    {% liquid
+      assign card_title = block.settings.card_title
+      assign card_img = block.settings.card_img
+      assign card_link = block.settings.card_link
+      assign enable_background = section.settings.enable_collection_background
+      assign enable_zoom = section.settings.enable_zoom
+      assign class_id = 'collage-custom__card' | append: ' ' | append: 'collage-custom-card' | append: '-' | append: forloop.index
+    %}
+
+    {%- comment -%} Nested render {%- endcomment -%}
+    {% if collection_quantity == 7 %}
+      {% if forloop.index == 2 %}
+        {{ nested_cards }}
+      {%- elsif forloop.first or forloop.index > 5 -%}
+        {% if card_img != blank %}
+          {% render 'collection-card',
+            classname: class_id,
+            title: card_title,
+            image: card_img,
+            link: card_link,
+            enable_background: enable_background
+            enable_zoom: enable_zoom
+          %}
+        {% endif %}
+      {% endif %}
+
+    {% else %}
+      {% if card_img != blank %}
+        {% render 'collection-card',
+          classname: class_id,
+          title: card_title,
+          image: card_img,
+          link: card_link,
+          enable_background: enable_background,
+          enable_zoom: enable_zoom
+        %}
+      {% endif %}
+    {% endif %}
+    <style>
+        .collage-custom-card-{{ forloop.index }} .collage-custom__subtitle .collage-custom__subtitle-content {
+          color: {{ block.settings.subtitle_color }}
+        }
+    </style>
+  {% endfor %}
+</div>
+
+
+  <style>
+    {% if section.settings.enable_collection_zoom %}
+      .collage-custom__card:hover img {
+        transform: scale(1.1);
+      }
+    {% endif  %}
+
+
+  </style>
+  
+
+
+{% schema %}
+{
+  "name": "Collage custom",
+  "class": "collage-custom section-space wrapper-without-limit",
+  "blocks": [
+    {
+      "type": "content",
+      "name": "Collage collection",
+      "limit": 9,
+      "settings": [
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card Title"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_img",
+          "label": "Card Image"
+        },
+        {
+          "type": "url",
+          "id": "card_link",
+          "label": "Card Link"
+        },
+        {
+          "type": "color",
+          "id": "subtitle_color",
+          "label": "Subtitle color",
+          "default": "#003BC3"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "collage_title",
+      "label": "Title",
+      "info": "It is the main section title",
+      "default": "Nos collections"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_collection_background",
+      "label": "Enable subtitle background",
+      "info": "It enables the background in all collection subtitles",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Enable zoom",
+      "info": "It enables the zoom for collage custom cards",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collage custom",
+      "blocks": [
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,88 @@
+{% comment %}
+  {% render 'banner-collection'
+    image: collection
+    text_config: collection
+  %}
+{% endcomment %}
+
+{% liquid
+  assign banner_image = image
+  assign content_banner = text_config
+
+  assign position_image = content_banner[0]
+  assign position_image = position_image | split: '|'
+  assign desk_direction_img = position_image[0] | strip
+  assign mobile_direction_img = position_image[1] | strip
+
+  assign title_banner = content_banner[1]
+  assign subtitle_banner = content_banner[2]
+  assign text_banner = content_banner[3]
+
+  assign button_banner = content_banner[4] | split: '|'
+  assign text_button_banner = button_banner[0] | strip
+
+  if button_banner[1] contains '[LNK]'
+    assign link_button_banner = button_banner[1] | strip
+  endif
+
+  assign type_button_banner = button_banner[2] | strip
+  assign type_button_banner = 'btn-' | append: type_button_banner
+
+
+  assign colors = content_banner[5] | split: '|'
+  assign bg_color = colors[0] | strip
+  assign text_color = colors[1] | strip
+
+%}
+
+
+<div
+  class="article-banner banner-{{ type }} img-position--{{ desk_direction_img }} img-position--{{ mobile_direction_img }}"
+>
+  <div class="article-banner__img-container">
+    {% render "render-image"
+      img_src: banner_image.src,
+      img: banner_image,
+      size: "400 600 800 1000",
+      alt: banner_image.alt,
+      width: "600",
+      height: "400"
+    %}
+  </div>
+
+  <div class="banner-promo__content">
+    <span class="banner-promo__title">
+      {{ title_banner }}
+    </span>
+
+    <span class="h2">
+      {{ subtitle_banner }}
+    </span>
+
+    <p class="banner-promo__text">
+      {{ text_banner }}
+    </p>
+
+    {% assign link_button_banner = link_button_banner | remove: '[LNK]' %}
+
+    {% if link_button_banner != blank %}
+      {% render 'link'
+        type: 'btn',
+        class: type_button_banner,
+        content: text_button_banner,
+        url: link_button_banner
+      %}
+    {% endif %}
+  </div>
+
+  <style>
+    .article-banner.banner-{{ type }} {
+      background: {{ bg_color }};
+    }
+
+    .article-banner.banner-{{ type }} *:not(.btn-1, .btn-2, span),
+    .article-banner.banner-{{ type }} .h2 {
+      color: {{ text_color }};
+    }
+  </style>
+</div>

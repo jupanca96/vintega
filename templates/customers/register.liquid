@@ -1,0 +1,235 @@
+<!-- eslint-disable @html-eslint/no-extra-spacing-attrs -->
+<div class="wrapper customer auth__register auth">
+  <h1 class="h2 title">
+    {{ 'customer.register.title' | t }}
+  </h1>
+
+  <span>
+    {{ 'customer.register.complement' | t }}
+  </span>
+
+  {% form 'create_customer',
+    id: "create_customer",
+    class: "manual-registration-js",
+    return_to: routes.account_url
+  %}
+
+    <!-- form content -->
+    {%- if form.errors -%}
+      <span
+        class="form__message form__message--error"
+        tabindex="-1"
+        autofocus
+      >
+        {% render 'icon-error' %}
+        {{ 'templates.contact.form.error_heading' | t }}
+      </span>
+      <div class="errors">
+        <ul>
+          {%- for field in form.errors -%}
+            <li>
+              {%- if field == 'form' -%}
+                {{ form.errors.messages[field] }}
+              {%- else -%}
+                <a href="#RegisterForm-{{ field }}">
+                  {{ form.errors.translated_fields[field] | capitalize }}
+                  {{ form.errors.messages[field] }}
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
+    <div class="form__textfield-notlabel form__textfield--spaced">
+      <input
+        type="text"
+        name="customer[first_name]"
+        id="RegisterForm-FirstName"
+        aria-required="true"
+        required
+        title="{{ 'customer.recover_password.fill' | t }}"
+        {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+        {% if form.errors contains 'email' %}
+          aria-invalid="true"
+          aria-describedby="RegisterForm-FirstName-error"
+        {% endif %}
+        autocomplete="given-name"
+        placeholder="{{ 'customer.register.first_name' | t }}"
+      />
+      <label for="RegisterForm-FirstName">
+        {{ 'customer.register.first_name' | t }}
+      </label>
+    </div>
+
+    {%- if form.errors contains 'first_name' -%}
+      <span
+        id="RegisterForm-FirstName-error"
+        class="form__message form__message--error"
+      >
+        {% render 'icon-error' %}
+        <!-- eslint-disable max-len -->
+        {{ form.errors.translated_fields['first_name'] | capitalize }} {{ form.errors.messages['first_name'] }}.
+      </span>
+    {%- endif -%}
+
+    <div class="form__textfield-notlabel form__textfield--spaced">
+      <input
+        type="text"
+        name="customer[last_name]"
+        id="RegisterForm-LastName"
+        aria-required="true"
+        required
+        title="{{ 'customer.recover_password.fill' | t }}"
+        {% if form.last_name %} value="{{ form.last_name }}"{% endif %}
+        {% if form.errors contains 'email' %}
+          aria-invalid="true"
+          aria-describedby="RegisterForm-LastName-error"
+        {% endif %}
+        autocomplete="family-name"
+        placeholder="{{ 'customer.register.last_name' | t }}"
+      />
+      <label for="RegisterForm-LastName">
+        {{ 'customer.register.last_name' | t }}
+      </label>
+    </div>
+
+    {%- if form.errors contains 'last_name' -%}
+      <span
+        id="RegisterForm-LastName-error"
+        class="form__message form__message--error"
+      >
+        {% render 'icon-error' %}
+        <!-- eslint-disable max-len -->
+        {{ form.errors.translated_fields['last_name'] | capitalize }} {{ form.errors.messages['last_name'] }}.
+      </span>
+    {%- endif -%}
+
+    <div class="form__textfield-notlabel form__textfield--spaced">
+      <input
+        type="email"
+        name="customer[email]"
+        id="RegisterForm-email"
+        {% if form.email %} value="{{ form.email }}"{% endif %}
+        spellcheck="false"
+        autocapitalize="off"
+        autocomplete="email"
+        aria-required="true"
+        required
+        {% if form.errors contains 'email' %}
+          aria-invalid="true"
+          aria-describedby="RegisterForm-email-error"
+        {% endif %}
+        placeholder="{{ 'customer.register.email' | t }}"
+      />
+      <label for="RegisterForm-email">
+        {{ 'customer.register.email' | t }}
+      </label>
+    </div>
+    {%- if form.errors contains 'email' -%}
+      <span
+        id="RegisterForm-email-error"
+        class="form__message form__message--error"
+      >
+        {% render 'icon-error' %}
+        <!-- eslint-disable max-len -->
+        {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}.
+      </span>
+    {%- endif -%}
+
+
+    {% assign placeholder_ref = 'customer.register.phone' | t %}
+    <div class="form__textfield-notlabel form__textfield--spaced">
+      {% render 'input-country'
+        input_id: "RegisterForm-phone",
+        input_ref: "#RegisterForm-phone",
+        is_required: true,
+        input_name: "customer[phone]",
+        placeholder_ref: placeholder_ref,
+        button_action: "#button-signup"
+      %}
+    </div>
+
+    <span
+      id="RegisterForm-phone-error"
+      class="form__message form__message--error"
+      style="display: none;"
+    >
+      {% render 'icon-error' %}
+      {{ 'templates.contact.form.error_phone' | t }}
+    </span>
+
+    <div class="form__textfield-notlabel form__textfield--spaced">
+      <span class="form__password" data-active="false">
+        {% render 'eye' %}
+        {% render 'eye-hidden' %}
+      </span>
+      <input
+        type="password"
+        name="customer[password]"
+        id="RegisterForm-password"
+        aria-required="true"
+        required
+        title="{{ 'customer.recover_password.fill' | t }}"
+        {% if form.errors contains 'password' %}
+          aria-invalid="true"
+          aria-describedby="RegisterForm-password-error"
+        {% endif %}
+        placeholder="{{ 'customer.register.password' | t }}"
+      />
+      <label for="RegisterForm-password">
+        {{ 'customer.register.password' | t }}
+      </label>
+    </div>
+    {%- if form.errors contains 'password' -%}
+      <span
+        id="RegisterForm-password-error"
+        class="form__message form__message--error"
+      >
+        {% render 'icon-error' %}
+        {{ form.errors.translated_fields['password'] | capitalize }} {{ form.errors.messages['password'] }}.
+      </span>
+    {%- endif -%}
+
+    <div class="flex auth__buttons" id="login-buttons">
+      <div class="auth__buttons-wrapper">
+        <button class="btn-1" type="submit" id="button-signup">
+          <span>
+            {{ 'customer.register.submit' | t }}
+          </span>
+          <div class="loading hidden" data-active="false"></div>
+        </button>
+      </div>
+
+      <div class="form__textfield form__textfield--spaced" id="consent">
+        <label for="RegisterForm-consent">
+          {{ 'customer.register.consent' | t }}
+          <input
+            type="checkbox"
+            name="customer[consent]"
+            id="RegisterForm-consent"
+            {% if form.errors contains 'consent' %}
+              aria-invalid="true"
+              aria-describedby="RegisterForm-consent-error"
+            {% endif %}
+            placeholder="{{ 'customer.register.consent' | t }}"
+          />
+          <span class="checkmark"></span>
+        </label>
+      </div>
+
+      <div class="auth__buttons-wrapper">
+        {{ 'customer.register.already_account' | t }}
+      </div>
+
+      <div class="auth__buttons-wrapper">
+        <a href="{{ routes.account_login_url }}">
+          {{ 'customer.register.go_to_login' | t }}
+        </a>
+      </div>
+    </div>
+  {% endform %}
+
+  {% render "social-media-forms" %}
+</div>

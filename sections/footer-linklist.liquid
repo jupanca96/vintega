@@ -1,0 +1,383 @@
+<div class="footer-linklist__links">
+  {% if section.settings.menu != blank %}
+    {% for link in linklists[section.settings.menu].links limit: 4 %}
+      <ul class="footer-list">
+        <li class="h3">
+          {{ link.title }}
+        </li>
+
+        {% for sublink in link.links %}
+          <li>
+            <a
+              href="{{ sublink.url }}"
+            >
+              {{ sublink.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<div class="footer-linklist__icons-component left-component">
+  {% if localization.available_countries.size > 1 %}
+    <div class="footer-linklist__currency">
+      {% if section.settings.currency_title != blank %}
+        <span class="h3">
+          {{ section.settings.currency_title }}
+        </span>
+      {% endif %}
+
+      {% for country in localization.available_countries %}
+        {% capture currencies %}{{ currencies | append: country.currency.iso_code }}{% endcapture %}
+        {% unless forloop.last %}
+          {% capture currencies %}{{ currencies | append: ', ' }}{% endcapture %}
+        {% endunless %}
+      {% endfor %}
+
+      {% assign uniq_currencies = currencies | split: ', ' | uniq %}
+
+      <div id="js-localization-currency-form">
+        {% form 'localization' %}
+          <button
+            type="button"
+            id="js-button-currency"
+            aria-expanded="false"
+            aria-controls="CountryList"
+          >
+            {{ localization.country.currency.iso_code }}
+            {% render 'icon-caret' %}
+          </button>
+
+          <ul id="js-list-currency" role="list" data-active="false">
+            {% for currency in uniq_currencies %}
+              {% for country in localization.available_countries %}
+                {% if currency == country.currency.iso_code %}
+                  {% unless forloop.first %}
+                    <li tabindex="-1">
+                      <a
+                        class="markets-js"
+                        href="#"
+                        {% if country.iso_code == localization.country.iso_code %}
+                          aria-current="true"
+                        {% endif %}
+                        data-value="{{ country.iso_code }}"
+                      >
+                        {{ currency }}
+                      </a>
+                    </li>
+                    {% break %}
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </ul>
+
+          <input
+            type="hidden"
+            name="country_code"
+            value="{{ localization.country.iso_code }}"
+          />
+        {% endform %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.blocks.size > 0 %}
+    <div class="footer-linklist__social-media">
+      {% for block in section.blocks %}
+        {% if block.type == 'social_media' %}
+          {% if block.settings.icon != blank and block.settings.url != blank %}
+            {% assign icon = block.settings.icon | split: '|' %}
+            {% assign icon_url = icon | first | append: '.svg' | file_url %}
+            {% assign icon_alt = icon | last %}
+
+            <a href="{{ block.settings.url }}">
+              {% render "render-image"
+                title: icon_alt,
+                img_src: icon_url,
+                size: "220 300 400 500",
+                alt: icon_alt,
+                width: "100",
+                height: "100"
+              %}
+            </a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if localization.available_languages.size > 1 %}
+    <div class="footer-linklist__languages">
+      {% if section.settings.languages_title != blank %}
+        <span class="h3">
+          {{ section.settings.languages_title }}
+        </span>
+      {% endif %}
+
+      <div id="js-localization-lang-form">
+        {% form 'localization' %}
+          <ul id="LanguageList" role="list">
+            {% for language in localization.available_languages %}
+              <li
+                class="
+                {% if localization.language.iso_code == language.iso_code %}
+                  isCurrent
+                {% endif %}
+                "
+                tabindex="-1">
+                <a
+                  class="markets-js"
+                  href="#"
+                  {% if language.iso_code == localization.language.iso_code %}
+                    aria-current="true"
+                  {% endif %}
+                  hreflang="{{ language.iso_code }}"
+                  lang="{{ language.iso_code }}"
+                  data-value="{{ language.iso_code }}"
+                >
+                  {% assign icon_url =
+                    language.iso_code | append: '.svg' | file_url %}
+                    {% render "render-image"
+                      title: icon_alt,
+                      img_src: icon_url,
+                      size: "220 300 400 500",
+                      alt: language.endonym_name,
+                      width: "100",
+                      height: "100"
+                    %}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <input
+            type="hidden"
+            name="language_code"
+            value="{{ localization.language.iso_code }}"
+          />
+        {% endform %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<div class="footer-linklist__icons-component">
+
+  {% if section.settings.payment_icons != blank %}
+    <div class="footer-linklist__payment">
+      {% if section.settings.payment_title != blank %}
+        <span class="h3">
+          {{ section.settings.payment_title }}
+        </span >
+      {% endif %}
+
+      {% assign payment_icons_array =
+        section.settings.payment_icons | split: ',' %}
+
+      {% for icon in payment_icons_array %}
+        {% assign icon_url = icon | strip | append: '.svg' | file_url %}
+        {% assign alt = icon | split: '-' | join: ' ' %}
+
+        {% render "render-image"
+          title: icon_alt,
+          img_src: icon_url,
+          size: "220 300 400 500",
+          alt: alt,
+          width: "100",
+          height: "100"
+        %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="footer-linklist__apps-store">
+    {% if section.settings.google_icon != blank %}
+      {% assign icon = section.settings.google_icon | split: '|' %}
+      {% assign icon_url = icon | first | append: '.svg' | file_url %}
+      {% assign alt = icon | last %}
+
+      {% if section.settings.google_url != blank %}
+        <a href="{{ section.settings.google_url }}" >
+          {% render "render-image"
+            title: icon_alt,
+            img_src: icon_url,
+            size: "220 300 400 500",
+            alt: alt,
+            width: "100",
+            height: "100"
+          %}
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% if section.settings.apple_icon != blank %}
+      {% assign icon = section.settings.apple_icon | split: '|' %}
+      {% assign icon_url = icon | first | append: '.svg' | file_url %}
+      {% assign alt = icon | last %}
+
+      {% if section.settings.apple_url != blank %}
+        <a href="{{ section.settings.apple_url }}" >
+          {% render "render-image"
+            title: icon_alt,
+            img_src: icon_url,
+            size: "220 300 400 500",
+            alt: alt,
+            width: "100",
+            height: "100"
+          %}
+        </a>
+
+      {% endif %}
+
+    {% endif %}
+  </div>
+
+  {% if section.settings.trustpilot_url != blank
+    and section.settings.trustpilot_icon != blank %}
+    <a
+      href="{{ section.settings.trustpilot_url }}"
+      rel="nofollow"
+      class="footer-linklist__trustpilot"
+    >
+      {% assign icon = section.settings.trustpilot_icon | split: '|' %}
+      {% assign icon_url = icon | first | append: '.svg' | file_url %}
+      {% assign alt = icon | last %}
+
+      {% render "render-image"
+        title: icon_alt,
+        img_src: icon_url,
+        size: "220 300 400 500",
+        alt: alt,
+        width: "100",
+        height: "100"
+      %}
+    </a>
+  {% endif %}
+</div>
+
+<!-- eslint-disable max-len -->
+{% schema %}
+{
+  "name": "Link list",
+  "tag": "section",
+  "class": "footer-linklist wrapper-without-limit",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "footer",
+      "label": "t:sections.footer.blocks.link_list.settings.menu.label",
+      "info": "t:sections.footer.blocks.link_list.settings.menu.info"
+    },
+    {
+      "type": "header",
+      "content": "Languages title"
+    },
+    {
+      "type": "text",
+      "id": "currency_title",
+      "default": "DEVISE",
+      "label": "Currency title"
+    },
+    {
+      "type": "text",
+      "id": "languages_title",
+      "default": "LANGUE",
+      "label": "Langue title"
+    },
+    {
+      "type": "paragraph",
+      "content": "To get languages icons is necesary add to CDN Shopify with iso-code as name"
+    },
+    {
+      "type": "header",
+      "content": "Payment title"
+    },
+    {
+      "type": "text",
+      "id": "payment_title",
+      "default": "PAIEMENTS",
+      "label": "Payment title"
+    },
+    {
+      "type": "text",
+      "id": "payment_icons",
+      "label": "Payment icons",
+      "default": "american-express, apple-pay, klarna, mastercard, paypal, visa",
+      "info": "Put icon name separete with comma. Ex: american-express, apple-pay, klarna"
+    },
+    {
+      "type": "header",
+      "content": "Trustpilot settings"
+    },
+    {
+      "type": "url",
+      "id": "trustpilot_url",
+      "label": "Trustpilot Url"
+    },
+    {
+      "type": "text",
+      "id": "trustpilot_icon",
+      "label": "Payment icons",
+      "default": "trustpilot-icon|Icon"
+    },
+    {
+      "type": "header",
+      "content": "Apps store settings"
+    },
+    {
+      "type": "text",
+      "id": "apple_icon",
+      "label": "Apple store icons",
+      "default": "apple-store|Icon"
+    },
+    {
+      "type": "url",
+      "id": "apple_url",
+      "label": "Apple store url",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "google_icon",
+      "label": "Google store icons",
+      "default": "google-store|Icon"
+    },
+    {
+      "type": "url",
+      "id": "google_url",
+      "label": "Google store url",
+      "default": "/"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "social_media",
+      "name": "Social media",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Social media icon",
+          "default": "facebook-icon|Facebook icon",
+          "info": "Use svg extension with this format: name-file|alt"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Social media url",
+          "default": "/"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

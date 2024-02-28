@@ -1,0 +1,289 @@
+{% comment %}
+  Render filtering in collections
+
+  Usage:
+  {% render 'filtering-store' %}
+{% endcomment %}
+
+{% liquid
+  assign filters = collection.filters
+
+  if is_search
+    assign filters = search.filters
+  endif
+%}
+
+<div
+  class="filter"
+  data-active="false"
+  id="filter"
+>
+
+  <form class="filter-form" id="js-filter-form">
+
+    <div class="filter-form__header">
+      <div class="filter-form__header-controls">
+        <button
+          type="button"
+          id="filter-close"
+          aria-label="{{ 'products.facets.filter_and_sort' | t }}"
+        >
+          {% render 'icon-caret' %}
+          {{ 'products.facets.filter_and_sort' | t }}
+        </button>
+
+        <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" class="btn-2 collection-filters__remove js-remove-filter">
+          {{ 'products.facets.clear_all' | t }}
+        </a>
+      </div>
+
+      {% render 'filters-applied', css_class: 'is-mobile' %}
+    </div>
+
+    {% capture accordions %}
+      {% for filter in filters %}
+        {% capture items_filter %}
+          {% assign filter_active_count = 0 %}
+          {% assign filter_active_count2 = 0 %}
+          {% assign label_filter = filter.label %}
+
+          {% comment %}
+            Determine the filter type, list, boolean, anymore
+          {% endcomment %}
+
+          {%- case filter.type -%}
+
+            {%- when 'boolean' or 'list' -%}
+              {% unless filter.param_name == 'filter.v.availability' %}
+
+                {%- for filter_value in filter.values -%}
+                  {% comment %}
+                    Sum each filter quantity and
+                    if this sum is 0 not render accordion and if it is highter than 0 render accordion
+                  {% endcomment %}
+                  {% assign filter_active_count = filter_active_count | plus: filter_value.count %}
+                {%- endfor -%}
+
+                {% render 'render-filter-searching', filter: filter %}
+
+                <ul
+                  class="filter-group-display__list
+                  {% if filter.param_name == 'filter.v.option.color' %}
+                    color
+                  {% endif %}"
+                  data-type-filter="{{ filter.param_name }}"
+                >
+
+                  {% render 'manual-order',
+                    filter: filter,
+                    label: 'filter.p.m.custom.product_condition',
+                    metaobject: shop.metaobjects.order_filters_condition,
+                  %}
+
+                  {% render 'manual-order',
+                    filter: filter,
+                    label: 'filter.p.m.custom.volume',
+                    metaobject: shop.metaobjects.order_filters_volume,
+                    label_filter: label_filter
+                  %}
+
+                  {% render 'manual-order',
+                    filter: filter,
+                    label: 'filter.p.m.custom.extern_colors_filtres_',
+                    metaobject: shop.metaobjects.order_filters_colors,
+                    label_filter: label_filter
+                  %}
+                  {% render 'manual-order',
+                    filter: filter,
+                    label: 'filter.p.m.custom.annee_de_production_filtres_',
+                    metaobject: shop.metaobjects.order_filters_year,
+                  %}
+
+                  {% render 'manual-order',
+                    filter: filter,
+                    label: 'filter.p.m.custom.category_filtres_',
+                    metaobject: shop.metaobjects.order_filters_category,
+                  %}
+
+                    {% if filter.param_name != 'filter.p.m.custom.product_condition'
+                      and filter.param_name != 'filter.p.m.custom.volume'
+                      and filter.param_name != 'filter.p.m.custom.extern_colors_filtres_'
+                      and filter.param_name != 'filter.p.m.custom.annee_de_production_filtres_'
+                      and filter.param_name != 'filter.p.m.custom.category_filtres_'
+                    %}
+                      {% render 'filters-item-loop',
+                        filter: filter,
+                        label_filter: label_filter
+                      %}
+                    {% endif %}
+
+                </ul>
+
+              {% endunless %}
+
+            {% comment %} Determine the filter type price{% endcomment %}
+            {%- when 'price_range' -%}
+                <div class="wrapper-filter">
+                  <div class="slider-filter">
+                    <div class="pro"></div>
+                  </div>
+                  <div class="range-in">
+                    {% render 'filter-field-range'
+                      type_input: "range",
+                      class: "range-min",
+                      range_max: filter.range_max,
+                      value_min_max: filter.min_value.value,
+                      value_default: "0"
+                    %}
+
+                    {% render 'filter-field-range'
+                      type_input: "range",
+                      class: "range-max",
+                      range_max: filter.range_max,
+                      value_min_max: filter.max_value.value,
+                      value_default: filter.range_max
+                    %}
+
+                  </div>
+
+                  <div class="price-in">
+                    <div class="field">
+                      <span>{{ cart.currency.symbol }}</span>
+                      {% render 'filter-field-range'
+                        type_input: "number",
+                        class: "in-min",
+                        name_input: filter.min_value.param_name,
+                        range_max: filter.range_max,
+                        value_min_max: filter.min_value.value,
+                        value_default: "0,00",
+                        paceh_input: "0.00"
+                      %}
+                    </div>
+                    <span class="separator">to</span>
+                    <div class="field">
+                      <span>{{ cart.currency.symbol }}</span>
+                      {% render 'filter-field-range'
+                        type_input: "number",
+                        class: "in-max",
+                        name_input: filter.max_value.param_name,
+                        range_max: filter.range_max,
+                        value_min_max: filter.max_value.value,
+                        value_default: filter.range_max,
+                        paceh_input: filter.range_max
+                      %}
+                    </div>
+                  </div>
+              </div>
+            {%- endcase -%}
+        {% endcapture %}
+
+        {% liquid
+          assign position_acc_active = false
+
+          if all_closed == false
+            assign index_parent = forloop.index
+            assign positions = accordion_open_position | split: ','
+            assign position_acc_active = false
+
+            for position in positions
+              assign position_parse = position | plus: 0
+
+              if index_parent == position_parse
+                assign position_acc_active = true
+              endif
+
+            endfor
+          else
+            assign position_acc_active = true
+          endif
+
+        %}
+
+        {% unless filter.param_name == 'filter.v.availability' %}
+          {% if filter_active_count != 0 or filter.type == 'price_range' %}
+
+            {% comment %}
+              - Next logic is to add css class when filter accordion has a input search
+              - And has min-height bigger
+            {% endcomment %}
+
+            {% liquid
+              assign has_search = ''
+
+              for item in shop.metaobjects.searching_filter_management.values
+                assign metaobject_hide_input_search = item.item.value
+              endfor
+              assign metaobject_hide_input_search = metaobject_hide_input_search | downcase | strip
+
+              assign filter_label_parse = filter.label | downcase | strip
+
+              if metaobject_hide_input_search contains filter_label_parse
+                assign has_search = 'has-search'
+              endif
+            %}
+
+            {% render 'accordion-item',
+              title: filter.label,
+              content: items_filter,
+              active: position_acc_active,
+              css_class: has_search
+            %}
+          {% endif %}
+        {% endunless %}
+      {% endfor %}
+    {% endcapture %}
+
+    {% capture accordions_join %}
+      {{ accordions }}
+
+      {% if items_filter_custom != blank %}
+        {{ items_filter_custom }}
+      {% endif %}
+
+      {% render 'filtering-store-submit'
+        css_class: 'is-mobile'
+      %}
+    {% endcapture %}
+
+    {% render 'accordions',
+      accordions: accordions_join,
+      class: 'filter-group',
+      toggle: toggle
+    %}
+
+    {% render 'add-filter-by-default'
+      type_filter: 'filter.v.availability',
+      filters: filters
+    %}
+
+    <div class="collection__filters-bottom-btns" data-console={{ accordion_open_position }}>
+      {% if type == 'search' %}
+        {%- liquid
+          assign terms = typePage.terms | escape
+          assign search_url_remove = '?q=' | append: terms | append: '&options%5Bprefix%5D=last'
+        -%}
+
+        <a href="{{ routes.search_url | append : search_url_remove }}" class="btn-2 collection-filters__remove js-remove-filter">
+          {{ 'products.facets.clear_all' | t }}
+        </a>
+      {% else %}
+        <a href="{{ typePage.url }}?sort_by={{ typePage.sort_by }}" class="btn-2 collection-filters__remove js-remove-filter">
+          {{ 'products.facets.clear_all' | t }}
+        </a>
+      {% endif %}
+
+      {% assign scrollup_text = 'products.facets.filter_button_scrollup' | t %}
+
+      {% render 'button'
+        class: "btn-1 collection-filters__scrollup",
+        content: scrollup_text,
+        action: "button",
+        arial_label: scrollup_text,
+        name: scrollup_text,
+        id: 'js-filters-scrollup',
+        icon_caret: true,
+      %}
+    </div>
+  </form>
+
+</div>

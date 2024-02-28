@@ -1,0 +1,42 @@
+<link rel="stylesheet" href="{{ 'criticaltheme.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
+
+{%- if request.page_type == 'product' -%}
+  <link rel="stylesheet" href="{{ 'criticalproduct.css' | asset_url }}">
+  {% render 'preload-css', asset: 'product.css' %}
+{%- endif -%}
+
+{%- if request.page_type == 'collection'
+  or request.page_type == 'search'
+-%}
+  {% render 'preload-css', asset: 'collection.css' %}
+{%- endif -%}
+
+{%- if request.page_type contains 'customers' -%}
+  {% render 'preload-css', asset: 'customer.css' %}
+  {% render 'preload-css', asset: 'sellMyBag.css' %}
+{%- endif -%}
+
+{% render 'preload-css', asset: 'cart.css' %}
+{% render 'preload-css', asset: 'cartpage.css' %}
+
+{% if request.page_type == 'index' %}
+  {% render 'preload-css', asset: 'home.css' %}
+{% endif %}
+
+{%- if request.page_type == 'blog'
+  or request.page_type == 'article'
+  or request.page_type == 'search'
+-%}
+  {% render 'preload-css', asset: 'blog.css' %}
+{%- endif -%}
+
+{%- if request.path contains 'pages' -%}
+  {% render 'preload-css', asset: 'sellMyBag.css' %}
+  {% render 'preload-css', asset: 'customer.css' %}
+  {% render 'preload-css', asset: 'pages.css' %}
+{%- endif -%}
+
+{%- if request.path contains 'faq' -%}
+  {% render 'preload-css', asset: 'faq.css' %}
+{%- endif -%}

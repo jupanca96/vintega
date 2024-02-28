@@ -1,0 +1,54 @@
+<!-- eslint-disable @html-eslint/require-li-container -->
+{% comment %}
+  Renders a article card
+  Accepts:
+  - article: { Object } article Liquid object
+  - active_tags: { Boolean } active tags or hidden
+
+  Usage:
+  {% render 'blog-card'
+    article: article,
+    active_tags
+  %}
+{% endcomment %}
+
+{% assign link_content = 'blogs.article.read_more' | t %}
+
+{% if article.title != blank %}
+  {% assign title = article.title | strip_html | truncatewords: 45 %}
+{% else %}
+  {% assign card_class = 'blog-card--no-excerpt' %}
+{% endif %}
+
+<a class="blog-card" href="{{ article.url }}">
+  {% render 'article-meta-data' article: article %}
+  <div class="{{ card_class }}">
+    <div class="blog-card__image">
+      {% assign img = article.image | img_url: '403x' %}
+      {% render "render-image"
+        class: "motion-reduce",
+        img_src: img,
+        img: article.image,
+        size: "165 330 535 750 1000",
+        alt: alt,
+        width: '403',
+        height: '403'
+      %}
+    </div>
+  </div>
+  <div class="blog-card__wrapper">
+    {% if title != blank %}
+      <div class="blog-card__wrapper-content">
+        <div class="blog-card__wrapper-content--excerpt">
+          {{ title }}
+        </div>
+      </div>
+    {% endif %}
+
+    {% render 'button'
+      class: "btn-1 blog-card__link",
+      content: link_content,
+      action: "button"
+    %}
+  </div>
+</a>

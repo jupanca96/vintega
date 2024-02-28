@@ -1,0 +1,172 @@
+<div class="loading"></div>
+
+<div
+  class="customer__wrapper customer__wrapper--empty hidden"
+  id="js-mes-alerts-empty-state"
+>
+  <div class="mes-alerts--empty">
+    <p>{{ 'customer.mes_alerts.texts_component.text_empty_state' | t }}</p>
+
+    {% if settings.title_btn_open_alerts != blank %}
+      {% render 'button'
+        class: "btn-2 mes-alerts--empty-btn account__btn--empty",
+        content: settings.title_btn_open_alerts,
+        action: "button",
+        arial_label: settings.title_btn_open_alerts,
+        name: settings.title_btn_open_alerts,
+        id: 'mes-alerts-empty-btn'
+      %}
+    {% endif %}
+  </div>
+</div>
+
+{% render 'mes-alerts'
+  is_simple: true,
+  available: true,
+  no_button: true
+%}
+
+<mes-alerts-account
+  class="mes-alerts-account hidden"
+  data-customer-id="{{ customer.id }}"
+  data-texts-component='{
+    "designer": "{{ "products.mes_alerts.text_selects.designer" | t }}",
+    "model": "{{ "products.mes_alerts.text_selects.model" | t }}",
+    "color": "{{ "products.mes_alerts.text_selects.color" | t }}",
+    "material": "{{ "products.mes_alerts.text_selects.material" | t }}",
+    "condition": "{{ "products.mes_alerts.text_selects.condition" | t }}",
+    "edit": "{{ "customer.mes_alerts.texts_component.open_edit_button" | t }}"
+  }'
+>
+  {% capture delete_button %}
+    {% assign text_delete = "customer.mes_alerts.texts_component.delete_button" | t %}
+
+    {% render 'button'
+      class: "btn-2 mes-alerts-account__btn-delete",
+      content: text_delete,
+      action: "button",
+      arial_label: text_delete,
+      name: text_delete,
+      id: 'js-mes-alerts-delete-open-confirm',
+    %}
+  {% endcapture %}
+
+  <div
+    class="mes-alerts-account__header-controls"
+    id="js-mes-alerts-account-controls"
+  >
+    <span class="mes-alerts-account__qty hidden" id="js-mes-alerts-account-qty">
+      {{ "customer.mes_alerts.texts_component.maximun_alerts" | t }}
+      <span>5 / 5</span>
+    </span>
+
+    <div
+      class="mes-alerts-account__form-header"
+      id="js-mes-alerts-account-form-header"
+    >
+      <span class="mes-alerts-account__current-alert" id="js-mes-alerts-current">
+        {{ "customer.mes_alerts.texts_component.alert_text" | t }}
+        <span>
+          {% comment %}
+            This is a dummy text, always will be replace to another text from js
+          {% endcomment %}
+          #1
+        </span>
+      </span>
+
+      {% assign text_return = "customer.mes_alerts.texts_component.return_button" | t %}
+      <div>
+        {% render 'button'
+          class: "btn-1 another-classes",
+          content: text_return,
+          action: "button",
+          arial_label: text_return,
+          name: text_return,
+          id: 'js-mes-alerts-account-return',
+        %}
+      </div>
+    </div>
+
+    {% render 'mes-alerts'
+      is_simple: true,
+      available: true,
+      add_btn: delete_button,
+      id: 'edit'
+    %}
+  </div>
+
+  <div id="js-mes-alerts-content">
+    <div class="mes-alerts-account__header-table">
+      <span>{{ "customer.mes_alerts.texts_component.alert_text" | t }}</span>
+      <span>{{ "products.mes_alerts.text_selects.designer" | t }}</span>
+      <span>{{ "products.mes_alerts.text_selects.model" | t }}</span>
+      <span>{{ "products.mes_alerts.text_selects.color" | t }}</span>
+      <span>{{ "products.mes_alerts.text_selects.material" | t }}</span>
+      <span>{{ "products.mes_alerts.text_selects.condition" | t }}</span>
+    </div>
+
+    <div id="js-mes-alerts-items"></div>
+  </div>
+
+
+  {% comment %} <span class="loading"></span> {% endcomment %}
+
+  {% capture delete_validation %}
+    <div class="mes-alerts__message-delete">
+      <span>
+        {{ "customer.mes_alerts.delete_message.text_confirm" | t }}
+      </span>
+
+      {% assign text_yes = "customer.mes_alerts.delete_message.confirm" | t %}
+      {% assign text_no = "customer.mes_alerts.delete_message.reject" | t %}
+
+      <div>
+        {% render 'button'
+          class: "btn-1 another-classes",
+          content: text_no,
+          action: "button",
+          arial_label: text_no,
+          name: text_no,
+          id: 'js-mes-alerts-delete-close',
+        %}
+
+        {% render 'button'
+          class: "btn-1 another-classes",
+          content: text_yes,
+          action: "button",
+          arial_label: text_yes,
+          name: text_yes,
+          id: 'js-item-alert-delete',
+        %}
+      </div>
+    </div>
+
+    <small
+      class="mes-alerts__response-error form__message form__message--error hidden"
+      id="js-mes-alerts-delete-response-error"
+    >
+      {{ 'customer.mes_alerts.delete_message.error' | t }}
+    </small>
+    <small
+      class="mes-alerts__response form__message hidden"
+      id="js-mes-alerts-delete-response"
+    >
+      {{ 'customer.mes_alerts.delete_message.success' | t }}
+    </small>
+  {% endcapture %}
+
+  {% render 'modal-description-product'
+    css_class: 'mes-alerts__delete-confirm',
+    modal_id: 'js-mes-alerts-delete-confirm',
+    modal_id_close: 'js-mes-alerts-modal-close',
+    grid: delete_validation
+  %}
+</mes-alerts-account>
+
+{% schema %}
+{
+  "name": "My alerts",
+  "tag": "section",
+  "class": "mes-alerts-account__container"
+}
+{% endschema %}

@@ -1,0 +1,50 @@
+{% assign content_text = product.metafields.custom.banner_text.value %}
+
+{% if content_text != blank %}
+  <div class="product-banner">
+    <div class="product-banner__content-container wrapper-l">
+      <div class="product-banner__content">
+        {% if section.settings.heading != blank %}
+          <h2 class="product-banner__title">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+
+        <div>
+          {{ content_text }}
+        </div>
+      </div>
+    </div>
+
+    <style>
+      {% if section.settings.image != blank %}
+        .product-banner {
+          background-image: url('{{ section.settings.image.src | image_url }}');
+          background-repeat: no-repeat;
+          background-size: cover;
+          background-position: center;
+        }
+      {% endif %}
+    </style>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product banner",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Le petit mot du sac"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    }
+  ]
+}
+{% endschema %}

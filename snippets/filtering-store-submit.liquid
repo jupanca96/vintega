@@ -1,0 +1,17 @@
+{% comment %}
+
+  {% render 'filtering-store-submit'
+    css_class: ''
+  %}
+{% endcomment %}
+
+<div class="filter-form__submit {{ css_class }}">
+  <button
+    type="button"
+    class="btn-1"
+    aria-label="{{ 'products.facets.apply' | t }}"
+    id="js-apply-filters-mobile-btn"
+  >
+    {{ 'products.facets.apply' | t }}
+  </button>
+</div>

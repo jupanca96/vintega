@@ -1,0 +1,131 @@
+{% assign heading_1 = section.settings.heading_1 %}
+{% assign heading_2 = section.settings.heading_2 %}
+{% assign description = section.settings.description %}
+
+{% unless heading_1 == blank and heading_2 == blank %}
+  <h1 class="faq__title h2">
+    <span>{{ heading_1 }}</span>
+    <span>{{ heading_2 }}</span>
+  </h1>
+{% endunless %}
+
+{% if description != blank %}
+  <p class="faq__description">
+    {{ description }}
+  </p>
+{% endif %}
+
+{% if section.blocks.size > 0 %}
+  <div class="faq-page">
+    <div class="faq-menu account-sidebar">
+      {% render 'faq-menu', blocks: section.blocks %}
+    </div>
+
+    <div class="faq-content customer__sections">
+      {% for block in section.blocks %}
+        {% render 'faq-questions',
+          questions: block.settings.questions_content,
+          toggle: section.settings.toggle,
+          question_toggle: section.settings.question_toggle
+        %}
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "FAQ category",
+  "tag": "section",
+  "class": "faq wrapper-m",
+  "settings": [
+    {
+      "type": "header",
+      "content": "FAQ settings"
+    },
+    {
+      "type": "text",
+      "id": "heading_1",
+      "label": "Main title first part",
+      "info": "First part of heading",
+      "default": "Une Question?"
+    },
+    {
+      "type": "text",
+      "id": "heading_2",
+      "label": "Main title second part",
+      "info": "Second part of heading",
+      "default": "Un doute?"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description",
+      "default": "Nous répondons à vos questions"
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle",
+      "label": "Is toggle ?",
+      "default": true,
+      "info": "When you click in accordion-item, all items are closed"
+    },
+    {
+      "type": "checkbox",
+      "id": "question_toggle",
+      "label": "Open first question by default ?",
+      "default": true,
+      "info": "If set to true first question of each category is open"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Category block",
+      "type": "category_block",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Category name"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Category title",
+          "default": "Category"
+        },
+        {
+          "type": "header",
+          "content": "Questions"
+        },
+        {
+          "type": "richtext",
+          "id": "questions_content",
+          "label": "Accordions content",
+          "default": "<p>question [title] response [brl] question [title] response</p>",
+          "info": "[brl]: New question - [title]: Separate the question of the response"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ category",
+      "blocks": [
+        {
+          "type": "category_block"
+        },
+        {
+          "type": "category_block"
+        },
+        {
+          "type": "category_block"
+        },
+        {
+          "type": "category_block"
+        }
+      ]
+    }
+  ],
+  "templates": ["page"]
+}
+{% endschema %}

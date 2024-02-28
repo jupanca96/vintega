@@ -1,0 +1,89 @@
+{%-liquid
+  assign handle = canonical_url | split: '/'
+
+  for tag in handle
+    if forloop.last == true
+      assign tag_handle = tag | split: '?' | first
+    endif
+  endfor
+-%}
+
+<div class="blog__header">
+  <h1 class="h2 blog__header-title">
+    {{ section.settings.header }}
+  </h1>
+
+  <nav class="blog__tags">
+    <ul class="flex blog__tags-elements">
+      <li
+        class="blog__tags-elements-tag
+        {% if tag_handle == blog.handle %}
+          active-tag
+        {% endif %}"
+      >
+        <a href="{{ blog.url }}">
+          {{ 'sections.featured_blog.view_all' | t }}
+        </a>
+      </li>
+      {%- for tag in blog.all_tags -%}
+        {% assign tag_element = tag | handle %}
+        <li
+          class="blog__tags-elements-tag
+          {% if tag_handle == tag_element %}
+            active-tag
+          {% endif %}"
+        >
+          <a href="{{ blog.url }}/tagged/{{ tag_element }}">
+            {{ tag }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+</div>
+
+<div class="blog__articles">
+  {% paginate blog.articles by section.settings.pagination %}
+    <div id="list-article">
+      <ul class="grid blog__articles--content">
+        {% for article in blog.articles %}
+
+          {% render 'blog-card'
+            article: article,
+            active_tags: true
+          %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% render 'pagination'
+      paginate: paginate,
+      anchor: '#shopify-section-header'
+    %}
+  {% endpaginate %}
+</div>
+
+{% schema %}
+  {
+    "name": "Blogs collection",
+    "tag": "section",
+    "class": "blog wrapper-s margin-wrapper",
+    "settings": [
+      {
+        "type": "text",
+        "id": "header",
+        "label": "Heading",
+        "default": "Magazine"
+      },
+      {
+        "type": "range",
+        "id": "pagination",
+        "label": "Blogs by page",
+        "unit": "Pr",
+        "min": 3,
+        "max": 50,
+        "step": 1,
+        "default": 12
+      }
+    ]
+  }
+{% endschema %}

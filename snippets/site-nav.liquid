@@ -1,0 +1,284 @@
+{% comment %}
+  Renders menu main
+  Accepts:
+  - linklist: object menu current
+  - snippet_logo: {HTML} icon svg
+  - logo_center: {Boolean}
+  - snippet_user: {HTML} items user, cart account
+  - size_items: {Number} item count menu
+  Usage:
+  {% render 'site-nav'
+    linklist: section.settings.menu,
+    snippet_logo: snippet_logo,
+    logo_center: logo_center,
+    snippet_user: snippet_user,
+    size_items: size_items
+  %}
+{% endcomment %}
+
+{% liquid
+  assign location_logo = size_items | divided_by: 2
+%}
+
+<ul
+  id="nav-list-js"
+  data-event="mouseenter"
+  class="flex menu-desktop"
+  data-toggle="true"
+  data-active="false"
+>
+{% for link in linklists[linklist].links %}
+  {%- assign title = link.title -%}
+
+  {% if link.title contains '[' or link.links != blank %}
+
+    {%- assign split_title = link.title | split: '[' -%}
+    {%- assign title = split_title | first -%}
+    {%- assign type = split_title
+      | last
+      | split: ':'
+      | first
+      | replace: ']', ''
+    -%}
+    {%- assign grid_class = 'grid' -%}
+    {%- assign grid_columns = 'grid-1' -%}
+    {%- assign list_items = 'grid' -%}
+    {%- assign have_icon = false -%}
+    {%- assign active_items = true -%}
+    {%- assign slider = false -%}
+    {%- assign id_slider = section.id | append: '-' | append: forloop.index -%}
+    {%- assign find_limit = link.title | split: ']' -%}
+    {%- assign limit_slider = 50 -%}
+    {%- assign is_column = false -%}
+    {%- assign order_column = '' -%}
+
+    {% if find_limit[1] contains ':' %}
+      {% if find_limit[0] contains ':' %}
+        {%- assign item = find_limit[0]
+          | split: '['
+          | last
+          | split: ':'
+          | last
+        -%}
+      {% endif %}
+    {% else %}
+      {% if split_title[1] contains ':' %}
+        {%- assign item = split_title
+          | last
+          | split: ':'
+          | last
+          | remove: ']'
+        -%}
+      {% endif %}
+    {% endif %}
+
+    {% case type %}
+      {% when "collection" %}
+        {%- assign slider = true -%}
+        {%- assign type_slide = 'slider_menu_short' -%}
+        {% assign object_slider = collections[item].products %}
+        {%- assign grid_columns = 'grid-2' -%}
+        {%- assign limit_slider = find_limit[1] | split: ':' | last -%}
+
+      {% when "blog" %}
+        {%- assign slider = true -%}
+        {%- assign type_slide = 'slider_menu_big' -%}
+        {%- assign object_slider = blogs[item].articles -%}
+        {%- assign active_items = false -%}
+        {%- assign grid_columns = 'grid-1' -%}
+        {%- assign limit_slider = find_limit[1] | split: ':' | last -%}
+
+      {% when "icons" %}
+        {%- assign list_items = 'flex' -%}
+        {%- assign have_icon = true -%}
+
+      {% when "article" %}
+        {%- assign slider = true -%}
+        {%- assign type_slide = 'slider_menu_big' -%}
+        {%- assign active_items = false -%}
+        {%- assign grid_columns = 'grid-1' -%}
+        {%- assign have_icon = true -%}
+        {%- assign object_slider = link.links -%}
+
+      {% when "column" %}
+        {%- assign grid_columns = 'grid-type-column' -%}
+        {%- assign is_column = true -%}
+        {%- assign active_items = false -%}
+        {%- assign order_column = split_title[1]
+          | split: ':'
+          | last
+          | remove: ']'
+        -%}
+
+      {% else %}
+    {% endcase %}
+
+    <li
+      class="nav-item nav-item-js
+      {% if title contains 'blue' %} nav-item--blue {% endif %}"
+    >
+      <button
+        class="button-dropdown-js"
+        data-active="false"
+        type="button"
+      >
+        {% if link.url == '/' %}
+          <span class="nav-item__link--span">
+            {{ title | replace: '|blue', '' }}
+          </span>
+        {% else %}
+          <a href="{{ link.url }}" class="nav-item__link">
+            {{ title | replace: '|blue', '' }}
+          </a>
+        {% endif %}
+        {% comment %} <span>{{ title | replace: '|blue', '' }}</span> {% endcomment %}
+        {% render 'icon-caret' %}
+      </button>
+
+      {% if grid_columns == 'grid-type-column' %}
+        {% unless order_column contains 'icons' %}
+          {% assign type_content = 'columsWithoutIcons' %}
+        {%- endunless -%}
+      {%- endif -%}
+
+      {% assign countImg = 0 %}
+      {% assign countItem = 0 %}
+
+      {%- assign columns = order_column | split: '|' -%}
+
+      {% for item in columns %}
+        {% if item == 'image' %}
+          {% assign countImg = countImg | plus: 1 %}
+        {% endif %}
+
+        {% if item == 'items' %}
+          {% assign countItem = countItem | plus: 1 %}
+        {% endif %}
+
+      {% endfor %}
+
+      {% assign image_class = 'image-count-' | append: countImg %}
+      {% assign items_class = 'items-count-' | append: countItem %}
+
+      <div class="dropdown {{ type_content }}">
+        <div
+          class="{{ grid_class }} {{ grid_columns }} {{ type_content }} {{ image_class }} {{ items_class }}"
+        >
+          {% if is_column %}
+            {% render 'site-nav-columns'
+              order_column: order_column,
+              link: link,
+              type_content: type_content
+            %}
+          {%- endif -%}
+
+          {% if active_items %}
+            <ul class="{{ list_items }}">
+              {% for childlink in link.links %}
+                <li>
+                    <a
+                      href="{{ childlink.url }}"
+                      class="child-title
+                        {% if childlink.links == blank %}
+                          child-title--icons
+                        {% endif %}
+                        {% if childlink.title contains 'blank' %}
+                          child-title--blank
+                        {% endif %}"
+                    >
+                        {% if have_icon %}
+                          {% assign children_split = childlink.title
+                            | remove: ']'
+                            | split: '['
+                          %}
+                          {% assign text = children_split | first %}
+                          {% assign icon = children_split | last | file_url %}
+
+                          {% render 'render-image'
+                            img_src: icon
+                          %}
+
+                          <span>
+                            {{ text }}
+                          </span>
+                        {% else %}
+                          {{ childlink.title }}
+                        {% endif %}
+                    </a>
+                  {% if childlink.links != blank %}
+                    <ul class="child-list">
+
+                      {% for grandchildlink in childlink.links %}
+                        <li>
+                          <a
+                            href="{{ grandchildlink.url }}"
+                          >
+                            {{ grandchildlink.title }}
+                          </a>
+                        </li>
+                      {% endfor %}
+
+                    </ul>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          {% if slider %}
+            {% render 'site-nav-slider'
+              collection: object_slider,
+              type_slide: type_slide,
+              id: id_slider,
+              type: type,
+              limit_slider: limit_slider
+            %}
+          {% endif %}
+
+        </div>
+      </div>
+
+      <div class="underline"></div>
+    </li>
+
+  {% elsif link.title contains 'btn' %}
+    {%- assign title = link.title | split: '|' | first -%}
+
+    <li class="nav-item--btn">
+      {% render 'link'
+        type: 'btn'
+        class: "btn-1",
+        content: title,
+        url: link.url
+      %}
+    </li>
+  {% else %}
+    <li class="nav-item">
+      <a
+        href="{{ link.url }}"
+        class="nav-item__link"
+      >
+        {{ link.title }}
+      </a>
+
+      <div class="underline"></div>
+    </li>
+  {% endif %}
+
+  {% if logo_center %}
+    {% if forloop.index == location_logo %}
+      {{ snippet_logo }}
+    {% endif %}
+
+    {% if forloop.last %}
+      {{ snippet_user }}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+</ul>
+
+{% render 'site-nav-mobil'
+  type: type,
+  linklistsAll: linklists[linklist],
+  open_first_element: open_first_element
+%}

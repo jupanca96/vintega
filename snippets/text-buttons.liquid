@@ -1,0 +1,59 @@
+{% comment %}
+  Renders a section with title (h1), description and CTA
+
+  Accepts:
+  - title: {String}
+  - description: {String}
+  - link: {String}
+  - link_text: {String}
+  - class: {String}
+
+  Usage:
+  {% render "text-buttons"
+    tag_title: 'h2'
+    title: {String},
+    class_title: {String},
+    description: {String},
+    more_content: more_content
+    link: {String},
+    link_text: {String},
+    position: left|center|right,
+    class: {String}
+  %}
+{% endcomment %}
+
+{% if link == blank or link_text == blank %}
+  {% assign button_less = 'button-less' %}
+{% endif %}
+
+<div
+  class="{{ class }} text-buttons wrapper {{ position }} {{ button_less }}"
+>
+  {% if title != blank %}
+    <{{ tag_title | default: 'h2' }} {% if class_title != blank %}class="{{ class_title }}" {% endif %}>
+      {{ title }}
+    </{{ tag_title | default: 'h2' }}>
+  {% endif %}
+
+  {% if description != blank %}
+    <{{ tag_description | default: 'div' }} class="text-buttons__p">
+      {{ description }}
+    </{{ tag_description | default: 'div' }}>
+  {% endif %}
+
+  {% if more_content != blank %}
+    {{ more_content }}
+  {% endif %}
+
+  {% assign type_button = type_button | default: 'btn-1 btn-m' %}
+
+  {% if link != blank and link_text != blank %}
+    {% render 'link'
+      type: 'btn',
+      class: type_button,
+      url: link,
+      content: link_text,
+      icon_arrow: icon_arrow,
+    %}
+  {% endif %}
+</div>

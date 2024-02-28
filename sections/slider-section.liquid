@@ -1,0 +1,112 @@
+<span
+  class="slider-section__title wrapper-m h2 headings-home"
+>
+  {{ section.settings.section_title }}
+</span>
+
+{% capture slider_tabs %}
+  <ul class="slider-tabs wrapper-m">
+    {% for block in section.blocks %}
+      {% if forloop.length > 1 %}
+        {% assign greater_than_one = true %}
+        {% assign active = forloop.first %}
+
+        {% if block.settings.tab_text == blank %}
+          {%- assign not_tab_text = true -%}
+        {% endif %}
+          <li class="slider-tabs__item" data-active="{{ active }}">
+            {{ block.settings.tab_text }}
+          </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endcapture %}
+
+{% if template.name == 'index' and greater_than_one %}
+  {% unless not_tab_text %}
+    {{ slider_tabs }}
+  {% endunless %}
+{% endif %}
+
+<div class="slider-container wrapper-m">
+  {% for block in section.blocks %}
+    <div class="slider-wrapper" data-active="{{ forloop.first }}">
+      {% render 'slider-content',
+        collection: block.settings.collection,
+        limit: block.settings.limit_product,
+        first: forloop.first,
+        button_url: block.settings.button_url,
+        button_text: block.settings.button_text
+      %}
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+  {
+    "name": "Slider section",
+    "class": "slider-section section-space slider-section--component",
+    "tag": "section",
+    "max_blocks": 2,
+    "blocks": [
+      {
+        "type": "content",
+        "name": "Collection info",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Collection",
+            "info": "The first collection will be enabled by default"
+          },
+          {
+            "type": "text",
+            "id": "tab_text",
+            "label": "Tab text",
+            "info": "This is the tab text",
+            "default": "Tab text"
+          },
+          {
+            "type": "url",
+            "id": "button_url",
+            "label": "Button url",
+            "info": "This is the button url for collection"
+          },
+          {
+            "type": "text",
+            "id": "button_text",
+            "label": "Button text",
+            "info": "This is the button text for collection"
+          },
+          {
+            "type": "number",
+            "id": "limit_product",
+            "label": "Products show limit for collection",
+            "default": 5
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "type": "text",
+        "id": "section_title",
+        "label": "Title",
+        "info": "It is the main section title",
+        "default": "Modèles phare"
+      },
+      {
+        "type": "checkbox",
+        "id": "include_icon",
+        "label": "Include icon",
+        "info": "It handles including icon in the section"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon",
+        "label": "Icon",
+        "info": "It is the icon to be included"
+      }
+    ]
+  }
+{% endschema %}

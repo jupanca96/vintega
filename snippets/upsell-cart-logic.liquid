@@ -1,0 +1,61 @@
+{% comment %}
+  Render Upsell Section
+
+  Accepts:
+
+  Usage:
+  {% render 'upsell-cart-logic'
+    metafield_products: [],
+    default_collection,
+    limit_products
+  %}
+{% endcomment %}
+
+{% liquid
+  assign metafield_products_in = metafield_products
+
+  if metafield_products_in == blank
+    assign metafield_products_in = default_collection.products
+  endif
+
+  if metafield_products_in == blank
+    assign metafield_products_in = collection['all'].products
+  endif
+%}
+
+{% for line_item in metafield_products_in limit: limit_products %}
+
+  {% capture conditioned_product_card %}
+    {% if cartpage %}
+      <div class="swiper-slide">
+        {% render 'product-card'
+          product: line_item
+        %}
+      </div>
+    {% else %}
+      {% render 'cart-upsell-product'
+        product: line_item
+        index: forloop.index
+      %}
+    {% endif %}
+  {% endcapture %}
+
+  {% for line_item_all in cart.items %}
+    {% if line_item.id == line_item_all.product.id %}
+      {% assign in_cart = line_item_all.product.id %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+
+  {% comment %}
+    Para que en el upsell no sé repitan productos del carrito
+  {% endcomment %}
+
+  {% if line_item.id == in_cart %}
+    {% continue %}
+  {% else %}
+    {% if line_item.available %}
+      {{ conditioned_product_card }}
+    {% endif %}
+  {% endif %}
+{% endfor %}

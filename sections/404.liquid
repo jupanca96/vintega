@@ -1,0 +1,59 @@
+<!-- eslint-disable max-len -->
+<div
+  class="error-page {{ section.settings.layout_position }}"
+>
+  {%- if section.settings.main_message != blank -%}
+    <h1 class="error-page__title">
+      {{ section.settings.main_message }}
+    </h1>
+  {%- endif -%}
+
+  {%- if section.settings.page_text != blank -%}
+    <div class="error-page__text h4">
+      {{ section.settings.page_text }}
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.btn_url != blank and section.settings.btn_text != blank -%}
+    <div class="btn-404">
+      {% render 'link',
+        type: 'btn',
+        class: 'btn-2 error-page__btn',
+        content: section.settings.btn_text,
+        url: section.settings.btn_url
+      %}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "404",
+  "settings": [
+    {
+      "type": "text",
+      "id": "main_message",
+      "label": "Main error text",
+      "default": "404"
+    },
+    {
+      "type": "richtext",
+      "id": "page_text",
+      "label": "Page text",
+      "default": "<p>La page que vous cherchez n'existe pas.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text",
+      "default": "Retour à l'accueil"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Url Button",
+      "default": "/"
+    }
+  ]
+}
+{% endschema %}

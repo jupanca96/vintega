@@ -1,0 +1,122 @@
+{% comment %}
+  Render a cart item
+
+  Accepts:
+  - cart: {Object} cart object
+  - cart_header: {HTMLElement} cart header html element
+  - cart_empty_message: {String} message if cart is empty
+  - empty_complement: {String} extra message if cart is empty
+  - empty_btn_text: {String} Button text if cart is empty
+  - empty_btn_url: {String} Button url if cart is empty
+  - cartpage: {String} If it is on cartpage
+  - cart_remove: {String} Text for cart remove item
+
+  Usage:
+  {% render 'cart-item'
+    product: product,
+    item: item
+  %}
+{% endcomment %}
+{% liquid
+  assign condition = product.metafields.custom.product_condition
+
+  for tag in product.tags
+    if tag == 'carte-cardeu'
+      assign cart_cardeu = true
+    endif
+  endfor
+%}
+
+<div
+  class="cart-items__container"
+  data-live-item-key="{{ item.key }}"
+  data-product-id="{{ product.id }}"
+>
+  {% render "product-meta-data"
+  product: product
+  quantity: item.quantity %}
+  <a
+    class="cart-items__container--product-title"
+    href="{{ product.url }}"
+  >
+    <div class="cart-items__container--image">
+      {% assign imgUrl = product.featured_media
+        | image_url: '82x110'
+      %}
+      {% assign image = product.featured_image %}
+      {% render "render-image"
+        class: "",
+        attr: "data-live-item-image",
+        img_src: imgUrl,
+        img: image,
+        width: "82",
+        height: "110"
+      %}
+    </div>
+  </a>
+
+  <div class="cart-items__container--product-info">
+    {% unless cart_cardeu %}
+      <div class="cart-items__container--vendor subtitle--general">
+        <span>
+          {{ product.vendor }}
+        </span>
+      </div>
+    {% endunless %}
+
+    <a
+      href="{{ product.url }}"
+      class="cart-items__container--title"
+    >
+      <span>
+        {{ product.title }}
+      </span>
+    </a>
+
+    {% if condition != blank %}
+      <div class="cart-items__container--condition">
+        <span>
+          {{ condition }}
+        </span>
+      </div>
+    {% endif %}
+
+    <div class="item-price">
+      {% if product.compare_at_price != blank %}
+        <span class="compare-price">
+          {{ product.compare_at_price | money }}
+        </span>
+      {% endif %}
+
+      <span
+        class="price-{{ item.variant.id }}-{{ forloop.index }}"
+        id="price-{{ item.variant.id }}-{{ forloop.index }}"
+        data-quantity="{{ item.quantity }}"
+      >
+        {{ item.original_line_price | money }}
+      </span>
+
+      <span
+        class="item-delete"
+        data-id="{{ item.variant.id }}"
+        data-index="{{ forloop.index }}"
+      >
+        {% render 'icon-remove' %}
+
+        <span>{{ cart_remove }}</span>
+      </span>
+
+      <span class="item-line-price">
+        {{ item.original_line_price | money }}
+      </span>
+    </div>
+
+    <div class="item-quantity">
+      {% render 'input-quantity'
+        id: item.variant.id
+        cart_item: item,
+        index: forloop.index,
+      %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,237 @@
+{% assign count = 0 %}
+
+{% capture slider_content %}
+  {% for block in section.blocks %}
+    {% liquid
+      assign image = block.settings.service_img
+      assign subtitle = block.settings.service_subtitle
+      assign description = block.settings.description
+      assign btn_text = block.settings.btn_text
+      assign btn_link = block.settings.btn_link
+    %}
+
+    {% capture reassurence %}
+      {% render 'reassurence-icons',
+        block: block
+      %}
+    {% endcapture %}
+
+    {% if image != blank and description != blank %}
+      <div class="swiper-slide"
+           data-swiper-autoplay="{{ section.settings.slider_delay }}"
+      >
+        {% render 'service-snippet',
+          image: image,
+          subtitle: subtitle,
+          description: description,
+          btn_text: btn_text,
+          btn_link: btn_link,
+          reassurence: reassurence
+        %}
+      </div>
+    {% else %}
+      {% assign count = count | plus: 1 %}
+    {% endif %}
+
+  {% endfor %}
+{% endcapture %}
+
+{% comment %}
+  The differente between count and blocks.size must be more of two
+  for show pagination and create countPagination variable
+  to don't damage count's value original
+{% endcomment %}
+{%- liquid
+  assign showPagination = false
+  assign countPagination = count | plus: 1
+
+  if section.blocks.size > 1 and section.blocks.size > countPagination
+    assign showPagination = true
+  endif
+-%}
+
+{% if section.blocks.size >= 1 and count != section.blocks.size %}
+  <div class="services{% if section.settings.section_space %} section-space{% endif %} {{ section.settings.type_slide }}">
+    {% if section.settings.services_title != blank %}
+      <span class="services__title h2 headings-home">
+        {{ section.settings.services_title }}
+      </span>
+    {% endif %}
+    {% render 'slider',
+      wrapper: 'slider__services',
+      content: slider_content,
+      pagination: showPagination,
+      autoplay: section.settings.slider_autoplay,
+      arrows: showPagination,
+      perpage: 1,
+      id: section.id
+    %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Services section",
+  "tag": "section",
+  "class": "services-section wrapper-without-limit",
+  "blocks": [
+    {
+      "type": "content",
+      "name": "Service slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "service_img",
+          "label": "Service image"
+        },
+        {
+          "type": "text",
+          "id": "service_subtitle",
+          "label": "Service subtitle",
+          "default": "Heading Title"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>"
+        },
+        {
+          "type": "text",
+          "id": "btn_text",
+          "label": "Button Text",
+          "default": "Button text"
+        },
+        {
+          "type": "url",
+          "id": "btn_link",
+          "label": "Button Link"
+        },
+        {
+          "type": "header",
+          "content": "Icon settings"
+        },
+        {
+          "type": "text",
+          "id": "icon_1",
+          "label": "Icon one",
+          "default": "fast_estimation|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_1_text",
+          "label": "Text of icono 1",
+          "default": "ESTIMATION RAPIDE"
+        },
+        {
+          "type": "text",
+          "id": "icon_2",
+          "label": "Icon two",
+          "default": "pickup_home|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_2_text",
+          "label": "Text of icono 2",
+          "default": " COLLECTE A DOMICILE"
+        },
+        {
+          "type": "text",
+          "id": "icon_3",
+          "label": "Icon three",
+          "default": "immediate_payment|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_3_text",
+          "label": "Text of icono 3",
+          "default": "PAIEMENT INMEDIAT"
+        },
+        {
+          "type": "text",
+          "id": "icon_4",
+          "label": "Icon four",
+          "default": "immediate_payment|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_4_text",
+          "label": "Text of icono 4",
+          "default": "PAIEMENT INMEDIAt"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "services_title",
+      "label": "Title",
+      "default": "Default title"
+    },
+    {
+      "type": "checkbox",
+      "id": "section_space",
+      "label": "Section bottom space",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "type_slide",
+      "label": "Type structure",
+      "options": [
+        {
+          "value": "type-1",
+          "label": "Type 1"
+        },
+        {
+          "value": "type-2",
+          "label": "Type 2"
+        }
+      ],
+      "default": "type-1"
+    },
+    {
+      "type": "header",
+      "content": "Slider settings"
+    },
+    {
+      "type": "number",
+      "id": "slider_delay",
+      "label": "Slider delay",
+      "default": 3000,
+      "info": "Format to seconds: 1000 is a one second, 500 half second."
+    },
+    {
+      "type": "checkbox",
+      "id": "slider_autoplay",
+      "label": "Slider autoplay",
+      "default": true,
+      "info": "This setting work for two slides or more slides"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Services section",
+      "blocks": [
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        },
+        {
+          "type": "content"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

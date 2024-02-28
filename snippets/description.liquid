@@ -1,0 +1,16 @@
+{% comment %}
+  Description
+
+  Accepts:
+ - description: {string} Text description
+
+  Usage:
+  {%
+    title: Product.description,
+  %}
+{% endcomment %}
+{%- if description != blank -%}
+  <div class="text__description">
+    {{ description }}
+  </div>
+{%- endif -%}

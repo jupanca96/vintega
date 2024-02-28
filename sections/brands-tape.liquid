@@ -1,0 +1,70 @@
+{% assign marquee = section.settings.slider_texts
+  | replace: '<p>', ''
+  | replace: '</p>', ''
+  | replace: ' |* ', '<span class="marquee_scroll--break">—</span>'
+%}
+
+{% if marquee != blank %}
+  <div class="marquee">
+    {% for i in (1..4) %}
+      <span
+        class="marquee_scroll"
+        {% unless forloop.first %} aria-hidden="true"{% endunless %}
+      >
+        {{ marquee | prepend: '<span class="marquee_scroll--break">—</span>' }}
+      </span>
+    {% endfor %}
+  </div>
+
+  <style>
+    :root {
+      --marque-time: {{ section.settings.delay | append: 's' }};
+      --marque-background: {{ section.settings.bg_color }};
+      --marque-color: {{ section.settings.font_color }};
+    }
+  </style>
+
+  {% if section.settings.section_space %}
+    <div class="section-space"></div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Brands tape",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "slider_texts",
+      "label": "Slider text",
+      "info": "Split text with ' |* '. Example: CHANEL |* BALENCIAGA |* CELINE"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#E2E4FC"
+    },
+    {
+      "type": "color",
+      "id": "font_color",
+      "label": "Font color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "section_space",
+      "label": "Section bottom space",
+      "default": false
+    },
+    {
+      "type": "number",
+      "id": "delay",
+      "label": "Speed slide",
+      "default": 10,
+      "info": "Seconds are number like these: 1, 2, 3, 4, etc."
+    }
+  ]
+}
+{% endschema %}

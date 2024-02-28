@@ -1,0 +1,217 @@
+<!-- eslint-disable -->
+{%- capture welcome -%}
+  Welcome to <a href="https://gradiweb.github.io/shopifyBase_doc/">Gradi Theme Base</a>
+{%- endcapture -%}
+
+<main class="hello">
+  <section class="hello-welcome">
+    {% render 'heading' content: welcome %}
+
+    <div>
+      {% render "render-image"
+        class: "class_image",
+        title: "Image alt",
+        img: section.settings.image_test,
+        size: "220 300 400 500",
+        alt: "Image alt",
+        width: "auto",
+        height: "auto"
+      %}
+    </div>
+  </section>
+
+  {% assign markdown = pages["handle-page"].metafields.custom.markdown %}
+  {% render 'markdown'
+    markdown: markdown,
+    class: 'wrapper'
+  %}
+
+  <section class="wrapper">
+    <h2 class="h1">Design System</h2>
+    <p class="h2">
+      Headings
+    </p>
+    <h1>HOLA</h1>
+    <h2>HOLA</h2>
+    <h3>HOLA</h3>
+    <h4>HOLA</h4>
+    <h5>HOLA</h5>
+    <h6>HOLA</h6>
+  </section>
+
+  {% render 'input'
+    class: "form__textfield-notlabel",
+    type: "text",
+    name: "email",
+    id: "email",
+    placeholder: 'phone_label',
+    required: false
+  %}
+
+  {% render 'input'
+    label: 'TESTING',
+    class: "form__textfield size-s",
+    type: "text",
+    name: "email",
+    id: "testi-1",
+    placeholder: 'phone_label',
+    required: false,
+    icon_glass: true
+  %}
+
+  {% render 'input'
+    class: "form__textfield-notlabel size-s",
+    type: "text",
+    name: "search",
+    id: "testi-1",
+    placeholder: 'phone_label',
+    icon_glass: true
+  %}
+
+  {% capture options %}
+    <option>
+      test1
+    </option>
+
+    <option>
+      test2
+    </option>
+  {% endcapture %}
+
+  {% render 'input-select',
+    class: "form__textfield",
+    label: 'Label',
+    name: "contact[body]",
+    id: "first-name",
+    autocomplete: 'country',
+    required: true,
+    options: options
+  %}
+
+  {% render 'input'
+    class: "form__textfield-notlabel size-s",
+    type: "textarea",
+    name: "search",
+    id: "testi21",
+    placeholder: 'phone_label',
+  %}
+
+  {% render 'input'
+    class: "form__checkbox",
+    type: "checkbox",
+    name: "search",
+    id: "testi-1",
+    placeholder: 'phone_label',
+  %}
+
+  {% render "radio-button",
+    class: 'form__radio-button',
+    value: "input_value",
+    name: "input_name",
+    label: "Lable input",
+    checked: false
+  %}
+
+  {% render 'button'
+    class: "btn-1 btn-s",
+    content: "Register",
+    action: "button",
+    icon_plus: true,
+    icon_arrow: true
+  %}
+
+  {% render 'button'
+    class: "btn-1 btn-m",
+    content: "Register",
+    action: "button",
+    icon_plus: true,
+    icon_arrow: true
+  %}
+
+  {% render 'button'
+    class: "btn-2 btn-l",
+    content: "Register",
+    action: "button",
+    icon_plus: true,
+    icon_caret: true
+  %}
+
+  {% render 'link'
+    type: 'btn',
+    class: "btn-2 btn-l",
+    content: "Register",
+    url: "/",
+    icon_plus: true,
+    icon_caret: true
+  %}
+
+  {% render 'link'
+    type: 'link',
+    class: "btn-m",
+    content: "Register",
+    url: "/",
+    icon_plus: true,
+  %}
+
+  <section class="wrapper">
+    <p class="h2">Grid system</p>
+    <div class="grid">
+      <div class="card">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel quod temporibus nemo perspiciatis excepturi earum eaque labore ab repellendus molestiae eius accusantium, officiis dicta porro? Omnis, non. Ut, sapiente amet.
+      </div>
+      <div class="card">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel quod temporibus nemo perspiciatis excepturi earum eaque labore ab repellendus molestiae eius accusantium, officiis dicta porro? Omnis, non. Ut, sapiente amet.
+      </div>
+      <div class="card">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel quod temporibus nemo perspiciatis excepturi earum eaque labore ab repellendus molestiae eius accusantium, officiis dicta porro? Omnis, non. Ut, sapiente amet.
+      </div>
+    </div>
+  </section>
+
+  <section class="wrapper">
+    <p class="h2">Flex component</p>
+    <div class="flex">
+      <div>
+        <h3 class="h4">Plan 1</h3>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam alias rerum harum animi ex totam quasi corporis illum, aliquid laudantium, velit possimus id! Ab laborum dolor qui cupiditate et accusantium.
+        </p>
+        <button class="btn-1 btn__w-100">
+          Active my plan
+        </button>
+      </div>
+      <div>
+        <h3 class="h4">Plan 2</h3>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam alias rerum harum animi ex totam quasi corporis illum, aliquid laudantium, velit possimus id! Ab laborum dolor qui cupiditate et accusantium.
+        </p>
+        <button class="btn-2 btn__w-100">
+          Active my plan ⭐
+        </button>
+      </div>
+      <div>
+        <h3 class="h4">Plan 2</h3>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam alias rerum harum animi ex totam quasi corporis illum, aliquid laudantium, velit possimus id! Ab laborum dolor qui cupiditate et accusantium.
+        </p>
+        <button class="btn-1 btn__w-100">
+          Active my plan
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+{% schema %}
+{
+  "name": "Hello world",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image_test",
+      "label": "Image test"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,51 @@
+{% comment %}
+  Renders Slider Content
+
+  Accepts:
+  - collection: {Object} The collection selected
+  - first: {Boolean} If it is set for first collection
+  - button_url: {String} It is the button url
+  - button_text: {String} It is the button text
+
+  Usage:
+  {% render 'slider-content',
+    collection: first_collection,
+    limit: 10
+    first: true,
+    button_url: first_button_url,
+    button_text: first_button_text,
+    slider_content
+    to_hide_arrows: 3
+  %}
+{% endcomment %}
+
+{% assign limit_to_hide_arrows = to_hide_arrows | default: 3 %}
+
+{% if slider_content == blank %}
+  {% capture slider_content %}
+    {% for product in collection.products limit: limit %}
+      <div class="swiper-slide">
+        {% render 'product-card', product: product, is_simple: true %}
+      </div>
+    {% endfor %}
+  {% endcapture %}
+{% endif %}
+
+{% liquid
+  assign slider_css_class = 'slider-content'
+
+  if limit <= limit_to_hide_arrows
+    assign slider_css_class = slider_css_class | append: ' without-arrows'
+  endif
+%}
+
+{% render 'slider',
+  custom_slider: 'slider_defer structure-preload preload-hidden',
+  arrows: true,
+  content: slider_content,
+  wrapper: slider_css_class
+%}
+
+{%- if button_text != blank and button_url != blank -%}
+  {% render 'link', type: 'btn', class: 'btn-1 btn-m slider-button', content: button_text, url: button_url %}
+{%- endif -%}

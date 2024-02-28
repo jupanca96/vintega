@@ -1,0 +1,172 @@
+{% assign conditions_title = section.settings.condition_title
+  | append: ' '
+  | append: product.metafields.custom.product_condition.value
+%}
+
+{% assign condition_items = product.metafields.custom.condition_details.value %}
+
+{% capture accordions %}
+{% if condition_items != blank %}
+  {% capture conditions_content %}
+    <ul class="{% if condition_items.size > 1 %}with-bullet{% endif %}">
+      {% for item in condition_items %}
+        <li>
+          {{ item }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endcapture %}
+{% endif %}
+
+
+  {% if product.metafields.custom.product_condition.value != blank or product.metafields.custom.product_condition.value == blank and condition_items != blank %}
+    {% capture title %}
+      {{ conditions_title }}
+      <button type="button" id="js-condition-modal-open">
+        {% liquid
+          assign modal_open_icon = section.settings.modal_open_blue_icon | split: '|'
+          assign modal_open_icon_url = modal_open_icon | first | append: '.svg' | file_url
+          assign modal_open_icon_alt = modal_open_icon | last
+        %}
+
+        {% if section.settings.modal_open_blue_icon != blank %}
+          {% render "render-image"
+            class: 'icon-incognito',
+            title: modal_open_icon_alt,
+            img_src: modal_open_icon_url,
+            alt: modal_open_icon_alt,
+            width: "20",
+            height: "20"
+          %}
+        {% endif %}
+      </button>
+    {% endcapture %}
+
+    {% render 'accordion-item',
+      title: title,
+      content: conditions_content,
+      active: accordion_open
+    %}
+  {% endif %}
+
+  {% capture description_content %}
+    {% render 'description-product-item'
+      title: section.settings.exterior_color_subtitle
+      metafield: product.metafields.custom.color_details.value
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.interior_color_subtitle
+      metafield: product.metafields.custom.inner_color.value
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.exterior_materials_subtitle
+      metafield: product.metafields.custom.extern_material.value
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.interior_materials_subtitle
+      metafield: product.metafields.custom.interior_materials.value
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.hardware_subtitle
+      metafield: product.metafields.custom.hardware.value
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.reference_subtitle
+      metafield: product.metafields.custom.reference.value
+    %}
+
+    {% assign accessories_items = product.metafields.custom.accessories_list.value %}
+
+    {% render 'description-product-item'
+      title: section.settings.accessories_subtitle,
+      metafield: accessories_items
+    %}
+
+    {% if section.settings.size_depth_subtitle != blank
+    and product.metafields.custom.size_depth.value != blank %}
+      {% assign custom_metafield_size = section.settings.size_depth_subtitle
+        | append: ' '
+        | append: product.metafields.custom.size_depth.value
+      %}
+    {% endif %}
+
+    {% if section.settings.size_width_subtitle != blank
+      and product.metafields.custom.size_width.value != blank %}
+      {% assign custom_metafield_size = custom_metafield_size
+        | append: '/'
+        | append: section.settings.size_width_subtitle
+        | append: ' '
+        | append: product.metafields.custom.size_width.value
+      %}
+    {% endif %}
+
+    {% if section.settings.size_height_subtitle != blank
+      and product.metafields.custom.size_height.value != blank %}
+      {% assign custom_metafield_size = custom_metafield_size
+        | append: '/'
+        | append: section.settings.size_height_subtitle
+        | append: ' '
+        | append: product.metafields.custom.size_height.value
+      %}
+    {% endif %}
+
+    {% render 'description-product-item'
+      title: section.settings.size_subtitle,
+      metafield: custom_metafield_size,
+      size: true
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.serial_code_subtitle,
+      metafield: product.metafields.custom.serial_code.value
+    %}
+
+    {% render 'description-product-item'
+      title: section.settings.year_of_production_subtitle,
+      metafield: product.metafields.custom.year_of_production.value
+    %}
+
+    {% assign shoulder_strap = blank %}
+
+    {% if product.metafields.custom.migration_shoulder_strap_1.value != blank
+      and section.settings.size_shoulder_strap_subtitle != blank %}
+      {% assign shoulder_strap = section.settings.size_shoulder_strap_subtitle
+        | append: ' '
+        | append: product.metafields.custom.migration_shoulder_strap_1.value %}
+    {% endif %}
+
+    {% render 'description-product-item'
+      title: section.settings.shoulder_strap_subtitle,
+      metafield: product.metafields.custom.shoulder_strap_2_details_.value,
+      first_element: shoulder_strap,
+      modal: true
+    %}
+  {% endcapture %}
+
+  {% liquid
+    assign description_title = section.settings.description_title
+  %}
+
+  {% if description_content != blank and description_title != blank %}
+    {% render 'accordion-item',
+      title: description_title,
+      content: description_content,
+      active: accordion_open,
+      css_class: 'main-product__accordion-description'
+    %}
+  {% endif %}
+
+{% endcapture %}
+
+{% if accordions != blank %}
+  {% render 'accordions',
+    accordions: accordions,
+    toggle: false,
+    class: 'main-product__accordion'
+  %}
+{% endif %}

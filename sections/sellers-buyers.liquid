@@ -1,0 +1,156 @@
+{% if section.blocks.size > 1 %}
+  {%- if section.settings.heading != blank -%}
+    <h1 class="headings-home wrapper-s">{{ section.settings.heading }}</h1>
+  {%- endif -%}
+
+  <div class="sellers-buyers__cards-container">
+    {% for block in section.blocks %}
+
+      {% capture icons_capture %}
+        {% render 'reassurence-icons',
+          block: block
+        %}
+      {% endcapture %}
+
+      <div class="sellers-buyers__card sellers-buyers-card-{{ forloop.index }}">
+        {% render "text-buttons"
+          tag_title: 'span',
+          title: block.settings.heading,
+          tag_description: 'h2',
+          description: block.settings.description,
+          more_content: icons_capture,
+          position: 'center',
+          class: 'sellers-buyers__card-content'
+        %}
+
+        {% render 'link'
+          type: 'btn',
+          class: 'btn-1 btn-m',
+          url: block.settings.cta_link,
+          content: block.settings.cta_text,
+        %}
+
+        <style>
+          .sellers-buyers-card-{{ forloop.index }} .text-buttons > span {
+            color: {{ block.settings.heading_color }};
+          }
+        </style>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sellers and buyers",
+  "tag": "section",
+  "class": "sellers-buyers wrapper-without-limit section-space",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Des sacs de luxe à (Re)aimer."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Text settings"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Vendeurs"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading color",
+          "default": "#FF6801"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Vendez les sacs que vous ne portez plus rapidement avec la possibilité de recevoir un paiement immédiat aprés"
+        },
+        {
+          "type": "header",
+          "content": "Icon settings"
+        },
+        {
+          "type": "text",
+          "id": "icon_1",
+          "label": "Icon one",
+          "default": "fast_estimation|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_1_text",
+          "label": "Text of icono 1",
+          "default": "estimation rapide"
+        },
+        {
+          "type": "text",
+          "id": "icon_2",
+          "label": "Icon two",
+          "default": "pickup_home|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_2_text",
+          "label": "Text of icono 2",
+          "default": "collecte a domicile"
+        },
+        {
+          "type": "text",
+          "id": "icon_3",
+          "label": "Icon three",
+          "default": "immediate_payment|Icon",
+          "info": "Icon must be .svg, format: name|alt"
+        },
+        {
+          "type": "text",
+          "id": "icon_3_text",
+          "label": "Text of icono 3",
+          "default": "paiement inmediat"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Button Text",
+          "default": "Button text"
+        },
+        {
+          "type": "text",
+          "id": "cta_link",
+          "label": "Button Link",
+          "default": "#"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sellers and buyers",
+      "blocks": [
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

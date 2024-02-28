@@ -1,0 +1,153 @@
+{%- assign privacy_policy_text = shop.metafields.consentbar_text["privacy_policy_text"] -%}
+{%- assign accept_button_text = shop.metafields.consentbar_text["accept_button_text"] -%}
+{%- assign close_button_text = shop.metafields.consentbar_text["close_button_text"] -%}
+{%- assign reject_button_text = shop.metafields.consentbar_text["reject_button_text"] -%}
+{%- assign change_cookies_text = shop.metafields.consentbar_text["change_cookies_text"] -%}
+{%- assign text = shop.metafields.consentbar_text["text"] -%}
+
+{%- assign strict_cookies_checkbox = shop.metafields.preferences_text["strict_cookies_checkbox"] -%}
+{%- assign strict_cookies_text = shop.metafields.preferences_text["strict_cookies_text"] -%}
+
+{%- assign analytics_cookies_checkbox = shop.metafields.preferences_text["analytics_cookies_checkbox"] -%}
+{%- assign analytics_cookies_text = shop.metafields.preferences_text["analytics_cookies_text"] -%}
+
+{%- assign marketing_cookies_checkbox = shop.metafields.preferences_text["marketing_cookies_checkbox"] -%}
+{%- assign marketing_cookies_text = shop.metafields.preferences_text["marketing_cookies_text"] -%}
+
+{%- assign functionality_cookies_checkbox = shop.metafields.preferences_text["functionality_cookies_checkbox"] -%}
+{%- assign functionality_cookies_text = shop.metafields.preferences_text["functionality_cookies_text"] -%}
+
+{%- assign popup_header = shop.metafields.preferences_text["popup_header"] -%}
+{%- assign popup_description = shop.metafields.preferences_text["popup_description"]| replace: '"' , '"' | strip_newlines -%}
+{%- assign dismiss_button_text = shop.metafields.preferences_text["dismiss_button_text"] -%}
+
+{%- assign accept_selected_button_text = shop.metafields.preferences_text["accept_selected_button_text"] -%}
+{%- assign accept_all_button_text = shop.metafields.preferences_text["accept_all_button_text"] -%}
+{%- assign reject_all_button_text = shop.metafields.preferences_text["reject_all_button_text"] -%}
+
+{%- assign data_collection_text = shop.metafields.preferences_text["data_collection_text"] -%}
+
+{%- assign cookie__ab = shop.metafields.cookie_description["_ab"] -%}
+{%- assign cookie__orig_referrer = shop.metafields.cookie_description["_orig_referrer"] -%}
+{%- assign cookie_identity_state = shop.metafields.cookie_description["identity_state"] -%}
+{%- assign cookie_identity_customer_account_number = shop.metafields.cookie_description["identity_customer_account_number"] -%}
+{%- assign cookie__landing_page = shop.metafields.cookie_description["_landing_page"] -%}
+{%- assign cookie__secure_session_id = shop.metafields.cookie_description["_secure_session_id"] -%}
+{%- assign cookie_cart = shop.metafields.cookie_description["cart"] -%}
+{%- assign cookie_cart_sig = shop.metafields.cookie_description["cart_sig"] -%}
+{%- assign cookie_cart_ts = shop.metafields.cookie_description["cart_ts"] -%}
+{%- assign cookie_cart_ver = shop.metafields.cookie_description["cart_ver"] -%}
+{%- assign cookie_cart_currency = shop.metafields.cookie_description["cart_currency"] -%}
+{%- assign cookie_tracked_start_checkout = shop.metafields.cookie_description["tracked_start_checkout"] -%}
+{%- assign cookie_storefront_digest = shop.metafields.cookie_description["storefront_digest"] -%}
+{%- assign cookie_checkout_token = shop.metafields.cookie_description["checkout_token"] -%}
+{%- assign cookie__shopify_m = shop.metafields.cookie_description["_shopify_m"] -%}
+{%- assign cookie__shopify_tm = shop.metafields.cookie_description["_shopify_tm"] -%}
+{%- assign cookie__shopify_tw = shop.metafields.cookie_description["_shopify_tw"] -%}
+{%- assign cookie__tracking_consent = shop.metafields.cookie_description["_tracking_consent"] -%}
+{%- assign cookie_secure_customer_sig = shop.metafields.cookie_description["secure_customer_sig"] -%}
+{%- assign cookie__shopify_y = shop.metafields.cookie_description["_shopify_y"] -%}
+{%- assign cookie_customer_auth_provider = shop.metafields.cookie_description["customer_auth_provider"] -%}
+{%- assign cookie_customer_auth_session_created_at = shop.metafields.cookie_description["customer_auth_session_created_at"] -%}
+{%- assign cookie__y = shop.metafields.cookie_description["_y"] -%}
+{%- assign cookie__shopify_s = shop.metafields.cookie_description["_shopify_s"] -%}
+{%- assign cookie__shopify_fs = shop.metafields.cookie_description["_shopify_fs"] -%}
+{%- assign cookie__ga = shop.metafields.cookie_description["_ga"] -%}
+{%- assign cookie__gid = shop.metafields.cookie_description["_gid"] -%}
+{%- assign cookie__gat = shop.metafields.cookie_description["_gat"] -%}
+{%- assign cookie__shopify_sa_t = shop.metafields.cookie_description["_shopify_sa_t"] -%}
+{%- assign cookie__shopify_sa_p = shop.metafields.cookie_description["_shopify_sa_p"] -%}
+{%- assign cookie_IDE = shop.metafields.cookie_description["IDE"] -%}
+{%- assign cookie__s = shop.metafields.cookie_description["_s"] -%}
+{%- assign cookie_GPS = shop.metafields.cookie_description["GPS"] -%}
+{%- assign cookie_PREF = shop.metafields.cookie_description["PREF"] -%}
+{%- assign cookie_BizoID = shop.metafields.cookie_description["BizoID"] -%}
+{%- assign cookie__fbp = shop.metafields.cookie_description["_fbp"] -%}
+{%- assign cookie___adroll = shop.metafields.cookie_description["__adroll"] -%}
+{%- assign cookie___adroll_v4 = shop.metafields.cookie_description["__adroll_v4"] -%}
+{%- assign cookie___adroll_fpc = shop.metafields.cookie_description["__adroll_fpc"] -%}
+{%- assign cookie___ar_v4 = shop.metafields.cookie_description["__ar_v4"] -%}
+{%- assign cookie_cookieconsent_preferences_disabled = shop.metafields.cookie_description["cookieconsent_preferences_disabled"] -%}
+{%- assign cookie_cookieconsent_status = shop.metafields.cookie_description["cookieconsent_status"] -%}
+{%- assign cookie_no_info = shop.metafields.cookie_description["no_info"] -%}
+
+<script type="text/javascript">
+    window.isense_gdpr_privacy_policy_text = "{{ privacy_policy_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_accept_button_text = "{{ accept_button_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_close_button_text = "{{ close_button_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_reject_button_text = "{{ reject_button_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_change_cookies_text = "{{ change_cookies_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_text = "{{ text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_strict_cookies_checkbox = "{{ strict_cookies_checkbox | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_strict_cookies_text = "{{ strict_cookies_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_analytics_cookies_checkbox = "{{ analytics_cookies_checkbox | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_analytics_cookies_text = "{{ analytics_cookies_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_marketing_cookies_checkbox = "{{ marketing_cookies_checkbox | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_marketing_cookies_text = "{{ marketing_cookies_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_functionality_cookies_checkbox = "{{ functionality_cookies_checkbox | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_functionality_cookies_text = "{{ functionality_cookies_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_popup_header = "{{ popup_header | replace: '"' , '"' | strip_newlines }}";
+
+    {% if popup_description == "empty_value" %}
+    window.isense_gdpr_popup_description = "";
+    {% else %}
+    window.isense_gdpr_popup_description = "{{ popup_description | replace: '"' , '"' | strip_newlines }}";
+    {% endif %}
+
+    window.isense_gdpr_dismiss_button_text = "{{ dismiss_button_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_accept_selected_button_text = "{{ accept_selected_button_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_accept_all_button_text = "{{ accept_all_button_text | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_reject_all_button_text = "{{ reject_all_button_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_data_collection_text = "{{ data_collection_text | replace: '"' , '"' | strip_newlines }}";
+
+    window.isense_gdpr_cookie__ab = "{{ cookie__ab | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__orig_referrer = "{{ cookie__orig_referrer | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_identity_state = "{{ cookie_identity_state | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_identity_customer_account_number = "{{ cookie_identity_customer_account_number | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__landing_page = "{{ cookie__landing_page | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__secure_session_id = "{{ cookie__secure_session_id | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cart = "{{ cookie_cart | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cart_sig = "{{ cookie_cart_sig | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cart_ts = "{{ cookie_cart_ts | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cart_ver = "{{ cookie_cart_ver | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cart_currency = "{{ cookie_cart_currency | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_tracked_start_checkout = "{{ cookie_tracked_start_checkout | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_storefront_digest = "{{ cookie_storefront_digest | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_checkout_token = "{{ cookie_checkout_token | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_m = "{{ cookie__shopify_m | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_tm = "{{ cookie__shopify_tm | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_tw = "{{ cookie__shopify_tw | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__tracking_consent = "{{ cookie__tracking_consent | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_secure_customer_sig = "{{ cookie_secure_customer_sig | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_y = "{{ cookie__shopify_y | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_customer_auth_provider = "{{ cookie_customer_auth_provider | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_customer_auth_session_created_at = "{{ cookie_customer_auth_session_created_at | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__y = "{{ cookie__y | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_s = "{{ cookie__shopify_s | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_fs = "{{ cookie__shopify_fs | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__ga = "{{ cookie__ga | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__gid = "{{ cookie__gid | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__gat = "{{ cookie__gat | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_sa_t = "{{ cookie__shopify_sa_t | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__shopify_sa_p = "{{ cookie__shopify_sa_p | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_IDE = "{{ cookie_IDE | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__s = "{{ cookie__s | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_GPS = "{{ cookie_GPS | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_PREF = "{{ cookie_PREF | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_BizoID = "{{ cookie_BizoID | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie__fbp = "{{ cookie__fbp | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie___adroll = "{{ cookie___adroll | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie___adroll_v4 = "{{ cookie___adroll_v4 | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie___adroll_fpc = "{{ cookie___adroll_fpc | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie___ar_v4 = "{{ cookie___ar_v4 | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cookieconsent_preferences_disabled = "{{ cookie_cookieconsent_preferences_disabled | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_cookieconsent_status = "{{ cookie_cookieconsent_status | replace: '"' , '"' | strip_newlines }}";
+    window.isense_gdpr_cookie_no_info = "{{ cookie_no_info | replace: '"' , '"' | strip_newlines }}";
+</script>

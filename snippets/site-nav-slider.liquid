@@ -1,0 +1,121 @@
+{% comment %}
+  Renders slider nav menu
+  Accepts:
+  - collection: {Array} collections,
+  - type_slide: {String} type slider class css,
+  - id: {Number} id current item,
+  - type: {String},
+  - limit_slider: {Number} number limit count image slider
+  Usage:
+  {% render 'site-nav-slider'
+    collection: object_slider,
+    type_slide: type_slide,
+    id: id_slider,
+    type: type,
+    limit_slider: limit_slider
+  %}
+{% endcomment %}
+
+{% capture content %}
+  {% for item in collection  limit: limit_slider %}
+  {%- assign count_for = forloop.index -%}
+    <div class="swiper-slide">
+    {% case type %}
+
+      {% when 'collection' %}
+        {% render 'product-card'
+          product: item,
+          is_simple: true
+        %}
+
+      {% when 'blog' %}
+        <div class="nav-article">
+          {%- assign image = item.image | img_url: '300x' -%}
+          {% render 'render-image'
+            img_src: image,
+            img: item.image,
+            size: "110 150 300 400",
+            width: "300",
+            height: "300"
+          %}
+          <a href="{{ item.url }}">
+            {% render 'button'
+              class: "btn-1 nav-article__button",
+              content: item.title,
+              action: "button"
+            %}
+          </a>
+        </div>
+
+      {% when 'article' %}
+        <div class="nav-article">
+          {%- assign name_image = item.title | split: '[' -%}
+          {%- assign image = name_image
+            | last
+            | remove: ']'
+            | file_url
+          -%}
+
+          {% render 'render-image'
+            img_src: image,
+            size: "110 150 300 400",
+            width: "300",
+            height: "300"
+          %}
+          <a href="{{ item.url }}">
+            {% assign name = name_image | first %}
+
+            {% render 'button'
+              class: "btn-1 nav-article__button",
+              content: name,
+              action: "button"
+            %}
+          </a>
+        </div>
+
+    {% endcase %}
+    </div>
+  {% endfor %}
+{% endcapture %}
+
+{% if count_for <= 3 %}
+  {%- assign countElements = 'center-elements' -%}
+  {%- assign withoutArrows = 'without-arrows' -%}
+{% endif %}
+
+<div
+  class="{{ wrapper }} wrapper__slider {{ withoutArrows }}{% if type == 'collection' %} product-slider-nav{% endif %}"
+>
+  <!-- Slider main container -->
+
+
+  <div
+    id="slider_{{ id }}"
+    class="swiper {{ type_slide }}"
+  >
+    <div class="swiper-wrapper  {{ countElements }}">
+      {{ content }}
+    </div>
+  </div>
+  {% if count_for > 3 or type == 'collection' and count_for > 2 %}
+    <button
+      type="button"
+      data-id="slider_{{ id }}"
+      class="swiper-button swiper-button-prev"
+      aria-hidden="true"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+
+    <button
+      type="button"
+      data-id="slider_{{ id }}"
+      class="swiper-button swiper-button-next"
+      aria-hidden="true"
+    >
+      {% render 'icon-circle-arrow' %}
+    </button>
+
+  {% endif %}
+
+</div>

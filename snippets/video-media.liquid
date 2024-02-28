@@ -1,0 +1,73 @@
+<!-- eslint-disable max-len -->
+|{% comment %}
+  Video playback from different sources (Youtube, Vimeo, HTML5)
+
+  Accepts:
+  - video_url: {String},
+  - video_url_embed: {String},
+  - poster: {String},
+  - iframe_class: {String},
+  - video_class: {String}
+
+  Usage:
+  {% render 'video-media',
+    video_url: section.settings.video_url,
+    video_url_embed: section.settings.video_url_embed,
+    poster: section.settings.background,
+    iframe_class: 'hero__iframe',
+    video_class: 'hero__video'
+  %}
+{% endcomment %}
+
+{% if video_url != blank and video_url_embed == blank %}
+
+{% assign video_mp4 = video_url | append: '.mp4' | file_url  %}
+{% assign video_web = video_url | append: '.webm' | file_url  %}
+
+  <div class={{ video_class }}>
+    <video
+      class="lazy"
+      autoplay
+      muted
+      loop
+      playsinline
+      width="100%"
+      height="auto"
+      poster={{ poster | img_url: '1440x' }}
+    >
+      <source data-src={{ video_mp4 }} type="video/webm">
+      <source data-src={{ video_web }} type="video/mp4">
+    </video>
+  </div>
+{% endif %}
+
+{% if video_url_embed != blank %}
+  <div class={{ iframe_class }}>
+    {%- if video_url_embed.type == 'youtube' -%}
+      {% assign yt_params = '?autoplay=1&showinfo=0&controls=0&enablejsapi=1&fs=0&loop=1&modestbranding=1&playsinline=1&mute=1&rel=0&playlist=' %}
+      <iframe
+        src="https://www.youtube.com/embed/{{ video_url_embed.id }}{{ yt_params }}{{ video_url_embed.id }}"
+        id="ytplayer"
+        class="video__modal-youtube youtube"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        width="100%"
+        height="auto"
+      ></iframe>
+    {%- else -%}
+      {% assign vimeo_params = '?autoplay=1&loop=1&muted=1&byline=0&title=0' %}
+      <iframe
+        src="https://player.vimeo.com/video/{{ video_url_embed.id }}{{ vimeo_params }}"
+        class="video__modal-vimeo js-vimeo"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        width="100%"
+        height="auto"
+      ></iframe>
+    {%- endif -%}
+  </div>
+{% endif %}

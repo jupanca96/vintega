@@ -1,0 +1,40 @@
+{% comment %}
+  @description: Pass a string to inline code according to markdown patterns
+  @author: Luis Avila
+
+  Accepts:
+  - lineCode: {String} This parameter must already be in array format
+
+  Usage:
+  {% render 'markdown-line-code'
+    lineCode: dataLine,
+  %}
+{% endcomment %}
+
+{% if lineCode.size > 1 %}
+  {% for linep in lineCode %}
+    {% if forloop.index == 1 %}
+      {% assign lineInit = linep %}
+    {% endif %}
+    {% if lineInit == blank %}
+      {%- comment -%} Linear starts with line code {%- endcomment -%}
+      {% assign residue = forloop.index | modulo: 2 %}
+
+      {% if residue == 1 %}
+        {{ linep }}
+      {% else %}
+        <code>{{ linep }}</code>
+      {% endif %}
+    {% else %}
+      {%- comment -%} Linear does not start with linde code {%- endcomment -%}
+      {% assign residue = forloop.index | modulo: 2 %}
+      {% if residue == 1 %}
+        {{ linep }}
+      {% else %}
+        <code>{{ linep }}</code>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% else %}
+  {{ lineCode }}
+{% endif %}

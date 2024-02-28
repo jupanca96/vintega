@@ -1,0 +1,176 @@
+{% liquid
+  assign heading_main = section.settings.heading_type
+
+  if template contains 'account'
+    assign description_class = 'wrapper-m'
+    assign wrapper = ''
+    assign heading_main = 'h2'
+  else
+    assign description_class = 'wrapper-xm'
+    assign wrapper = 'wrapper-without-limit'
+  endif
+
+  if heading_main == 'h1'
+    assign heading_secondary = 'h2'
+  else
+    assign heading_secondary = 'h3'
+  endif
+%}
+
+<div class="{{ wrapper }}">
+  {% unless template contains 'account' %}
+    {% if section.settings.heading != blank %}
+      <{{heading_main}} class="h2 text-image__title">
+        {{ section.settings.heading }}
+      </{{heading_main}}>
+    {% endif %}
+  {% endunless %}
+
+  {% if section.settings.image != blank %}
+    <div class="text-image__image">
+      {% render "render-image"
+        title: section.settings.image.alt,
+        img: section.settings.image,
+        size: "300 400 500 600 700 800 900 1000",
+        alt: section.settings.image.alt
+      %}
+    </div>
+  {% endif %}
+</div>
+
+<div class="{{ description_class }}">
+  {% if section.settings.blockquote != blank %}
+    <div class="text-image__blockquote">
+
+      {% if section.settings.blockquote_icon != blank %}
+        {% liquid
+          assign icon = section.settings.blockquote_icon | split: '|'
+          assign icon_url = icon | first | append: '.svg' | file_url
+          assign icon_alt = icon | last
+        %}
+
+        {% render "render-image"
+          title: icon_alt,
+          img_src: icon_url,
+          size: "220 300 400 500",
+          alt: icon_alt,
+          width: "44",
+          height: "14"
+        %}
+      {% endif %}
+
+      {{ section.settings.blockquote }}
+    </div>
+  {% endif %}
+
+  {% if section.settings.subtitle != blank %}
+    <{{heading_secondary}} class="h4 text-image__subtitle">
+      {{ section.settings.subtitle }}
+    </{{heading_secondary}}>
+  {% endif %}
+
+  {% if section.settings.description != blank %}
+    <div class="text-image__description">
+      {{ section.settings.description }}
+    </div>
+  {% endif %}
+</div>
+
+{% if template.name contains 'page' %}
+  {% if section.settings.button_text != blank and section.settings.button_url != blank %}
+    {% render 'link'
+      type: 'btn'
+      class: "btn-1 text-image__link"
+      content: section.settings.button_text
+      url: section.settings.url,
+      target: "_blank"
+    %}
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Text image section",
+  "class": "text-image",
+  "tag": "section",
+  "templates": [
+    "page",
+    "customers/account"
+  ],
+  "settings": [
+    {
+      "type": "radio",
+      "id": "heading_type",
+      "label": "Heading type",
+      "info": "It is the heading type to be used in the section, it could be H1 or H2. For account it is fixed in H2",
+      "options": [
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Title",
+      "info": "It is the main section title (Not available for account personal shoppers)",
+      "default": "COMMENT BIEN VENDRE?"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "It is the main section image"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "info": "It is the section subtitle",
+      "default": "Nos 5 conseils pour mieux valoriser votre sac"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "info": "It is the section description",
+      "default": "<p>Nous sommes à votre disposition pour offrir à vos articles une seconde vie à la hauteur de vos attentes. Pour cela, nous avons établi les 5 conseils et astuces pour assurer une vente rapide et efficace de vos articles.</p>"
+    },
+    {
+      "type": "text",
+      "id": "blockquote_icon",
+      "label": "Blockquote icon",
+      "default": "blockquote-icon|Icon"
+    },
+    {
+      "type": "richtext",
+      "id": "blockquote",
+      "label": "Blockquote",
+      "info": "It is the section blockquote"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "info": "It is the button text (Not available for account, use calendly section)"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button url",
+      "info": "It is the button url (Not available for account, use calendly section)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text image section"
+    }
+  ]
+}
+{% endschema %}

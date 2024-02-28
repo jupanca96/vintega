@@ -1,0 +1,23 @@
+<ul class="flex">
+  {% if section.settings.message_url != blank %}
+    <li class="header__user-icon-message">
+      <a href="{{ section.settings.message_url }}" aria-label="contact page">
+        {% render 'icon-message' %}
+      </a>
+    </li>
+  {% endif %}
+  <li class="header__user-icon-account">
+    <a href="{{ routes.account_url }}" aria-label="account page">
+      {% render 'icon-account' %}
+    </a>
+  </li>
+  <li class="header__user-icon-cart">
+    <button type="button" class="button-cart" aria-label="sidecart">
+      {% render 'icon-cart' %}
+    </button>
+
+    <div
+      class="button-cart__count {% if cart.item_count == 0 %}hidden{% endif %}"
+    ></div>
+  </li>
+</ul>

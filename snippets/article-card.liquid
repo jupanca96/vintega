@@ -1,0 +1,36 @@
+{% comment %}
+  Renders a article card
+
+  Accepts:
+  - article: {Object} article Liquid object
+
+  Usage:
+  {% render 'article-card'
+    article: article
+  %}
+{% endcomment %}
+
+<div class="article-card">
+  <a
+    class="product-card--head"
+    href="{{ article.url }}"
+  >
+    <div class="article-card--head-images">
+      {% render "render-image"
+        class: "article-card_image-1",
+        img_src: article.image.src,
+        img: article.image,
+        size: "110 150 300 400",
+        alt: article.image.alt,
+        width: "100",
+        height: "100"
+      %}
+      <span class="badge">{{ 'templates.search.blog' | t }}</span>
+    </div>
+    <div class="article-card--head-info">
+      <span>
+        {{ article.title }}
+      </span>
+    </div>
+  </a>
+</div>

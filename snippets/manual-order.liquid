@@ -1,0 +1,96 @@
+{% comment %}
+  Order item with metaobject like schema or example to order
+
+  Usage:
+    {% render 'manual-order',
+      filter: filter,
+      label: label {string} What filter tpye is
+      metaobject: shop.metaobjects.order_filters_condition.values
+    %}
+{% endcomment %}
+
+{% comment %} Metaobject with schema to order {% endcomment %}
+{% assign object = metaobject.values %}
+{% assign label_filter = filter.label %}
+
+{% assign size_object = 0 %}
+
+{% for item in object %}
+  {% for item2 in item.item.value %}
+    {% comment %}
+      To validate if there are items in metaobjects
+    {% endcomment %}
+    {% assign size_object = forloop.length %}
+  {%- endfor -%}
+{%- endfor -%}
+
+{% assign size_object = size_object | plus: 0 %}
+
+{% comment %}
+  To validate if it is in correct filter
+{% endcomment %}
+{% if filter.param_name == label %}
+  {% comment %}
+    To validate if there are items in metaobjects
+  {% endcomment %}
+  {% if size_object > 0 %}
+
+    {% for item in object %}
+      {% for item2 in item.item.value %}
+
+        {%- for filter_value in filter.values -%}
+
+          {% comment %}
+            unless filter_value.label contains ':'
+              To not render sub items in parent items
+          {% endcomment %}
+          {% unless filter_value.label contains ':' %}
+            {% unless filter_value.count == 0 and filter_value.active == false -%}
+              {% comment %} {% assign item2_parse = item2 | split: '|' | first %}
+              {% assign item2_parse = item2_parse | times: 1 %} {% endcomment %}
+              {% comment %}
+                With next validation it gets order
+
+                Compare default position with number in metaobject
+              {% endcomment %}
+              {% assign item2_parse = item2 | strip | downcase %}
+              {% assign filter_value_label = filter_value.label | strip | downcase %}
+              {% assign items2_array = item2 | split: '|' %}
+              {% assign items2_array = items2_array | uniq %}
+              {% assign loop = forloop %}
+              {% comment %}
+                With next validation it gets order
+              {% endcomment %}
+
+              {% for meta in items2_array %}
+                {% assign meta_parse = meta | strip | downcase %}
+
+
+                {% if meta_parse == filter_value_label %}
+                  {% render 'filters-item-wrapper',
+                    filter: filter,
+                    filter_value: filter_value,
+                    label_filter: label_filter,
+                    forloop: loop
+                  %}
+                {% endif %}
+              {% endfor %}
+
+              {% if item2_parse contains filter_value_label %}
+
+
+
+              {% endif %}
+            {% endunless %}
+          {% endunless %}
+
+        {% endfor %}
+      {%- endfor -%}
+    {%- endfor -%}
+  {% else %}
+    {% render 'filters-item-loop',
+      filter: filter,
+      label_filter: label_filter
+    %}
+  {% endif %}
+{% endif %}

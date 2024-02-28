@@ -1,0 +1,106 @@
+{%- comment -%}
+  If you want to get different UI from our customization code.
+  You could change this properties:
+
+  - position_icons: Text orientation -> left | top
+  - slider_mobile: Mobile slider UI -> true | false
+
+{%- endcomment -%}
+
+<!-- eslint-disable max-len -->
+{% liquid
+  assign position_icons = 'top'
+  assign slider_mobile = section.settings.slider_mobile
+%}
+{% if section.settings.heading != blank %}
+  <h2>
+    {{ section.settings.heading }}
+  </h2>
+{% endif %}
+
+<div
+  class="flex row-icons__elements {% if slider_mobile %}slider-mobile{% endif %}"
+>
+  {% for block in section.blocks %}
+    {% if block.settings.row_icon_image != blank %}
+      <div
+        class="row-icons__element {% if position_icons == 'left' %}position__left{% else %}position__top{% endif %}"
+      >
+          {% assign url = block.settings.row_icon_image
+            | append: '.svg'
+            | file_url
+          %}
+          {% render "render-image"
+            img_src: url,
+            alt: block.settings.row_icon_image,
+            width: "80",
+            height: "80"
+          %}
+
+        {% if block.settings.heading != blank or block.settings.row_icon_description != blank %}
+          <div class="row-icons__description">
+            {% if block.settings.heading != blank %}
+              <h3>
+                {{ block.settings.heading }}
+              </h3>
+            {% endif %}
+
+            {% if block.settings.row_icon_description != blank %}
+              <div>{{ block.settings.row_icon_description }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% schema %}
+  {
+    "name": "Row icons",
+    "class": "row-icons wrapper",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Title"
+      },
+      {
+        "type": "checkbox",
+        "id": "slider_mobile",
+        "label": "Slider mobile ?",
+        "default": true,
+        "info": "switch the view in mobile between slide and grid"
+      }
+    ],
+    "max_blocks": 5,
+    "blocks": [
+      {
+        "name": "List items",
+        "type": "icon",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Title",
+            "default": "Icon"
+          },
+          {
+            "type": "richtext",
+            "id": "row_icon_description",
+            "label": "Description",
+            "default": "<p>Lorem ipsum letto</p>"
+          },
+          {
+            "type": "text",
+            "id": "row_icon_image",
+            "info": "size: 80x80 px. Add file name (.svg)",
+            "label": "Image",
+            "default": "icon"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

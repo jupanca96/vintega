@@ -1,0 +1,96 @@
+{%- comment -%}
+  Renders: Faq menu
+
+  Receives:
+
+  - blocks: {Array} It is the array of blocks for faq menu
+
+  Usage:
+
+  {% render 'faq-menu', blocks: section.blocks %}
+{%- endcomment -%}
+
+<aside class="faq-menu">
+  <nav>
+    <ul
+      class="account-sidebar__desktop"
+      data-selected="{{ blocks[0].settings.heading | handleize | append: '-1' }}"
+    >
+      {% for link in blocks %}
+        {% assign handle = link.settings.heading | handleize %}
+
+        {% if forloop.first %}
+          {% assign active_class = 'active' %}
+        {% else %}
+          {% assign active_class = '' %}
+        {% endif %}
+
+        {% assign link_class = 'account-sidebar__item ' | append: active_class %}
+
+        <li
+          class="{{ link_class }}"
+          data-id="{{ handle | append: '-' | append: forloop.index }}"
+        >
+          {% render 'link',
+            type: 'link',
+            class: 'account-sidebar__link',
+            content: link.settings.heading,
+            icon_arrow: true,
+            url: '#'
+          %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div
+      class="account-sidebar__mobile"
+    >
+      <select
+        name="account-select"
+        class="account-sidebar__select hidden"
+      >
+        {%- for option in blocks -%}
+          <option
+            value="{{ option.settings.heading | handleize }}"
+            {% if forloop.first %}
+              selected="true"
+            {% endif %}
+          >
+            {{ option.settings.heading }}
+          </option>
+        {%- endfor -%}
+      </select>
+
+      <div
+        class="account-sidebar__options"
+        data-active="false"
+      >
+        {%- for option in blocks -%}
+          {% if forloop.first %}
+            <div
+              class="custom-select__selected"
+              data-id="{{ option.settings.heading | handleize | append: '-1' }}"
+            >
+              <span>{{ option.settings.heading }}</span>
+              {% render 'icon-caret' %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <ul
+          class="custom-select__items"
+          data-selected="{{ blocks[0].settings.heading | handleize | append: '-1' }}"
+        >
+          {%- for option in blocks -%}
+            <li
+              data-id="{{ option.settings.heading | handleize | append: '-' | append: forloop.index }}"
+              class="{% if forloop.first %}hidden{% endif %}"
+            >
+              {{ option.settings.heading }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</aside>

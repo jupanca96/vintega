@@ -1,0 +1,60 @@
+{% if collection.description != blank %}
+
+  <div class="text-seo__bg">
+    <div class="text-seo__container wrapper-l">
+      <div class="text-seo__content">
+        {% assign excerpt = collection.description | split: '[EXCERPT]' %}
+        <div>
+          {{ excerpt | first }}
+        </div>
+
+        <div
+          class="text-seo__content--hidden"
+          id="js-text-seo-hidden"
+          data-active="false"
+        >
+          {{ excerpt | last }}
+        </div>
+
+        {% if excerpt.size > 1 %}
+          <button
+            type="button"
+            id="js-text-seo-voir-plus"
+          >
+            <span class="plus">
+              {{ section.settings.see_plus }}
+            </span>
+
+            <span class="less">
+              {{ section.settings.see_less }}
+            </span>
+          </button>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+{% endif %}
+
+{% schema %}
+{
+  "name": "Text seo",
+  "tag": "section",
+  "class": "text-seo",
+  "settings": [
+    {
+      "type": "text",
+      "id": "see_plus",
+      "label": "Add text to: See more",
+      "default": "VOIR PLUS"
+    },
+    {
+      "type": "text",
+      "id": "see_less",
+      "label": "Add text to: See less",
+      "default": "VOIR MOINS"
+    }
+  ]
+}
+{% endschema %}

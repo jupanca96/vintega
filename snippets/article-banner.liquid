@@ -1,0 +1,63 @@
+{% comment %}
+  Article banner
+
+  Accepts:
+  - short_code: Liquid structure
+  R: Right
+  l: Left
+  U: Up
+  D: Down
+  E: External
+  I: Internal
+
+  Usage:
+  {% render 'article-banner',
+    short_code: image.jpg|alt text|R or L|U or D|"Link redirection of image"|E or I|Here goes the text
+    css_class: '',
+    stamp: image
+  %}
+{% endcomment %}
+
+{% liquid
+  assign code = short_code
+  assign code = code | split: '|'
+  assign img_url = code[0] | strip_html
+  assign img_alt = code[1] | strip_html
+  assign desk_direction_img = code[2] | strip_html
+  assign mobile_direction_img = code[3] | strip_html
+  assign link_redirection = code[4] | strip_html
+  assign type_redirection = code[5] | strip_html
+  assign text_content = code[6]
+%}
+
+<div
+  class="article-banner {{ css_class }} img-position--{{ desk_direction_img }} img-position--{{ mobile_direction_img }}"
+>
+
+  {% if stamp != blank %}
+    {% assign image = stamp | append: '.svg' | file_url %}
+    {% render "letter-icon"
+      image: image,
+      position: 'top-left',
+      width: "200",
+      height: "271"
+    %}
+  {% endif %}
+
+  <a
+    href="{{ link_redirection }}"
+    {% if type_redirection == 'E' %} target="_blank" {% endif %}
+    class="article-banner__img-container"
+  >
+    {% render "render-image"
+      img_src: img_url,
+      alt: img_alt,
+      width: "auto",
+      height: "auto"
+    %}
+  </a>
+
+  <div class="article-banner__description">
+    {{ text_content }}
+  </div>
+</div>

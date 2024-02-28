@@ -1,0 +1,1393 @@
+{% assign backButtonText = 'customer.sell_my_bag.general.back'| t %}
+{% assign nextButtonText = 'customer.sell_my_bag.general.next'| t %}
+{% assign finishButtonText = 'customer.sell_my_bag.general.finish'| t %}
+
+{% if customer %}
+  <div id="smb-navigation"></div>
+  <div class="smb__container" id="sell-my-bag">
+    <div class="sell-form-head" v-if="this.success">
+      <h4>Merci !</h4>
+    </div>
+    <div class="smb__head" v-else>
+    </div>
+    <div class="v-sell-form-wrap">
+      <div class="wizard">
+        <div
+          v-if="successMessage"
+          class="alert alert-success"
+          v-html="successMessage"
+        ></div>
+        <div v-if="errorMessage" class="text-danger">
+          ${errorMessage}
+        </div>
+
+        <div v-if="!hide">
+          <form-wizard
+            back-button-text="{{ backButtonText }}"
+            next-button-text="{{ nextButtonText }}"
+            finish-button-text="{{ finishButtonText }}"
+            :title="'empty'"
+            :subtitle="'empty'"
+            :start-index="0"
+            @on-complete="handleSubmit"
+            color="#003bc3"
+            class="smb__form"
+          >
+            <tab-content
+              :before-change="stepOneValidate"
+              title="Votre Sac"
+              icon="ti-user"
+              class="smb__form-step"
+            >
+              <div class="v-step-head">
+                <span class="h2">Étape 1/3</span>
+                <span class="h3">Complétez le formulaire pour recevoir une offre d'achat !</span>
+              </div>
+              <span class="h3">Votre Sac</span>
+                <div class="form__textfield-label size-s form__textfield-label--spaced form__textfield-label--spaced">
+                  <label>De quel créateur est votre sac ? (*)</label>
+
+                  <select name="brand" v-model="form.brand">
+                    <option value=""> Merci de choisir un élément </option>
+                    <option value="Balenciaga "> Balenciaga </option>
+                    <option value="Bottega Veneta "> Bottega Veneta </option>
+                    <option value="Celine "> Celine </option>
+                    <option value="Chanel"> Chanel </option>
+                    <option value="Chloe "> Chloe </option>
+                    <option value="Dior "> Dior </option>
+                    <option value="Fendi"> Fendi </option>
+                    <option value="Gucci"> Gucci </option>
+                    <option value="Hermes "> Hermes </option>
+                    <option value="Loewe "> Loewe </option>
+                    <option value="Louis Vuitton "> Louis Vuitton </option>
+                    <option value="Prada "> Prada </option>
+                    <option value="Saint Laurent "> Saint Laurent </option>
+
+                  </select>
+
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(errors, 'brand', null)"
+                  >
+                    <span v-for="message in _.get(errors, 'brand', [])">
+                      ${message}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <label>Année d’achat</label>
+
+                  <div class="input-container">
+                    <input
+                      class=" "
+                      name="year_of_purchase"
+                      v-model="form.year_of_purchase"
+                      type="text"
+                      placeholder="DATE"
+                    />
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <label>Couleur (*)</label>
+
+                  <select name="color" v-model="form.color" class="form__textfield-label--spaced" id="">
+                    <option value=""> Merci de choisir un élément </option>
+                    <option value="Argent"> Argent </option>
+                    <option value="Bordeaux"> Bordeaux </option>
+                    <option value="Blanc "> Blanc </option>
+                    <option value="Bleu "> Bleu </option>
+                    <option value="Camel "> Camel </option>
+                    <option value="Gris "> Gris </option>
+                    <option value="Imprimer / Patchwork">
+                      Imprimer / Patchwork
+                    </option>
+                    <option value="Jaune "> Jaune </option>
+                    <option value="Marron"> Marron </option>
+                    <option value="Multicolores"> Multicolores </option>
+                    <option value="Noir"> Noir </option>
+                    <option value="Or"> Or </option>
+                    <option value="Orange "> Orange </option>
+                    <option value="Rouge"> Rouge </option>
+                    <option value="Rose"> Rose </option>
+                    <option value="Vert"> Vert </option>
+                    <option value="Violet "> Violet </option>
+                    <option value="Autre"> Autres </option>
+                  </select>
+
+                  <div v-if="form.color == 'Autre'" class="input-container">
+                    <input
+                      class=""
+                      min="0"
+                      name="other_color"
+                      v-model="form.other_color"
+                      type="text"
+                      placeholder="Autre"
+                    />
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(errors, 'other_color', null)"
+                    >
+                      <span
+                        v-for="message in _.get(errors, 'other_color', [])"
+                      >
+                        ${message}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(errors, 'color', null)"
+                  >
+                    <span v-for="message in _.get(errors, 'color', [])">
+                      ${message}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <label>Matière</label>
+
+                  <select name="material" v-model="form.material" class="form__textfield-label--spaced">
+                    <option value=""> Merci de choisir un élément </option>
+                    <option value="Bois "> Bois </option>
+                    <option value="Coton "> Coton </option>
+                    <option value="Cuir "> Cuir </option>
+                    <option value="Cuir Vernis "> Cuir Vernis </option>
+                    <option value="Cuir Exotique "> Cuir Exotique </option>
+                    <option value="Daim"> Daim </option>
+                    <option value="Denim"> Denim </option>
+                    <option value="Jersey"> Jersey </option>
+                    <option value="Laine "> Laine </option>
+                    <option value="Lin "> Lin </option>
+                    <option value="Metal"> Metal </option>
+                    <option value="Nylon "> Nylon </option>
+                    <option value="Polyester "> Polyester </option>
+                    <option value="Satin"> Satin </option>
+                    <option value="Sequins "> Sequins </option>
+                    <option value="Soie "> Soie </option>
+                    <option value="Synthétique "> Synthétique </option>
+                    <option value="Toile "> Toile </option>
+                    <option value="Tweed"> Tweed </option>
+                    <option value="Veau facon poulain">
+                      Veau facon poulain
+                    </option>
+                    <option value="Velours "> Velours </option>
+                    <option value="Autre"> Autres </option>
+                  </select>
+
+                  <div v-if="form.material == 'Autre'" class="input-container">
+                    <input
+                      class=""
+                      min="0"
+                      name="other_material"
+                      v-model="form.other_material"
+                      type="text"
+                      placeholder="Autre"
+                    />
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(errors, 'other_material', null)"
+                    >
+                        <span
+                          v-for="message in _.get(errors, 'other_material', [])"
+                        >
+                          ${message}
+                        </span>
+                    </div>
+                  </div>
+
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(errors, 'material', null)"
+                  >
+                    <span
+                      v-for="message in _.get(errors, 'material', [])">
+                      ${message}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <label>Dimensions (*)</label>
+
+                  <div class="form__textfield-label size-s form__textfield-label--spaced">
+                    <select name="unit" v-model="form.unit" class=" ">
+                      <option value=""> Merci de choisir un élément </option>
+                      <option value="cm"> cm </option>
+                      <option value="in"> in </option>
+                    </select>
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(errors, 'unit', null)"
+                    >
+                      <span
+                        v-for="message in _.get(errors, 'unit', [])"
+                      >
+                        ${message}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="form__textfield-label size-s form__textfield-label--spaced">
+                    <div class="input-container">
+                      <input
+                        class=""
+                        min="0"
+                        name="height"
+                        v-model="form.height"
+                        type="number"
+                        :placeholder=placeHolderHeight
+                      />
+                    </div>
+
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(errors, 'height', null)"
+                    >
+                      <span v-for="message in _.get(errors, 'height', [])">
+                        ${message}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="form__textfield-label size-s form__textfield-label--spaced">
+                    <div class="input-container">
+                      <input
+                        class=""
+                        name="width"
+                        v-model="form.width"
+                        type="number"
+                        :placeholder=placeHolderWidth
+                      />
+                    </div>
+                    <div
+                      class="input-error text-danger"
+                      v-if="_.has(errors, 'width', null)"
+                    >
+                      <span v-for="message in _.get(errors, 'width', [])">
+                        ${message}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <label>Quelle est la condition de votre sac ? (*)</label>
+
+                  <select class="" v-model="form.item_condition">
+                    <option value=""> Merci de choisir un élément </option>
+                    <option value="A l Etat Neuf ">À l'état neuf</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Tres bon">Très bon</option>
+                    <option value="Bon">Bon</option>
+                    <option value="Correct "> Correct </option>
+                  </select>
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(errors, 'item_condition', null)"
+                  >
+                    <span
+                      v-for="message in _.get(errors, 'item_condition', [])"
+                    >
+                      ${message}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="smb__form-check-container">
+                  <a
+                    href="#test-popup"
+                    class="open-popup-link"
+                  >
+                    En savoir plus sur les conditions des sacs ! (*)
+                  </a>
+                </div>
+
+                <div class="smb__form-check-container">
+                  <label class="smb__form-check-title">Vous détenez :</label>
+
+                  <p>
+                    Ces éléments seront à fournir lors de l’envoi de votre sac !
+                  </p>
+
+                  <div class="form__checkbox">
+                    <input
+                      type="checkbox"
+                      id="cadenas"
+                      value="Cadenas t clés"
+                      v-model="form.holdings"
+                    />
+
+                    <span class="slider"></span>
+
+                    <label for="cadenas">Cadenas et clés</label>
+                  </div>
+                  <div class="form__checkbox">
+                    <input
+                      type="checkbox"
+                      id="dustbag"
+                      value="dustbag"
+                      v-model="form.holdings"
+                    />
+
+                    <span class="slider"></span>
+
+                    <label for="dustbag">Dustbag</label>
+                  </div>
+                  <div class="form__checkbox">
+                    <input
+                      type="checkbox"
+                      id="Certificat"
+                      value="Certificat"
+                      v-model="form.holdings"
+                    />
+
+                    <span class="slider"></span>
+
+                    <label for="Certificat">
+                      Certificat d’authentification
+                    </label>
+                  </div>
+                  <div class="form__checkbox">
+                    <input
+                      type="checkbox"
+                      id="Carte"
+                      value="Carte"
+                      v-model="form.holdings"
+                    />
+
+                    <span class="slider"></span>
+
+                    <label for="Carte">Carte d’authenticité</label>
+                  </div>
+                  <div class="form__checkbox">
+                    <input
+                      type="checkbox"
+                      id="Boite"
+                      value="Boite"
+                      v-model="form.holdings"
+                    />
+
+                    <span class="slider"></span>
+
+                    <label for="Boite">Boite</label>
+                  </div>
+
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(errors, 'holdings', null)"
+                  >
+                    <span v-for="message in _.get(errors, 'holdings', [])">
+                      ${message}
+                    </span>
+                  </div>
+
+                  </div>
+                <div class="form__textfield-label size-s form__textfield-label--spaced">
+                  <label>Description des défauts et commentaires :</label>
+
+                  <textarea class="" v-model="form.remarks"></textarea>
+
+                  <div
+                    class="input-error text-danger"
+                    v-if="_.has(errors, 'remarks', null)"
+                  >
+                    <span v-for="message in _.get(errors, 'remarks', [])">
+                      ${message}
+                    </span>
+                  </div>
+
+              </div>
+            </tab-content>
+            <tab-content
+              :before-change="stepTwoValidate"
+              title="Prise De Photos"
+              icon="ti-settings"
+              class="smb__form-step"
+            >
+              <div class="v-step-head">
+                <span class="h2">Étape 2/3</span>
+                <span class="h3">Complétez le formulaire pour recevoir une offre d'achat !</span>
+              </div>
+
+              <span class="h3">Prise De Photos</span>
+
+              <div
+                class="text-danger"
+                v-if="_.has(errors, 'attachments', null)"
+              >
+                <span v-for="message in _.get(errors, 'attachments', [])">
+                  ${message}
+                </span>
+              </div>
+
+              <div class="smb__form-photos">
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': attachments.first}"
+                    :style="handleFirstStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br/> <span>(Vue de face)</span>
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="firstAttach"
+                      v-on:change="handleFirstAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('first')"
+                      v-if="attachments.first"
+                      class="remove-btn">
+                      X
+                    </a>
+                  </div>
+                </div>
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': attachments.second}"
+                    :style="handleSecondStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br/> <span>(Vue de dos)</span>
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="secondAttach"
+                      v-on:change="handleSecondAttachment"
+                    />
+
+                    <a
+                      @click="removeAttachment('second')"
+                      v-if="attachments.second"
+                      class="remove-btn"
+                    >
+                     X
+                    </a>
+                  </div>
+                </div>
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': attachments.third}"
+                    :style="handleThirdStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br/> <span>(Vue de dessous)</span>
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="thirdAttach"
+                      v-on:change="handleThirdAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('third')"
+                      v-if="attachments.third"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': attachments.fourth}"
+                    :style="handleFourthStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br/> <span>(Vue de l’intérieur)</span>
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="fourthAttach"
+                      v-on:change="handleFourthAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('fourth')"
+                      v-if="attachments.fourth"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': attachments.fifth}"
+                    :style="handleFifthStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br/> <span>(Numéro de série)</span>
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="fifthAttach"
+                      v-on:change="handleFifthAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('fifth')"
+                      v-if="attachments.fifth"
+                      class="remove-btn"
+                    >
+                      X
+                    </a>
+                  </div>
+                </div>
+                <div class="smb__form-photos-input">
+                  <div
+                    class="upload-btn-wrapper"
+                    :class="{'uploaded': attachments.sixth}"
+                    :style="handleSixthStyle"
+                  >
+                    <button type="button" class="btn">
+                      Prendre une photo <br/> <span>(Label de la marque)</span>
+                    </button>
+                    <input
+                      type="file"
+                      name="myfile"
+                      ref="sixthAttach"
+                      v-on:change="handleSixthAttachment"
+                    />
+                    <a
+                      @click="removeAttachment('sixth')"
+                      v-if="attachments.sixth"
+                      class="remove-btn">
+                      X
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </tab-content>
+            <tab-content
+              title="Coordonnées"
+              icon="ti-check"
+              class="smb__form-step last-step"
+            >
+              <div class="v-step-head">
+                <span class="h2">Étape 3/3</span>
+                <span class="h3">Complétez le formulaire pour recevoir une offre d'achat !</span>
+              </div>
+
+              <span class="h3">Vos Coordonnées </span>
+
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Prénom (*)</label>
+
+                <input
+                  class=""
+                  name="first_name"
+                  v-model="form.first_name"
+                  type="text"
+                  placeholder="{{customer.first_name}}"
+                />
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(errors, 'first_name', null)"
+                >
+                  <span v-for="message in _.get(errors, 'first_name', [])">
+                    ${message}
+                  </span>
+                </div>
+              </div>
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Nom de famille (*)</label>
+
+                <input
+                  class=""
+                  name="last_name"
+                  v-model="form.last_name"
+                  type="text" placeholder="{{customer.last_name}}"
+                />
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(errors, 'last_name', null)"
+                >
+                  <span v-for="message in _.get(errors, 'last_name', [])">
+                    ${message}
+                  </span>
+                </div>
+              </div>
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Votre adresse mail (*)</label>
+
+                <input
+                  class=""
+                  name="email"
+                  v-model="form.email"
+                  type="text"
+                  placeholder="{{customer.email}}"
+                />
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(errors, 'email', null)"
+                >
+                  <span v-for="message in _.get(errors, 'email', [])">
+                    ${message}
+                  </span>
+                </div>
+              </div>
+              <div class="form__textfield-label size-s form__textfield-label--spaced">
+                <label>Votre numéro de téléphone (*)</label>
+                {% render 'input-country' 
+                  input_id: "phone",
+                  input_ref: "#phone",
+                  is_required: true,
+                  input_name: "phone",
+                  placeholder_ref: "NUMERO DE TELEPHONE",
+                  params: 'v-model="form.phone"',
+                  button_action: ".finish-button"
+
+                %}
+
+                <div
+                  class="input-error text-danger"
+                  v-if="_.has(errors, 'phone', null)"
+                >
+                  <span v-for="message in _.get(errors, 'phone', [])">
+                    ${message}
+                  </span>
+                </div>
+              </div>
+              <div class="form__checkbox">
+                <input
+                  type="checkbox"
+                  id="newsletter"
+                  value="y"
+                  v-model="form.newsletter"
+                />
+
+                <span class="slider"></span>
+
+                <label for="newsletter">
+                  Je consens à l'utilisation de mon email pour pouvoir recevoir
+                  des nouvelles et des offres de la part de Vintega
+                </label>
+              </div>
+            </tab-content>
+            <template slot="footer" slot-scope="props">
+              <div v-if="!loading">
+                <div
+                  class="smb__buttons two"
+                  v-if="props.activeTabIndex > 0 "
+                >
+                  <div class="wizard-footer-left">
+                    <wizard-button
+                      v-if="props.activeTabIndex > 0 "
+                      @click.native="changeSmooth"
+                    >
+                      {{ backButtonText }}
+                    </wizard-button>
+                  </div>
+                  <div class="wizard-footer-right">
+                    <template>
+                    </template>
+                    <wizard-button
+                      v-if="!props.isLastStep"
+                      @click.native="props.nextTab()"
+                      class="wizard-footer-right"
+                      :style="props.fillButtonStyle"
+                    >{{ nextButtonText }}
+                    </wizard-button>
+                    <wizard-button
+                      v-else @click.native="handleSubmit"
+                      class="wizard-footer-right finish-button"
+                      :style="props.fillButtonStyle"
+                    >
+                      ${props.isLastStep
+                          ? '{{ finishButtonText }}'
+                          : '{{ nextButtonText }}'
+                        }
+                    </wizard-button>
+                  </div>
+                </div>
+                <div class="smb__buttons" v-else>
+                  <div class="wizard-footer-left">
+                    <wizard-button
+                      v-if="props.activeTabIndex > 0 "
+                      @click.native="changeSmooth"
+                    >
+                      {{ backButtonText }}
+                    </wizard-button>
+                  </div>
+                  <div class="wizard-footer-right">
+                    <template>
+                    </template>
+                    <wizard-button
+                      v-if="!props.isLastStep"
+                      @click.native="props.nextTab()"
+                      class="wizard-footer-right"
+                      :style="props.fillButtonStyle"
+                    >{{ nextButtonText }}
+                    </wizard-button>
+                    <wizard-button
+                      v-else @click.native="handleSubmit"
+                      class="wizard-footer-right finish-button"
+                      :style="props.fillButtonStyle"
+                    >
+                      ${props.isLastStep
+                          ? '{{ finishButtonText }}'
+                          : '{{ nextButtonText }}'
+                        }
+                    </wizard-button>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                {% render "render-image"
+                  title: "Loader",
+                  img_src: "https://cdn.shopify.com/s/files/1/0313/9980/5061/files/waiting-icon-gif-7_jpg.gif?v=1646736843",
+                  size: "220 300 400 500",
+                  alt: "Loader",
+                  width: "20",
+                  height: "20"
+                %}
+              </div>
+            </template>
+          </form-wizard>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="test-popup" data-active="false">
+    <div class="smb-popup">
+      {% if shop.locale == 'fr'%}
+        {% render 'render-image',
+          class: "smb-popup__img-desktop",
+          title: section.settings.desktop_fr_image.alt,
+          img: section.settings.desktop_fr_image,
+          size: "220 300 400 500",
+          alt: section.settings.desktop_fr_image.alt,
+          width: "auto",
+          height: "auto"
+        %}
+
+        {% render 'render-image',
+          class: "smb-popup__img-mobile",
+          title: section.settings.mobile_fr_image.alt,
+          img: section.settings.mobile_fr_image,
+          size: "220 300 400 500",
+          alt: section.settings.mobile_fr_image.alt,
+          width: "auto",
+          height: "auto"
+        %}
+      {% else %}
+        {% render 'render-image',
+          class: "smb-popup__img-desktop",
+          title: section.settings.desktop_en_image.alt,
+          img: section.settings.desktop_en_image,
+          size: "220 300 400 500",
+          alt: section.settings.desktop_en_image.alt,
+          width: "auto",
+          height: "auto"
+        %}
+
+        {% render 'render-image',
+          class: "smb-popup__img-mobile",
+          title: section.settings.mobile_en_image.alt,
+          img: section.settings.mobile_en_image,
+          size: "220 300 400 500",
+          alt: section.settings.mobile_en_image.alt,
+          width: "auto",
+          height: "auto"
+        %}
+      {% endif %}
+    </div>
+    <button type="button" class="close-popup-link">x</button>
+  </div>
+
+  {% capture condition_capture %}
+    {% if section.blocks.size > 0 %}
+      <div class="description-modal__grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'conditions' %}
+            <div class="description-modal__grid-item">
+              <span>
+                {{ block.settings.condition_title }}
+              </span>
+
+              <div>
+                {{ block.settings.condition_text }}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+      </div>
+    {% endif %}
+  {% endcapture %}
+
+  {% render 'modal-description-product'
+    modal_id: 'js-smb-popup',
+    modal_id_close: 'close-popup-link',
+    moda_title: section.settings.modal_title,
+    modal_icon: section.settings.modal_icon,
+    modal_description: section.settings.modal_description,
+    grid: condition_capture
+  %}
+
+  {% comment %} Not defer {% endcomment %}
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.min.css"/>
+  <script src="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.22.0/axios.min.js" integrity="sha512-m2ssMAtdCEYGWXQ8hXVG4Q39uKYtbfaJL5QMTbhl2kc6vYyubrKHhr6aLLXW4ITeXSywQLn1AhsAaqrJl8Acfg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    var origin   = window.location.host;
+    var _locale = "fr";
+    origin = origin.split(".");
+    if(origin) {
+      origin = origin.shift();
+      if(origin) {
+        origin = origin.toLowerCase();
+        var locales = ["de", "es", "fr", "pt", "it", "en"];
+        if(locales.includes(origin)) {
+          _locale = origin;
+        }
+      }
+    }
+
+    const app = new Vue({
+      el: "#sell-my-bag",
+      delimiters: ['${', '}'],
+      data() {
+        return {
+          step: 1,
+          success: false,
+          hide: false,
+          form: {
+            "_locale":_locale,
+            "brand": null,
+            "year_of_purchase": null,
+            "color": null,
+            "other_color": null,
+            "material": null,
+            "other_material": null,
+            "unit": "cm",
+            "height": null,
+            "width": null,
+            "item_condition": null,
+            "holdings": [],
+            "remarks": null,
+            "first_name": "{{customer.first_name}}",
+            "last_name": "{{customer.last_name}}",
+            "email": "{{customer.email}}",
+            "phone": null,
+            "newsletter": "y"
+          },
+          attachments: {
+            first: null,
+            second: null,
+            third: null,
+            fourth: null,
+            fifth: null,
+            sixth: null
+          },
+          successMessage: null,
+          errorMessage: null,
+          errors: {},
+          loading: false
+        };
+      },
+      created() {
+
+        let data = window.localStorage.getItem("sell-my-bag");
+        if(data) {
+          data = JSON.parse(data);
+          if(_.isObject(data)) {
+            this.form = {...this.form, ...data};
+          }
+        }
+      },
+      watch: {
+        'form': {
+          deep: true,
+          handler: function(val, oldVal) {
+
+            window.localStorage.setItem("sell-my-bag", JSON.stringify(val));
+          }
+        }
+      },
+      computed: {
+        placeHolderHeight() {
+          return `00 ${this.form.unit} (hauteur)`;
+
+        },
+        placeHolderWidth() {
+          return `00 ${this.form.unit} (largeur)`;
+
+        },
+        handleFirstStyle(){
+
+          if(this.attachments.first){
+            return {
+              'background-image': `url(${URL.createObjectURL(
+                this.attachments.first
+              )})`
+            };
+          };
+          return {};
+        },
+        handleSecondStyle(){
+          if(this.attachments.second){
+            return {
+              'background-image': `url(${URL.createObjectURL(
+                this.attachments.second
+              )})`
+            };
+          };
+          return {};
+        },
+        handleThirdStyle(){
+          if(this.attachments.third){
+            return {
+              'background-image': `url(${URL.createObjectURL(
+                this.attachments.third
+              )})`
+            };
+          };
+          return {};
+        },
+        handleFourthStyle(){
+          if(this.attachments.fourth){
+            return {
+              'background-image': `url(${URL.createObjectURL(
+                this.attachments.fourth
+              )})`
+            };
+          };
+          return {};
+        },
+        handleFifthStyle(){
+          if(this.attachments.fifth){
+            return {
+              'background-image': `url(${URL.createObjectURL(
+                this.attachments.fifth
+              )})`
+            };
+          };
+          return {};
+        },
+        handleSixthStyle(){
+          if(this.attachments.sixth){
+            return {
+              'background-image': `url(${URL.createObjectURL(
+                this.attachments.sixth
+              )})`
+            };
+          };
+          return {};
+        }
+      },
+      methods: {
+        changeSmooth() {
+          this.$children[0].prevTab()
+          this.navigation();
+        },
+        navigation() {
+          const navigationTarget = document.querySelector('#smb-navigation')
+
+          if (navigationTarget)
+          navigationTarget.scrollIntoView({ block: 'start', behavior: "smooth"});
+        },
+        stepOneValidate() {
+          const formValues = {};
+          let result = true;
+          let errors = {};
+          const $el = this.$el
+          _.forEach(this.form, function(value, key) {
+            formValues[key] = value;
+            if(_.includes(
+              ["brand","color","height","width","item_condition"],
+              key
+            )) {
+              if(!value) {
+                errors[key] = ["Merci de remplir ce champ."];
+                if(result) {
+                  $el.scrollIntoView({ block: 'start', behavior: "smooth"});
+                  result = false;
+                }
+              }
+            }
+          });
+          this.errors = errors;
+          this.navigation();
+
+          if(result){
+            //> add_bag_info
+            console.log('add_bag_info')
+            dataLayer.push({
+              event: 'add_bag_info',
+              item_brand: formValues.brand.trim(),
+              item_category: "Timeless",
+              item_category2: formValues.color.trim(),
+              item_category4: formValues.material.trim(),
+              item_category7: Number(formValues.year_of_purchase),
+              item_variant: formValues.item_condition.trim(),
+              item_size: [`Width: ${formValues.width}${formValues.unit}`,`Height: ${formValues.height}${formValues.unit}`],
+              item_certification: formValues.holdings,
+            })
+          }
+          
+          return result;
+        },
+        stepTwoValidate() {
+          let result = true;
+          let errors = {};
+          if(!this.attachments.first || !this.attachments.second) {
+            errors["attachments"] =
+              ["Merci de télécharger au minimum une photo de face et une photo de dos."];
+            if(result) {
+              this.navigation();
+              result = false;
+            }
+          }
+          this.errors = errors;
+          this.navigation();
+          if(result){
+            //> add_bag_photo
+            console.log('add_bag_photo')
+            dataLayer.push({
+              event: 'add_bag_photo',
+              photo_front: this.attachments.first ? 'yes' : 'no',
+              photo_back: this.attachments.second ? 'yes' : 'no',
+              photo_bottom: this.attachments.third ? 'yes' : 'no',
+              photo_interior: this.attachments.fourth ? 'yes' : 'no',
+              photo_serial_number: this.attachments.fifth ? 'yes' : 'no',
+              photo_brand_label: this.attachments.sixth ? 'yes' : 'no',
+            })
+          }
+
+          return result;
+        },
+        validate() {
+          const hash = async (string) => {
+            const utf8 = new TextEncoder().encode(string);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray
+              .map((bytes) => bytes.toString(16).padStart(2, '0'))
+              .join('');
+            return hashHex;
+          }
+          const formValues = {};
+          let result = true;
+          let errors = {};
+
+          _.forEach(this.form, function(value, key) {
+            formValues[key] = value;
+            if(_.includes(
+              [
+                "brand",
+                "color",
+                "height",
+                "width",
+                "item_condition",
+                "first_name",
+                "last_name",
+                "email",
+                "phone"
+              ],
+              key)) {
+              if(!value) {
+                errors[key] = ["Merci de remplir ce champ."];
+                if(result) {result = false;}
+              }
+            }
+          });
+
+          if(!this.attachments.first || !this.attachments.second) {
+            errors["attachments"] =
+              ["Merci de télécharger au minimum une photo de face et une photo de dos"];
+            if(result) {result = false;}
+          }
+
+          this.errors = errors;
+
+          if(result){
+            //> add_bag_owner_info
+            const gtmEvent = async () => {
+              console.log('add_bag_owner_info')
+              dataLayer.push({
+                event: 'add_bag_owner_info',
+                first_name: await hash(formValues.first_name),
+                last_name: await hash(formValues.last_name),
+                email: await hash(formValues.email),
+                phone_number: await hash(formValues.phone),
+              })
+            }
+            
+            gtmEvent()
+          }
+          return result;
+        },
+        goto(val) {
+          this.step = value;
+        },
+        handleFirstAttachment(){
+            // const regex = new RegExp(/(image\/(jpe?g|png|gif|bmp))$/gm);
+            // const fileType = this.$refs.firstAttach.files[0]["type"];
+            // let errors = {};
+            // if(!regex.test(fileType)) {
+            //   errors["attachments"] =
+            //     ["Sélectionnez une image valide (format .png ou .jpeg)"];
+            //   this.errors = Object.assign(errors, this.errors);
+            //   this.$refs.firstAttach.value=null;
+            //   return false;
+            // }
+            // errors["attachments"] = [];
+            // this.errors = Object.assign({}, this.errors, errors);
+          this.attachments.first = this.$refs.firstAttach.files[0];
+          this.$refs.firstAttach.value=null;
+        },
+        handleSecondAttachment(){
+          //  const regex = new RegExp(/(image\/(jpe?g|png|gif|bmp))$/gm);
+          //  const fileType = this.$refs.secondAttach.files[0]["type"];
+          //  let errors = {};
+          //  if(!regex.test(fileType)) {
+          //    errors["attachments"] =
+          //      ["Sélectionnez une image valide (format .png ou .jpeg)"];
+          //    this.errors = Object.assign(errors, this.errors);
+          //    this.$refs.firstAttach.value=null;
+          //    return false;
+          //  }
+          //  errors["attachments"] = [];
+          //  this.errors = Object.assign({}, this.errors, errors);
+          this.attachments.second = this.$refs.secondAttach.files[0];
+          this.$refs.secondAttach.value=null;
+        },
+        handleThirdAttachment(){
+          // const regex = new RegExp(/(image\/(jpe?g|png|gif|bmp))$/gm);
+          // const fileType = this.$refs.thirdAttach.files[0]["type"];
+          // let errors = {};
+          // if(!regex.test(fileType)) {
+          //   errors["attachments"] =
+          //      ["Sélectionnez une image valide (format .png ou .jpeg)"];
+          //   this.errors = Object.assign(errors, this.errors);
+          //   this.$refs.firstAttach.value=null;
+          //   return false;
+          // }
+          // errors["attachments"] = [];
+          // this.errors = Object.assign({}, this.errors, errors);
+          this.attachments.third = this.$refs.thirdAttach.files[0];
+          this.$refs.thirdAttach.value=null;
+        },
+        handleFourthAttachment(){
+          // const regex = new RegExp(/(image\/(jpe?g|png|gif|bmp))$/gm);
+          // const fileType = this.$refs.fourthAttach.files[0]["type"];
+          // let errors = {};
+          // if(!regex.test(fileType)) {
+          //   errors["attachments"] =
+          //      ["Sélectionnez une image valide (format .png ou .jpeg)"];
+          //   this.errors = Object.assign(errors, this.errors);
+          //   this.$refs.firstAttach.value=null;
+          //   return false;
+          // }
+          // errors["attachments"] = [];
+          // this.errors = Object.assign({}, this.errors, errors);
+          this.attachments.fourth = this.$refs.fourthAttach.files[0];
+          this.$refs.fourthAttach.value=null;
+        },
+        handleFifthAttachment(){
+          // const regex = new RegExp(/(image\/(jpe?g|png|gif|bmp))$/gm);
+          // const fileType = this.$refs.fifthAttach.files[0]["type"];
+          // let errors = {};
+          // if(!regex.test(fileType)) {
+          //   errors["attachments"] =
+          //      ["Sélectionnez une image valide (format .png ou .jpeg)"];
+          //   this.errors = Object.assign(errors, this.errors);
+          //   this.$refs.firstAttach.value=null;
+          //   return false;
+          // }
+          // errors["attachments"] = [];
+          // this.errors = Object.assign({}, this.errors, errors);
+          this.attachments.fifth = this.$refs.fifthAttach.files[0];
+          this.$refs.fifthAttach.value=null;
+        },
+        handleSixthAttachment(){
+            //  const regex = new RegExp(/(image\/(jpe?g|png|gif|bmp))$/gm);
+            //  const fileType = this.$refs.sixthAttach.files[0]["type"];
+            //  let errors = {};
+            //  if(!regex.test(fileType)) {
+            //    errors["attachments"] =
+            //      ["Sélectionnez une image valide (format .png ou .jpeg)"];
+            //    this.errors = Object.assign(errors, this.errors);
+            //    this.$refs.firstAttach.value=null;
+            //    return false;
+            //  }
+            //  errors["attachments"] = [];
+            //  this.errors = Object.assign({}, this.errors, errors);
+            this.attachments.sixth = this.$refs.sixthAttach.files[0];
+            this.$refs.sixthAttach.value=null;
+        },
+        removeAttachment(key){
+          this.attachments[key] = null;
+        },
+        handleSubmit() {
+          if(!this.validate()){
+            this.navigation();
+            return false;
+          }
+          this.loading = true;
+
+          let params = new FormData();
+          for ( var key in this.form ) {
+            if(key === "holdings"){
+              this.form[key].forEach(function(value, index) {
+                var key = 'holdings[' + index + ']';
+                params.append(key, value);
+              });
+            }else{
+              if(this.form[key] !== null)
+              {
+                params.append(key, this.form[key]);
+              }
+            }
+          }
+          let i = 0;
+          for (var key in this.attachments) {
+            let value = this.attachments[key];
+            if(value) {
+              params.append('attachments[' + i + ']', value);
+              i++;
+            }
+          };
+          this.step = 1;
+          this.errors = {};
+          this.successMessage = null;
+          this.errorMessage = null;
+          axios.post("https://smb.vintega.eu/api/leads", params, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then(response => {
+            this.success = true;
+            this.successMessage = _.get(
+              response,
+              "data.message",
+              "Request submitted successfully"
+            );
+            this.$el.scrollIntoView({ block: 'end', behavior: "smooth"})
+            this.navigation();
+            this.errorMessage = null;
+            this.form = {
+              "brand": null,
+              "year_of_purchase": null,
+              "color": null,
+              "other_color": null,
+              "material": null,
+              "other_material": null,
+              "unit": "cm",
+              "height": null,
+              "width": null,
+              "item_condition": null,
+              "holdings": [],
+              "remarks": null,
+              "first_name": "{{customer.first_name}}",
+              "last_name": "{{customer.last_name}}",
+              "email": "{{customer.email}}",
+              "phone": null,
+              "newsletter": true,
+              "attachments": [],
+            };
+            this.hide = true;
+            this.loading = false;
+            window.localStorage.removeItem("sell-my-bag");
+          })
+          .catch(error => {
+            this.loading = false;
+            this.errors =  _.get(error.response.data, 'errors', {});
+            this.successMessage = null;
+            this.errorMessage = "Veuillez réduire la taille de vos images.";
+          });
+        }
+      }
+    });
+  </script>
+{% else %}
+
+  <span class="smb__login-title wrapper-m">
+    {{ section.settings.title_login_form }}
+  </span>
+
+  {% assign url = '/pages/' | append: page.template_suffix %}
+  {% render 'login-snippet' redirect: true, redirect_url: url %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sell my back form",
+  "class": "smb wrapper-m section-space",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Title login form"
+    },
+    {
+      "type": "text",
+      "id": "title_login_form",
+      "label": "Title login form",
+      "default": "POUR ACCÉDER AU FORMULAIRE SELL MY BAG, MERCI DE VOUS CONNECTER OU CRÉER VOTRE COMPTE CI-DESSOUS !"
+    },
+    {
+      "type": "header",
+      "content": "Condition modal settings"
+    },
+    {
+      "type": "text",
+      "id": "modal_title",
+      "label": "Modal title",
+      "default": "Conditions"
+    },
+    {
+      "type": "richtext",
+      "id": "modal_description",
+      "label": "Modal description",
+      "default": "<p>Pour mieux vous projeter, veuillex trouver le porté de 4 sacs selon sa taille de bandouliere. On estime qu´un sac se porte en croisé bandouliere quand sa bandouliere mesure plus de 90cm.</p>"
+    },
+    {
+      "type": "text",
+      "id": "modal_icon",
+      "label": "Modal icon",
+      "default": "medal|Icon",
+      "info": "name-file|alt"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Conditions",
+      "type": "conditions",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "condition_title",
+          "label": "Condition title"
+        },
+        {
+          "type": "richtext",
+          "id": "condition_text",
+          "label": "Text"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

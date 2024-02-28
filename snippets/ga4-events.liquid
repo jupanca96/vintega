@@ -1,0 +1,587 @@
+{% assign page_category = template.name %}
+{% if page_category == 'index' %}
+  {% assign page_category = 'homepage' %}
+{% endif %}
+{% if product %}
+  {% assign page_category = page_category | append: ' - ' | append: product.type %}
+{% endif %}
+{% assign user_type = "Guest" %}
+{% assign user_logged = false %}
+{% if customer %}
+  {% assign user_id = customer.id %}
+  {% assign user_email = customer.email %}
+  {% assign user_type = "Registered" %}
+  {% assign user_newsletter = customer.accepts_marketing %}
+  {% assign user_logged = true %}
+  {% assign user_last_order = customer.last_order %}
+  {% assign number_transaction = customer.orders.size %}
+  {% assign average_orders = 0 %}
+  {% if customer.orders.size > 0 %}
+    {% for order in customer.orders %}
+      {% assign average_orders = average_orders | plus: order.total_price %}
+    {% endfor %}
+    {% assign average_orders = average_orders | divided_by: customer.orders.size %}
+  {% endif %}
+{% endif %}
+
+
+<script>
+  window.pageCategory = "{{ page_category }}"
+  async function hash(string) {
+    if(string){
+      const utf8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray
+        .map((bytes) => bytes.toString(16).padStart(2, '0'))
+        .join('');
+      return hashHex;
+    }
+    return "";
+  }
+  window.addEventListener("load", async (event) => {
+    function formatData({ data, index = 0, optional = [] }) {
+      const productionYear = Number(data.item_year)
+      const coupons = JSON.parse(sessionStorage.getItem('vintega_discount_applied'))
+      const optionalData = {
+        item_category3: data.item_interiorcolor,
+        item_category5: data.item_interiormaterial,
+        item_category6: data.item_hardware,
+        quantity: Number(data.quantity),
+        coupon: coupons ? [coupons?.code] : "N/A"
+      };
+      const productData = {
+        item_id: data.item_id,
+        item_serialcode: data.item_serialcode,
+        item_name: data.item_name,
+        index: index,
+        currency: window.Shopify.currency.active,
+        item_brand: data.item_brand,
+        item_category: data.item_category,
+        item_category2: data.item_exteriorcolor,
+        item_category4: data.item_exteriormaterial,
+        item_category7: productionYear > 0 ? productionYear : 'N/A',
+        item_variant: data.item_variant,
+        item_size: [data.depth, data.width, data.height],
+        price: parseFloat(data.price),
+        discount_type:
+          data.discount_type !== '' ? data.discount_type.split(',') : 'N/A',
+      };
+  
+      optional.forEach((key) => {
+        productData[key] = optionalData[key];
+      });
+
+      return productData;
+    }
+  
+    // Toutes les pages
+    console.log('page_view');
+    dataLayer.push({
+      event: 'page_view',
+      brand: 'Vintega',
+      pageName: '{{ page_title }}',
+      pageCategory: '{{ page_category }}',
+      page_path: window.location.pathname,
+      siteVersion: '1.0',
+      siteCountry: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      user_id: '{{ user_id }}', // not appear
+      user_type: '{{ user_type }}',
+      user_email: await hash('{{ user_email }}'),
+      user_newsletter: {% if customer %}{{ user_newsletter }}{% else %}""{% endif %},
+      user_logged: {{ user_logged }},
+      user_lastpurchase: `{{ user_last_order.created_at | date:"%Y-%m-%d" }}`,
+      average_valuepurchased: {% if average_orders %}{{ average_orders |  divided_by: 100.0 }}{% else %}""{% endif %},
+      number_transaction: {% if number_transaction %}{{ number_transaction }}{% else %}""{% endif %},
+    });
+  
+    // Impressions_produits
+    {% if collection %}
+      const collectionItems = []
+      let discountTag = []
+      let productionYear = ""
+  
+      {% for item in collection.products %}
+        discountTag = []
+        productionYear = "N/A"
+        {% assign year_of_production = item.metafields.custom.year_of_production | times: 1 %}
+        {% if year_of_production > 0 %}
+          productionYear = {{ year_of_production }}
+        {% endif %}
+        {% for tag in item.tags %}
+          {% if tag contains 'statustag' %}
+            {% assign status_tag = tag | split: '-' %}
+            {% assign status_tag = status_tag | last | split: '|' %}
+            {% assign status_tag_text = status_tag | first %}
+  
+            {% if status_tag_text != blank %}
+              discountTag.push("{{ status_tag_text }}")
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+  
+        collectionItems.push({
+          item_id: "{{ item.metafields.custom.reference }}",
+          item_serialcode: "{{ item.metafields.custom.serial_code }}",
+          item_name: "{{ item.name }}",
+          index: {{ forloop.index0 }},
+          currency: window.Shopify.currency.active,
+          item_brand: '{{ item.vendor }}',
+          item_category: '{{ item.type }}',
+          item_category2: '{{ item.metafields.custom.extern_colors_filtres_.value  | join: ',' }}',
+          item_category3: '{{ item.metafields.custom.inner_color }}',
+          item_category4: '{{ item.metafields.custom.extern_material.value  | join: ',' }}',
+          item_category5: '{{ item.metafields.custom.interior_materials }}',
+          item_category6: '{{ item.metafields.custom.hardware }}',
+          item_category7: productionYear,
+          item_variant: "{{ item.metafields.custom.product_condition }}",
+          item_size: [
+            "Depth: {{ item.metafields.custom.size_depth }}",
+            "Width: {{ item.metafields.custom.size_width }}",
+            "Height: {{ item.metafields.custom.size_height }}",
+          ],
+          price: {{ item.price |  divided_by: 100.0 }},
+          discount_type: discountTag.length > 0 ? discountTag : 'N/A',
+        })
+      {% endfor %}
+
+      console.log('view_item_list')
+      dataLayer.push({
+        event: 'view_item_list',
+        ecommerce:{
+          item_list_name: '{{ collection.title }}',
+          item_list_id: '{{ collection.id }}',
+          items: collectionItems,
+        }
+      })
+  
+      // Clic_produit
+      document.querySelectorAll(".product-js").forEach(item => {
+        const hyperlink = item.querySelector(".product-card--head")
+        const metaDataElement = item.querySelector(".meta-data")
+        hyperlink.addEventListener("click", async (e) => {
+          e.preventDefault()
+          const itemData = formatData({
+            data: metaDataElement.dataset,
+            optional: ['item_category3', 'item_category5', 'item_category6'],
+          });
+          console.log('select_item')
+          dataLayer.push({
+            event: 'select_item',
+            ecommerce:{
+              item_list_name: '{{ collection.title }}',
+              item_list_id: '{{ collection.id }}',
+              items: [itemData],
+            }
+          })
+          window.location.href = e.currentTarget.href;
+        })
+      })
+    {% endif %}
+  
+    // Vue_produit
+    {% if product %}
+      discountTag = []
+      productionYear = "N/A"
+      {% assign year_of_production = item.metafields.custom.year_of_production | times: 1 %}
+      {% if year_of_production > 0 %}
+        productionYear = {{ year_of_production }}
+      {% endif %}
+      {% for tag in product.tags %}
+        {% if tag contains 'statustag' %}
+          {% assign status_tag = tag | split: '-' %}
+          {% assign status_tag = status_tag | last | split: '|' %}
+          {% assign status_tag_text = status_tag | first %}
+  
+          {% if status_tag_text != blank %}
+            discountTag.push("{{ status_tag_text }}")
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      console.log('view_item')
+      dataLayer.push({
+        event: 'view_item',
+        ecommerce:{
+          currency: window.Shopify.currency.active,
+          value: {{ product.price |  divided_by: 100.0 }},
+          items: [
+            {
+              item_id: "{{ product.metafields.custom.reference }}",
+              item_serialcode: "{{ product.metafields.custom.serial_code }}",
+              item_name: '{{ product.title }}',
+              index: 0,
+              currency: window.Shopify.currency.active,
+              item_brand: '{{ product.vendor }}',
+              item_category: '{{ product.type }}',
+              item_category2: '{{ product.metafields.custom.extern_colors_filtres_.value  | join: ',' }}',
+              item_category3: '{{ product.metafields.custom.inner_color }}',
+              item_category4: '{{ product.metafields.custom.extern_material.value | join: ',' }}',
+              item_category5: '{{ product.metafields.custom.interior_materials }}',
+              item_category6: '{{ product.metafields.custom.hardware }}',
+              item_category7: productionYear,
+              item_variant: "{{ product.metafields.custom.product_condition }}",
+              item_size: [
+                "Depth: {{ product.metafields.custom.size_depth }}",
+                "Width: {{ product.metafields.custom.size_width }}",
+                "Height: {{ product.metafields.custom.size_height }}",
+              ],
+              price: {{ product.price |  divided_by: 100.0 }},
+              discount_type: discountTag.length > 0 ? discountTag : 'N/A',
+            },
+          ],
+        }
+      })
+  
+      //> Ajout_panier
+      document.querySelectorAll(".add-cart-js").forEach((item) => {
+        item.addEventListener("submit", () => {
+          let productionYear = "N/A"
+          {% assign year_of_production = item.metafields.custom.year_of_production | times: 1 %}
+          {% if year_of_production > 0 %}
+            productionYear = {{ year_of_production }}
+          {% endif %}
+          console.log('add_to_cart')
+          dataLayer.push({
+            event: 'add_to_cart',
+            ecommerce:{
+              currency: window.Shopify.currency.active,
+              value: {{ product.price |  divided_by: 100.0 }},
+              items: [
+                {
+                  item_id: "{{ product.metafields.custom.reference }}",
+                  item_serialcode: "{{ product.metafields.custom.serial_code }}",
+                  item_name: '{{ product.title }}',
+                  index: 0,
+                  currency: window.Shopify.currency.active,
+                  item_brand: '{{ product.vendor }}',
+                  item_category: '{{ product.type }}',
+                  item_category2: '{{ product.metafields.custom.extern_colors_filtres_.value  | join: ',' }}',
+                  item_category3: '{{ product.metafields.custom.inner_color }}',
+                  item_category4: '{{ product.metafields.custom.extern_material.value | join: ',' }}',
+                  item_category5: '{{ product.metafields.custom.interior_materials }}',
+                  item_category6: '{{ product.metafields.custom.hardware }}',
+                  item_category7: productionYear,
+                  item_variant: "{{ product.metafields.custom.product_condition }}",
+                  item_size: [
+                    "Depth: {{ product.metafields.custom.size_depth }}",
+                    "Width: {{ product.metafields.custom.size_width }}",
+                    "Height: {{ product.metafields.custom.size_height }}",
+                  ],
+                  quantity: 1,
+                  price: {{ product.price |  divided_by: 100.0 }},
+                  discount_type: discountTag.length > 0 ? discountTag : 'N/A',
+                },
+              ],
+            }
+          })
+        })
+      })
+      
+      // click_more_info
+      document.querySelector("#share-js").addEventListener("click", () => {
+        let productionYear = "N/A"
+        {% assign year_of_production = item.metafields.custom.year_of_production | times: 1 %}
+        {% if year_of_production > 0 %}
+          productionYear = {{ year_of_production }}
+        {% endif %}
+        console.log('click_more_info');
+        dataLayer.push({
+          event: 'click_more_info',
+          info_type: "url",
+          items: [
+            {
+              item_id: "{{ product.metafields.custom.reference }}",
+              item_serialcode: "{{ product.metafields.custom.serial_code }}",
+              item_name: '{{ product.title }}',
+              index: 0,
+              currency: window.Shopify.currency.active,
+              item_brand: '{{ product.vendor }}',
+              item_category: '{{ product.type }}',
+              item_category2: '{{ product.metafields.custom.extern_colors_filtres_.value  | join: ',' }}',
+              item_category3: '{{ product.metafields.custom.inner_color }}',
+              item_category4: '{{ product.metafields.custom.extern_material.value | join: ',' }}',
+              item_category5: '{{ product.metafields.custom.interior_materials }}',
+              item_category6: '{{ product.metafields.custom.hardware }}',
+              item_category7: productionYear,
+              item_variant: "{{ product.metafields.custom.product_condition }}",
+              item_size: [
+                "Depth: {{ product.metafields.custom.size_depth }}",
+                "Width: {{ product.metafields.custom.size_width }}",
+                "Height: {{ product.metafields.custom.size_height }}",
+              ],
+              price: {{ product.price |  divided_by: 100.0 }},
+            },
+          ],
+        });
+      })
+    {% endif %}
+  
+  
+    // Recommendation_produit
+    const suggestContainer = document.querySelector(".recommendation")
+    if(suggestContainer) {
+      const productsSugested = []
+      suggestContainer
+      .querySelectorAll('.product-js .meta-data')
+      .forEach(async (item, index) => {
+        productsSugested.push(formatData({ data: item.dataset, index: index }));
+      });
+      
+      const observerSuggest = new IntersectionObserver((entries)=>{
+        const element = entries[0].target
+        if(entries[0].isIntersecting && !element.classList.contains("is-triggered")){
+          element.classList.add("is-triggered")
+          
+          console.log('items_recommendation')
+          dataLayer.push({
+            event: 'items_recommendation',
+            ecommerce:{
+              item_list_id: 'recommendation',
+              item_list_name:
+                element.querySelector('.slider-section__title').textContent ||
+                'VOUS POURRIEZ AUSSI AIMER',
+              items: productsSugested,
+            }
+          })
+        }
+      }, { threshold: [0] })
+      
+      setTimeout(()=>{
+        observerSuggest.observe(suggestContainer)
+      }, 2000)
+    }
+    
+    const cartContainer = document.querySelector("#side-cart")
+  
+    // Recommendations produit side cart
+    const observerCartSugested = new IntersectionObserver((entries)=>{
+      const element = entries[0].target
+      if(entries[0].isIntersecting === true && !element.classList.contains("is-triggered")){
+        element.classList.add("is-triggered")
+        const metaData = element.querySelector(".meta-data")
+        const name = metaData.dataset.item_name
+
+        if(!name.includes('Cadeau') || !name.includes('Carte')){
+          console.log('items_recommendation_side_cart')
+          dataLayer.push({
+            event: 'items_recommendation_side_cart',
+            ecommerce:{
+              item_list_id: 'cart-upsell-slider',
+              item_list_name:
+                document.querySelector('.cart-upsell-title').textContent ||
+                'VOUS POURRIEZ AIMER',
+              items: [formatData({ data: metaData.dataset })],
+            }
+          })
+        }
+      }
+    }, { threshold: [0] })
+
+    document
+      .querySelectorAll('.cart-upsell .cart-upsell-container-product')
+      .forEach((item) => {
+        observerCartSugested.observe(item);
+      });
+    
+  
+    // Clic_recommendation_produit
+    document
+    .querySelectorAll('.recommendation .product-js')
+    .forEach(async (item) => {
+      const hyperlink = item.querySelector('.product-card--head');
+      const metaDataElement = item.querySelector('.meta-data');
+      hyperlink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        console.log('click_items_recommendation')
+        dataLayer.push({
+          event: 'click_items_recommendation',
+          ecommerce:{
+            item_list_id: 'recommendation',
+            item_list_name:
+              document.querySelector('.recommendation .slider-section__title')
+                .textContent || 'VOUS POURRIEZ AUSSI AIMER',
+            items: [formatData({ data: metaDataElement.dataset })],
+          }
+        })
+        window.location.href = e.currentTarget.href;
+      });
+    });
+  
+  
+    // > clic_recommendations_produits_side_cart
+    document
+    .querySelectorAll('#cart-upsell-slider .cart-upsell-container-product')
+    .forEach(async (item) => {
+      const hyperlinkImage = item.querySelector(
+        '.cart-upsell-container-product__image'
+      );
+      const hyperlinkInfo = item.querySelector(
+        '.cart-upsell-container-product__info'
+      );
+      const metaDataElement = item.querySelector('.meta-data');
+      const clickTrigger = async (e) => {
+        e.preventDefault();
+        console.log('click_items_recommendation_product_side_cart')
+        dataLayer.push({
+          event: 'click_items_recommendation_product_side_cart',
+          ecommerce:{
+            item_list_id: 'cart-upsell-slider',
+            item_list_name:
+              document.querySelector('.cart-upsell .cart-upsell-title')
+                .textContent || 'VOUS POURRIEZ AIMER',
+            items: [formatData({ data: metaDataElement.dataset })],
+          }
+        })
+        window.location.href = e.currentTarget.href;
+      };
+      hyperlinkImage.addEventListener('click', clickTrigger);
+      hyperlinkInfo.addEventListener('click', clickTrigger);
+    });
+  
+    //> Vue_page_panier
+    const cartViewEvent = (element) => {
+      let totalPrice = 0;
+      const cartItems = [];
+      document
+        .querySelectorAll(
+          '#side-cart .cartitems-js .cart-items__container .meta-data'
+        )
+        .forEach((item, index) => {
+          totalPrice += parseFloat(item.dataset.price)
+          const productData = formatData({
+            data: item.dataset,
+            index: index,
+            optional: ['item_category3', 'item_category5', 'item_category6', 'quantity', 'coupon'],
+          });
+          cartItems.push(productData);
+        });
+      if(cartItems.length > 0){
+        element?.classList.add('is-triggered');
+
+        console.log('view_cart')
+        dataLayer.push({
+          event: 'view_cart',
+          ecommerce:{
+            currency: window.Shopify.currency.active,
+            value: totalPrice,
+            items: cartItems,
+          }
+        })
+      }
+    };
+
+    const observerCart = new IntersectionObserver(
+      (entries) => {
+        const element = entries[0].target;
+        if (
+          entries[0].isIntersecting === true &&
+          !element.classList.contains('is-triggered')
+        ) {
+          cartViewEvent();
+        }
+      },
+      { threshold: [0] }
+    );
+    observerCart.observe(document.querySelector('#side-cart'));
+
+    if (window.location.pathname.includes('/cart')) {
+      cartViewEvent();
+    }
+    
+    
+    // > Newsletter
+    window.addEventListener("klaviyoForms", async function(e) { 
+      if (e.detail.type == 'submit') {
+        console.log('newsletter_subscribe')
+        dataLayer.push({
+          event: 'newsletter_subscribe',
+          newsletter_date: new Date().toISOString(),
+          email: await hash(e.detail.metaData.$email),
+        })
+      }
+    });
+  
+    //> Langues
+    document.querySelectorAll("#LanguageList .markets-js").forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault()
+        const element = e.currentTarget
+        console.log('language_selection');
+        dataLayer.push({
+          event: 'language_selection',
+          selected_language: element.dataset.value
+        });
+      })
+    })
+  
+    
+    {% if blog %}
+      //> Articles
+      {%-liquid
+        assign item_list_name = 'sections.featured_blog.view_all' | t
+        assign handle = canonical_url | split: '/'
+  
+        for tag in handle
+          if forloop.last == true
+            assign tag_handle = tag | split: '?' | first
+          endif
+        endfor
+  
+        for tag in blog.all_tags
+          assign tag_element = tag | handle
+          if tag_handle == tag_element
+            assign item_list_name = tag
+          endif
+        endfor
+      -%}
+      const articleList = [];
+  
+      document.querySelectorAll('#list-article .blog-card').forEach((item, index) => {
+        const metaData = item.querySelector('.meta-data');
+        articleList.push({
+          item_title: metaData.dataset.item_title,
+          item_index: index,
+        });
+      });
+  
+      console.log('view_article');
+      dataLayer.push({
+        event: 'view_article',
+        item_list_name: "{{ item_list_name }}",
+        items: articleList,
+      });
+      
+      // Click articles
+      document.querySelectorAll(".blog-card").forEach((item) => {
+        item.addEventListener("click", (e) => {
+          const metaData = item.querySelector(".meta-data")
+          e.preventDefault
+          console.log('select_article');
+          dataLayer.push({
+            event: 'select_article',
+            item_list_name: "{{ blog.title }}",
+            items: {
+              item_title: metaData.dataset.item_title,
+              item_index: Number(metaData.dataset.item_index),
+              item_keywords: metaData.dataset.item_keywords,
+            },
+          });
+          window.location.href = e.currentTarget.href;
+        })
+      })
+    {% endif %}
+  
+  
+    document.querySelectorAll(".main-contact__actions .contact-action-js").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        console.log('contact');
+        dataLayer.push({
+          event: 'contact',
+          selected_contact_type: e.currentTarget.dataset.action,
+        });
+      })
+    })
+  
+  });
+</script>

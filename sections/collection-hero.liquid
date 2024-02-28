@@ -1,0 +1,62 @@
+{% liquid
+  assign image = collection.image
+  assign content = collection.metafields.custom.hero_content.value
+  assign bg = collection.metafields.custom.hero_content_white.value
+  assign title_color = collection.metafields.custom.hero_color_title.value
+  assign content_color = collection.metafields.custom.hero_content_text_color.value
+
+  if collection.metafields.custom.hero_title != blank
+    assign collection_title = collection.metafields.custom.hero_title
+  else
+    assign collection_title = collection.title
+  endif
+%}
+
+{% assign img = image.src | image_url: width: 1740 %}
+
+{% render "render-image"
+  class: "collection-hero__img",
+  img_src: img,
+  img: image,
+  size: "400 700 1000 1440",
+  alt: image.alt,
+  width: "1200",
+  height: "300"
+%}
+
+<div class="collection-hero__content-wrapper">
+  <div class="collection-hero__content">
+    <span class="h1 collection-hero__title">
+      {{ collection_title }}
+    </span>
+
+    <div class="collection-hero__description">
+      {{ content }}
+    </div>
+  </div>
+</div>
+
+
+<style>
+  {% if bg %}
+    .collection-hero__content {
+      background: #fff;
+    }
+  {% endif %}
+
+  .collection-hero__title {
+    color: {{ title_color | default: '#003BC3' }};
+  }
+
+  .collection-hero__description {
+    color: {{ content_color | default: '#000' }};
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Collection hero",
+  "tag": "section",
+  "class": "collection-hero"
+}
+{% endschema %}

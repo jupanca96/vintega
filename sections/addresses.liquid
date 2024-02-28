@@ -1,0 +1,332 @@
+{% liquid
+  assign first_name = 'customer.addresses.first_name' | t
+  assign last_name = 'customer.addresses.last_name' | t
+  assign company = 'customer.addresses.company' | t
+  assign address1 = 'customer.addresses.address1' | t
+  assign address2 = 'customer.addresses.address2' | t
+  assign city = 'customer.addresses.city' | t
+  assign phone = 'customer.addresses.phone' | t
+  assign zip = 'customer.addresses.zip' | t
+%}
+
+<button
+  class="btn-1 address-js address__btn-new"
+  data-event="new"
+  data-active="true"
+  type="button"
+>
+  {{ 'customer.addresses.add_new' | t }}
+</button>
+
+<div
+  class="address__edit"
+  data-active="false"
+>
+  <span
+    class="h5 address__title"
+  >
+    {{ 'customer.addresses.add_new' | t }}
+  </span>
+
+  {% form 'customer_address', customer.new_address %}
+    <div class="grid address__form">
+      {% render 'input'
+        class: "form__textfield-notlabel",
+        type: "text",
+        name: "address[first_name]",
+        id: "AddressFirstNameNew",
+        placeholder: first_name,
+        required: true
+      %}
+
+      {% render 'input'
+        class: "form__textfield-notlabel",
+        type: "text",
+        name: "address[last_name]",
+        id: "AddressLastNameNew",
+        placeholder: last_name,
+        required: true
+      %}
+
+      {% render 'input'
+        class: "form__textfield-notlabel address__form-100",
+        type: "text",
+        name: "address[company]",
+        id: "AddressCompanyNew",
+        placeholder: company,
+        required: false
+      %}
+
+      {% render 'input'
+        class: "form__textfield-notlabel address__form-100",
+        type: "text",
+        name: "address[address1]",
+        id: "AddressAddress1New",
+        placeholder: address1,
+        required: true
+      %}
+
+      {% render 'input'
+        class: "form__textfield-notlabel address__form-100",
+        type: "text",
+        name: "address[address2]",
+        id: "AddressAddress2New",
+        placeholder: address2,
+        required: false
+      %}
+
+      <div class="form__textfield-notlabel address__form-100">
+        <select
+          id="AddressCountryNew"
+          name="address[country]"
+          autocomplete="country"
+          required
+        >
+          {{ all_country_option_tags }}
+        </select>
+      </div>
+
+      {% render 'input'
+        class: "form__textfield-notlabel address__form-100",
+        type: "text",
+        name: "address[city]",
+        id: "AddressCityNew",
+        placeholder: city,
+        required: true
+      %}
+
+      {% render 'input'
+        class: "form__textfield-notlabel address__form-100",
+        type: "number",
+        name: "address[phone]",
+        id: "AddressPhoneNew",
+        placeholder: phone,
+        required: false
+      %}
+
+      <div
+        class="address__form-100 default-checkbox"
+      >
+        {{ form.set_as_default_checkbox }}
+        <label for="address_default_address_new">
+          {{ 'customer.addresses.set_default' | t }}
+        </label>
+      </div>
+
+      <button
+        class="btn-1 address__form-100"
+        type="submit"
+      >
+        {{ 'customer.addresses.add' | t }}
+      </button>
+    </div>
+  {% endform %}
+
+  <button
+    class="btn-2 address-js address__cancel"
+    data-event='cancel'
+    type="button"
+  >
+    {{ 'customer.addresses.cancel' | t }}
+  </button>
+</div>
+
+{% paginate customer.addresses by 5 %}
+  <ul class="address__list">
+    {% for address in customer.addresses %}
+    <li>
+      <div
+        class='address__detail'
+        data-form="{{ address.id }}"
+      >
+        {% if address == customer.default_address %}
+          <span class="address__detail-badge">
+            {{ 'customer.addresses.default' | t }}
+          </span>
+        {% endif %}
+
+        {{ address | format_address }}
+      </div>
+
+      <div
+        class="grid address__actions"
+        data-form="{{ address.id }}"
+        data-active="true"
+      >
+        <form
+          method="post"
+          action="/account/addresses/{{ address.id }}"
+        >
+          <input
+            type="hidden"
+            name="_method"
+            value="delete"
+          />
+          <button
+            class="btn-1 btn_w-100"
+            class="btn-1 btn__w-100"
+            type="submit"
+          >
+            {{ 'customer.addresses.delete' | t }}
+          </button>
+        </form>
+
+        <button
+          class='address-js btn-2 modify-btn'
+          data-event='edit'
+          data-form='{{ address.id }}'
+          type="button"
+        >
+          {{ 'customer.addresses.edit' | t }}
+        </button>
+      </div>
+    </li>
+
+    <div
+      class="address__edit"
+      data-form="{{ address.id }}"
+      data-active="false"
+    >
+      <span
+        class="h5 address__title"
+      >
+        {{ 'customer.addresses.edit_address' | t }}
+      </span>
+
+      {% form 'customer_address', address %}
+        <div class="grid address__form">
+          {% render 'input'
+            class: "form__textfield-notlabel",
+            type: "text",
+            name: "address[first_name]",
+            id: "AddressFirstName",
+            placeholder: first_name,
+            value: address.first_name
+            required: true,
+          %}
+
+          {% render 'input'
+            class: "form__textfield-notlabel",
+            type: "text",
+            name: "address[last_name]",
+            id: "AddressLastName",
+            placeholder: last_name,
+            value: address.last_name,
+            required: true
+          %}
+
+          {% render 'input'
+            class: "form__textfield-notlabel address__form-100",
+            type: "text",
+            name: "address[company]",
+            id: "AddressCompany",
+            placeholder: company,
+            value: address.company,
+            required: false
+          %}
+
+          {% render 'input'
+            class: "form__textfield-notlabel address__form-100",
+            type: "text",
+            name: "address[address1]",
+            id: "AddressAddress1",
+            placeholder: address1,
+            value: address.address1,
+            required: true
+          %}
+
+          {% render 'input'
+            class: "form__textfield-notlabel address__form-100",
+            type: "text",
+            name: "address[address2]",
+            id: "AddressAddress2",
+            placeholder: address2,
+            value: address.address2,
+            required: false
+          %}
+
+          <div class="form__textfield-notlabel address__form-100">
+            <select
+              id="AddressCountry"
+              name="address[country]"
+              autocomplete="country"
+              required
+            >
+              {{ all_country_option_tags }}
+            </select>
+          </div>
+
+          {% render 'input'
+            class: "form__textfield-notlabel address__form-100",
+            type: "text",
+            name: "address[city]",
+            id: "AddressCity",
+            placeholder: city,
+            value: address.city,
+            required: true
+          %}
+
+          {% render 'input'
+            class: "form__textfield-notlabel address__form-100",
+            type: "text",
+            name: "address[phone]",
+            id: "AddressPhone",
+            placeholder: phone,
+            value: address.phone,
+            required: false
+          %}
+
+          <div
+            class="address__form-100 default-wrapper"
+          >
+            {{ form.set_as_default_checkbox }}
+            <label for="address_default_address_{{ address.id }}">
+              {{ 'customer.addresses.set_default' | t }}
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn-1 address__form-100"
+          >
+            {{ 'customer.addresses.update' | t }}
+          </button>
+        </div>
+      {% endform %}
+
+      <button
+        class="btn-2 address-js address__cancel"
+        data-form="{{ address.id }}"
+        data-event='cancel'
+        type="button"
+      >
+        {{ 'customer.addresses.cancel' | t }}
+      </button>
+    </div>
+    {% endfor %}
+  </ul>
+
+  {%- if paginate.pages > 1 -%}
+    {% render 'pagination',
+      paginate: paginate
+    %}
+  {%- endif -%}
+{% endpaginate %}
+
+
+{% schema %}
+{
+  "name": "Customer addresses",
+  "class": "customer__addresses wrapper address",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "empty_addreses",
+      "label": "Empty addreses",
+      "info": "It is the text for empty addreses",
+      "default": "Vous n'avez pas d'adresses"
+    }
+  ]
+}
+{% endschema %}

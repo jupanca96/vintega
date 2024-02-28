@@ -1,0 +1,252 @@
+<!-- eslint-disable @html-eslint/no-extra-spacing-attrs -->
+{% comment %}
+  @description: Basic structure for receiving and rendering markdown
+  @version: 1.0.beta
+  @author: Luis Avila
+
+  Accepts:
+  - markdown: {String} information
+  - class: {String} Class for the markdown block
+
+  Usage:
+  {% render 'markdown'
+    class: 'example',
+    markdown: data,
+  %}
+{% endcomment %}
+
+{% assign break = "\" %}
+{% assign dataMarkdown = markdown
+  | replace: '\u003c', '<'
+  | replace: '\n\u003c', '<'
+  | replace: '\u003e', '>'
+  | replace: '&gt;', '>'
+%}
+{% assign dataMarkdown = dataMarkdown | split: break %}
+{% assign isSubitem = false %}
+
+<div class="markdown {{ class }}">
+  {% for line in dataMarkdown %}
+    {%- comment -%}Clear some information strings{%- endcomment -%}
+    {% assign dataLine = line
+      | escape
+      | replace: '&gt;', '>'
+      | strip_html
+      | strip
+    %}
+    {%- comment -%}Identify the beginning of each line{%- endcomment -%}
+    {% assign dataLineStart = dataLine | slice: 0, 1 %}
+
+    {%- comment -%}Render header information{%- endcomment -%}
+    {% if dataLine contains "######" and dataLineStart == '#' %}
+      <h6 class="markdown--h6">{{ dataLine | remove: "######" }}</h6>
+    {% elsif dataLine contains "#####"  and dataLineStart == '#' %}
+      <h5 class="markdown--h5">{{ dataLine | remove: "#####" }}</h5>
+    {% elsif dataLine contains "####"  and dataLineStart == '#' %}
+      <h4 class="markdown--h4">{{ dataLine | remove: "####" }}</h4>
+    {% elsif dataLine contains "###" and dataLineStart == '#' %}
+      <h3 class="markdown--h3">{{ dataLine | remove: "###" }}</h3>
+    {% elsif dataLine contains "##"  and dataLineStart == '#' %}
+      <h2 class="markdown--h2">{{ dataLine | remove: "##" }}</h2>
+    {% elsif dataLine contains "#" and dataLineStart == '#' %}
+      <h1 class="markdown--h1">{{ dataLine | remove: "#" }}</h1>
+
+    {%- comment -%}Render code information as a block{%- endcomment -%}
+    {% elsif dataLine contains "```" and dataLineStart == '`' %}
+      {% assign code = line | escape %}
+      <p class="markdown--code">
+        <code>
+          {{ code
+            | remove: "```php"
+            | remove: "```html"
+            | remove: "```javascript"
+            | remove: "```bash"
+            | remove: "```"
+            | newline_to_br
+          }}
+        </code>
+      </p>
+
+    {%- comment -%}Render image information{%- endcomment -%}
+    {% elsif dataLine contains "![" and dataLineStart == '!' %}
+      {% assign imageData = dataLine | split: "](" %}
+      {% if imageData.size == 2 %}
+        {% assign image = imageData[1] | replace: '&quot;', '"' %}
+        {% assign clearImage = image | split: '"' %}
+        {% assign src =  clearImage[0] %}
+        <p class="markdown--image">
+          <img src="{{ src | remove: ')' }}"
+            {% if imageData[0] != blank %}
+              alt="{{ imageData[0] | remove: '![' }}"
+            {% endif %}
+            {% if clearImage[1] %}
+              title="{{ clearImage[1] }}"
+            {% endif %}
+          />
+        </p>
+      {% endif %}
+
+    {%- comment -%}Render link information{%- endcomment -%}
+    {% elsif dataLine contains "[" and dataLineStart == '[' %}
+      {% assign link = dataLine | split: "](" %}
+      <p class="markdown--link">
+        <a href="{{ link[1] | remove: ")" }}"
+          target="_blank" title="{{ link[0] | remove: "[" }}">
+          {{ link[0] | remove: "[" }}
+        </a>
+      </p>
+
+    {%- comment -%}Render comment information{%- endcomment -%}
+    {% elsif dataLineStart == ">" %}
+
+      {% assign blockData = dataLine | remove: ">" %}
+      {% assign blockData = blockData | split: "`" %}
+
+      {% capture strDataBlock %}
+        {% render 'markdown-line-code' lineCode: blockData %}
+      {% endcapture %}
+
+      {% assign lineItalic = strDataBlock | split: "*" %}
+      {% capture strDataString %}
+        {% render 'markdown-italic' lineItalic: lineItalic %}
+      {% endcapture %}
+
+      {% assign lineStrong = strDataBlock | split: "**" %}
+      {% capture strDataBlock %}
+        {% render 'markdown-bold' lineStrong: lineStrong %}
+      {% endcapture %}
+
+      <blockquote class="markdown--quote">
+        {{ strDataBlock }}
+      </blockquote>
+
+    {%- comment -%}Render list information{%- endcomment -%}
+    {% elsif dataLineStart == "-" %}
+      {% capture strDataBlock %}
+        <ul class="markdown--list">
+          {% assign dataList = dataLine | split: "-"  %}
+          {% for item in dataList %}
+            {%- if item != blank -%}
+              {% if item contains "__ " %}
+                {% assign futureData = dataList[forloop.index] | strip %}
+                {% assign hasItemFuture = futureData | slice: 0, 2 %}
+                {% if isSubitem == false %}
+                  <ul class="markdown--sub-item">
+                {%- endif -%}
+                {% assign isSubitem = true %}
+                  <li>{{ item | remove: "__" }}</li>
+                {% unless  hasItemFuture contains "__" %}
+                    </ul>
+                  {% assign isSubitem = false %}
+                {%- endunless  -%}
+              {% else %}
+                <li>{{ item }}</li>
+              {% endif %}
+            {%- endif -%}
+          {% endfor %}
+        </ul>
+      {% endcapture %}
+
+      {% assign lineItalic = strDataBlock | split: "*" %}
+      {% capture strDataString %}
+        {% render 'markdown-italic' lineItalic: lineItalic %}
+      {% endcapture %}
+
+      {%- comment -%}Render information in bold text{%- endcomment -%}
+      {% assign lineStrong = strDataBlock | split: "**" %}
+      {% capture strDataString %}
+        {% render 'markdown-bold' lineStrong: lineStrong %}
+      {% endcapture %}
+
+      {%- comment -%}Render code information inline{%- endcomment -%}
+      {% assign blockData = strDataString | split: "`" %}
+      {% capture strDataString %}
+        {% render 'markdown-line-code' lineCode: blockData %}
+      {% endcapture %}
+
+      {{ strDataString }}
+
+    {%- comment -%}Render information in bold and italic{%- endcomment -%}
+    {% elsif dataLine contains "***" %}
+
+      {% assign lineStrong = dataLine | remove: ">" %}
+      {% assign lineStrong = lineStrong | split: "***" %}
+
+      {% capture strDataString %}
+        {% render 'markdown-bold-italic' lineStrong: lineStrong %}
+      {% endcapture %}
+
+      {% assign blockData = strDataString | split: "`" %}
+      {% capture strDataString %}
+        {% render 'markdown-line-code' lineCode: blockData %}
+      {% endcapture %}
+
+      <p class="markdown--strong">
+        {{ strDataString }}
+      </p>
+
+    {%- comment -%}Render information in bold{%- endcomment -%}
+    {% elsif dataLine contains "**" %}
+
+      {% assign lineStrong = dataLine | remove: ">" %}
+      {% assign lineStrong = lineStrong | split: "**" %}
+
+      {% capture strDataString %}
+        {% render 'markdown-bold' lineStrong: lineStrong %}
+      {% endcapture %}
+
+      {% assign blockData = strDataString | split: "`" %}
+      {% capture strDataString %}
+        {% render 'markdown-line-code' lineCode: blockData %}
+      {% endcapture %}
+
+      <p class="markdown--strong">
+        {{ strDataString }}
+      </p>
+
+    {%- comment -%}
+      If no pattern is found, take the information as a paragraph
+    {%- endcomment -%}
+    {% elsif dataLine contains "*" %}
+
+      {% assign lineItalic = dataLine | remove: ">" %}
+      {% assign lineItalic = lineItalic | split: "*" %}
+
+      {% capture strDataString %}
+        {% render 'markdown-italic' lineItalic: lineItalic %}
+      {% endcapture %}
+
+      {% assign blockData = strDataString | split: "`" %}
+      {% capture strDataString %}
+        {% render 'markdown-line-code' lineCode: blockData %}
+      {% endcapture %}
+
+      <p class="markdown--italic">
+        {{ strDataString }}
+      </p>
+
+    {%- comment -%}
+      If no pattern is found, take the information as a paragraph
+    {%- endcomment -%}
+    {% else %}
+
+      {%- comment -%}
+        Validate if the paragraph has any inline code
+      {%- endcomment -%}
+      {% assign paragraph = dataLine | split: "`"  %}
+      {% if paragraph.size > 1 %}
+        <p class="markdown--p-code">
+          {% render 'markdown-line-code' lineCode: paragraph %}
+        </p>
+      {% else %}
+
+        {% if dataLine == "" %}
+          <br>
+        {% else %}
+          <p class="markdown--p">{{ dataLine }}</p>
+        {% endif %}
+      {% endif %}
+
+    {% endif %}
+  {% endfor %}
+</div>

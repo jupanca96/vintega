@@ -1,0 +1,312 @@
+{% if section.settings.heading != blank %}
+  <h2 class="h4 main-contact__title wrapper-xm">
+    {{ section.settings.heading }}
+  </h2>
+{% endif %}
+
+{% if section.settings.description != blank %}
+  <div class="main-contact__description wrapper-xm">
+    <div
+      tabindex="-1"
+      autofocus
+      class="form__message form__message--success hidden"
+      id="contact-error-index"
+    >
+      <!-- eslint-disable max-len -->
+      {% render 'icon-success' %} {{ 'templates.contact.form.post_success' | t }}
+      <!-- eslint-enable max-len -->
+    </div>
+
+    {{ section.settings.description }}
+  </div>
+{% endif %}
+
+{% if section.blocks.size > 0 %}
+  <div class="main-contact__actions">
+    {% for block in section.blocks %}
+      {% if block.type == "phone" %}
+        <a href="tel:+{{ block.settings.phone }}"
+          class="main-contact__button contact-action-js"
+          data-action="{{ block.type }}"
+        >
+      {% elsif block.type == "whatsapp" %}
+        <a href="https://wa.me/{{ block.settings.phone }}"
+          class="main-contact__button contact-action-js"
+          data-action="{{ block.type }}"
+        >
+      {% else %}
+        <div
+          {% if block.type == "email" %}
+            id="open-contactform-js"
+          {% endif %}
+
+          {% if block.type == "link" %}
+            data-link="{{ block.settings.link_url }}"
+          {% endif %}
+
+          data-action="{{ block.type }}"
+          class="main-contact__button contact-action-js"
+        >
+      {% endif %}
+
+        {% assign image = block.settings.icon | split: '|' | first %}
+        {% assign alt = block.settings.icon | split: '|' | last %}
+        {% assign image_src = image | append: '.svg' | file_url %}
+
+        {% render "render-image"
+          title: alt,
+          img_src: image_src,
+          size: "24",
+          alt: alt,
+          width: "24",
+          height: "22"
+        %}
+
+        <div class="text-wrapper">
+          <span class="text-wrapper__title">
+            {{ block.settings.heading }}
+          </span>
+          <span class="text-wrapper__description">
+            {{ block.settings.description }}
+          </span>
+        </div>
+
+      {% if block.type == "phone" or block.type == "whatsapp" %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %}
+
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if section.settings.icon_letter != blank %}
+  {% assign image = section.settings.icon_letter | append: '.svg' | file_url %}
+  {% render "letter-icon"
+    image: image,
+    position: 'top-left',
+    width: "200",
+    height: "271"
+  %}
+{% endif %}
+
+<div
+  id="contactform-js"
+  class="main-contact__modal modal"
+  data-active="false"
+>
+  <button
+    id="close-contactform-js"
+    class="icon-close"
+  >
+    {% render 'icon-close' %}
+  </button>
+
+  <span class="h2 main-contact__title">
+    {{ section.settings.heading_modal }}
+  </span>
+
+  {% assign topics = section.settings.topics | split: '|' %}
+  {% render 'contact-form'
+    topics: topics
+  %}
+</div>
+
+{% schema %}
+  {
+    "name": "Main contact",
+    "class": "main-contact section-space",
+    "tag": "section",
+    "templates": [
+      "page"
+    ],
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Title",
+        "default": "Comment nous contacter?"
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description",
+        "info": "It is the section description",
+        "default": "<p>Nous sommes disponibles du lundi au venredi de 9h30 a 18h30</p>"
+      },
+      {
+        "type": "text",
+        "id": "icon_letter",
+        "label": "Letter Icon stamp",
+        "info": "Only SVG format",
+        "default": "letter-stamp-rose-2"
+      },
+      {
+        "type": "text",
+        "id": "heading_modal",
+        "label": "Title modal",
+        "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      },
+      {
+        "type": "text",
+        "id": "topics",
+        "label": "Topics in form",
+        "default": "Por qui|Returns|Shipping|Custom order|Other"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "email",
+        "name": "Email button",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Title",
+            "default": "Email"
+          },
+          {
+            "type": "text",
+            "id": "icon",
+            "label": "Card svg",
+            "default": "icon-contact|Contact Vintega icon",
+            "info": "icon-contact|Description icon"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description",
+            "default": "<p>lara@vintega.fr</p>"
+          }
+        ]
+      },
+      {
+        "type": "phone",
+        "name": "Phone button",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Title",
+            "default": "Téléphone"
+          },
+          {
+            "type": "text",
+            "id": "icon",
+            "label": "Card svg",
+            "default": "icon-contact|Contact Vintega icon",
+            "info": "icon-phone|Description icon"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description",
+            "default": "<p>09 55 33 77 66</p>"
+          },
+          {
+            "type": "number",
+            "id": "phone",
+            "label": "Phone strip",
+            "default": 3142661371
+          }
+        ]
+      },
+      {
+        "type": "chat",
+        "name": "Chat button",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Title",
+            "default": "Chat"
+          },
+          {
+            "type": "text",
+            "id": "icon",
+            "label": "Card svg",
+            "default": "icon-contact|Contact Vintega icon",
+            "info": "icon-phone|Description icon"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description"
+          }
+        ]
+      },
+      {
+        "type": "whatsapp",
+        "name": "Whatsapp button",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Title",
+            "default": "Whatsapp"
+          },
+          {
+            "type": "text",
+            "id": "icon",
+            "label": "Card svg",
+            "default": "icon-contact|Contact Vintega icon",
+            "info": "icon-whatsapp|Description icon"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description",
+            "default": "<p>09 55 33 77 66</p>"
+          },
+          {
+            "type": "number",
+            "id": "phone",
+            "label": "Phone strip",
+            "default": 3142661371
+          }
+        ]
+      },
+      {
+        "type": "link",
+        "name": "Content button",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Title",
+            "default": "Le titre est ici"
+          },
+          {
+            "type": "text",
+            "id": "icon",
+            "label": "Card svg",
+            "default": "icon-contact|Contact Vintega icon",
+            "info": "icon-contact|Description icon"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description",
+            "default": "<p>It is a long established.</p>"
+          },
+          {
+            "type": "url",
+            "id": "link_url",
+            "label": "Link url",
+            "default": "/"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Main contact"
+      }
+    ]
+  }
+{% endschema %}

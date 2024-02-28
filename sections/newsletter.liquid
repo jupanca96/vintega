@@ -1,0 +1,94 @@
+<div class="wrapper-xl" id="js-newsletter">
+  <div class="newsletter__container">
+    <span class="newsletter__title h2 dddd">
+      {{ section.settings.title }}
+    </span>
+
+    {% form 'customer', class: 'newsletter-form' %}
+      <input
+        type="hidden"
+        name="contact[tags]"
+        value="newsletter"
+      />
+
+      <div class="grid newsletter-form__wrapper">
+        <div class="newsletter-form__input-wrapper">
+          <div class="form__textfield-notlabel">
+            <div class="klaviyo-form-TvKjEs" id="klaviyo-form-footer"></div>
+          </div>
+        </div>
+
+        {%- if form.errors -%}
+          <small
+            class="newsletter-form__message form__message"
+            id="Newsletter-error--{{ section.id }}"
+          >
+            <!-- eslint-disable max-len -->
+            {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+            <!-- eslint-enable max-len -->
+          </small>
+        {%- else -%}
+          <!-- eslint-disable max-len -->
+          <small
+            class="newsletter-form__message newsletter-form__message--error form__message error-js"
+            id="Newsletter-error--{{ section.id }}"
+          >
+          <!-- eslint-enable max-len -->
+
+            {{ 'newsletter.registered' | t }}
+          </small>
+        {%- endif -%}
+      </div>
+
+      {%- if form.posted_successfully? -%}
+        <!-- eslint-disable max-len -->
+        <span
+          class="newsletter-form__message newsletter-form__message--success form__message"
+          id="Newsletter-success--{{ section.id }}"
+          tabindex="-1"
+          autofocus
+        >
+          {{ 'newsletter.success' | t }}
+        </span>
+        <!-- eslint-enable max-len -->
+      {%- endif -%}
+    {% endform %}
+  </div>
+
+  {% if section.settings.stamp != blank %}
+    {% assign icon = section.settings.stamp | split: '|' %}
+    {% assign icon_url = icon | first | append: '.svg' | file_url %}
+    {% assign icon_alt = icon | last %}
+
+    {% render 'letter-icon'
+      css_class: 'newsletter__letter-stamp'
+      image: icon_url,
+      position: 'bottom-right',
+      alt: icon_alt,
+      width: "180",
+      height: "269"
+    %}
+  {% endif %}
+</div>
+
+{% schema %}
+  {
+    "name": "Newsletter",
+    "class": "newsletter",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "stamp",
+        "label": "Stamp",
+        "default": "letter-stamp-vert|Letter stamp"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Account title",
+        "default": "Inscrivez-vous à notre Newsletter et recevez jusqu'à 200€ en bon d'achat !"
+      }
+    ]
+  }
+{% endschema %}

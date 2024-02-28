@@ -1,0 +1,45 @@
+{% assign logout = 'customer.account.logout' | t %}
+
+{% render 'preload-window' %}
+
+<div class="customer" id="js-contact_account_form">
+  <h1 class="customer__title">
+    {{ 'customer.account.title' | t }}
+  </h1>
+
+  {% render 'link'
+    type: 'link'
+    class: "customer__nav-link",
+    content: logout,
+    icon_close: true
+    url: routes.account_logout_url
+  %}
+
+  <div class="customer__layout">
+
+    {% section 'account-sidebar' %}
+
+    <div class="customer__sections">
+      {% section 'customer-orders' %}
+
+      <div class="my-sales">
+        {% render 'sell-my-bag-my-account' %}
+      </div>
+
+      {% if settings.mes_alerts_enable %}
+        {% section 'mes-alerts-section' %}
+      {% endif %}
+
+      {% section 'my-wishlist' %}
+
+      <div class="account__personal-shoppers">
+        {% section 'personal-shoppers' %}
+        {% section 'calendly-button' %}
+      </div>
+
+      {% section 'newsletter-account' %}
+      {% section 'addresses' %}
+      {% section 'accordion' %}
+    </div>
+  </div>
+</div>

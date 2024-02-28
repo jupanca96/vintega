@@ -1,0 +1,23 @@
+{% assign logout = 'customer.account.logout' | t %}
+
+<div class="customer">
+  <h1 class="customer__title">
+    {{ 'customer.account.title' | t }}
+  </h1>
+
+  {% render 'link'
+    type: 'link'
+    class: "customer__nav-link",
+    content: logout,
+    icon_close: true
+    url: routes.account_logout_url
+  %}
+
+  <div class="customer__layout">
+    {% section 'account-sidebar' %}
+
+    <div class="customer__sections">
+      {% section 'addresses' %}
+    </div>
+  </div>
+</div>
