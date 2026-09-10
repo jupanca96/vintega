@@ -50,13 +50,25 @@
     {% endif %}
 
     {% if link_text != blank and link_url != blank %}
-      {% render 'link'
-        type: 'link'
-        class: {{ classname | append: '-link' }},
-        content: link_text,
-        url: link_url,
-        target: "_blank"
-      %}
+      {% render 'link', type: 'link', class: nil, append: '-link', content: link_text, url: link_url, target: "_blank" %}
     {% endif %}
   </div>
 </div>
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'link'
+            type: 'link'
+            class: {{ classname | append: '-link' }},
+            content: link_text,
+            url: link_url,
+            target: "_blank"
+          %}
+  to: '{% render ''link'', type: ''link'', class: nil, append: ''-link'', content:
+    link_text, url: link_url, target: "_blank" %}'
+  position: 1277..1392
+{% endcomment %}
